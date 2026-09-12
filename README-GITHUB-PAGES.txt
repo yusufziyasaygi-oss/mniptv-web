@@ -1,54 +1,52 @@
-MN IPTV — GitHub Pages HTTP Direct Build
-========================================
+MN IPTV WEB REV3.1 - GENERIC PROVIDERS / CACHE BUST
 
-Bu paket Netlify proxy kullanmaz. Tarayıcı IPTV sunucusuna doğrudan bağlanır:
-http://orfoz60.top:2086
+MN IPTV — GitHub Pages HTTP Direct Build — REV3
+================================================
+
+Bu sürüm TEK BİR IPTV SAĞLAYICISINA KİLİTLİ DEĞİLDİR.
+Kullanıcı kendi Xtream Codes sunucu adresi + kullanıcı adı + şifresini veya kendi M3U bağlantısını girebilir.
 
 ÖNEMLİ
-- Siteyi http://mavinokta.pro olarak aç.
+- Siteyi mümkünse http://mavinokta.pro olarak aç.
 - GitHub Pages ayarlarında "Enforce HTTPS" KAPALI kalmalı.
-- GitHub deposuna IPTV kullanıcı adı veya şifre yazma. Bu paket hiçbir kullanıcı adı/şifre içermez.
-- HTTP bağlantısı şifreli değildir. Ortak Wi-Fi üzerinde kullanma.
-- HTTP nedeniyle PWA/Service Worker ve güvenli-context gerektiren çevrimdışı indirme özellikleri devre dışıdır.
-- Favoriler, izleme geçmişi, Devam Et, dizi resume, önceki/sonraki bölüm ve player özellikleri tarayıcı yerel depolamasıyla çalışır.
+- Bir IPTV sağlayıcısı yalnızca HTTP sunuyorsa HTTPS sayfası mixed-content nedeniyle bağlantıyı engelleyebilir.
+- Bazı IPTV sağlayıcıları tarayıcı erişimine CORS izni vermez. Böyle bir sağlayıcı native iOS/macOS/Android uygulamasında çalışsa bile web sürümünde çalışmayabilir.
+- GitHub deposuna IPTV kullanıcı adı veya şifre yazılmaz. Giriş bilgileri yalnızca o tarayıcı oturumunda tutulur.
+- HTTP bağlantısı şifreli değildir; ortak Wi-Fi üzerinde hassas giriş bilgileri kullanma.
+- Favoriler, izleme geçmişi, Devam Et ve diğer kişisel kayıtlar cihazdaki tarayıcı depolamasında, IPTV hesabına göre ayrı tutulur.
 
-GITHUB PAGES KURULUMU
-1) GitHub'da yeni PUBLIC repository oluştur. Örn: mniptv-web
-2) Bu ZIP'in İÇİNDEKİ dosyaların tamamını repo köküne yükle ve Commit et.
-3) Repository > Settings > Pages
-4) Build and deployment > Source: Deploy from a branch
-5) Branch: main / (root) > Save
-6) Custom domain alanına: mavinokta.pro yaz > Save
-7) "Enforce HTTPS" seçeneğini İŞARETLEME / kapalı bırak.
+GİRİŞ SEÇENEKLERİ
+1) Xtream Codes
+   - Sunucu adresi: sağlayıcının verdiği http:// veya https:// adresi ve gerekiyorsa port
+   - Kullanıcı adı
+   - Şifre
 
-DNS — mavinokta.pro kök alan adı
-Mevcut Netlify A/ALIAS kayıtlarını kaldır ve şu 4 A kaydını ekle:
-@  A  185.199.108.153
-@  A  185.199.109.153
-@  A  185.199.110.153
-@  A  185.199.111.153
+2) M3U
+   - Sağlayıcının verdiği tam M3U URL'si
 
-İstersen www için:
-www  CNAME  KULLANICI-ADIN.github.io
+REV3 (3.2.0)
+- orfoz60.top / 2086 sabit sağlayıcı kilidi tamamen kaldırıldı.
+- Girilen Xtream sunucu adresi dinamik olarak kullanılır.
+- player_api.php, XMLTV/EPG ve canlı/film/dizi medya URL'leri bağlı hesabın kendi sunucusundan oluşturulur.
+- http ve https Xtream sunucuları desteklenir.
+- Kullanıcı sunucu alanına player_api.php / get.php / xmltv.php adresi yapıştırırsa temel sunucu yolu otomatik ayıklanır.
+- Sağlayıcının allowed_output_formats bilgisinde m3u8 varsa canlı yayınlarda m3u8 tercih edilir; yoksa ts kullanılabilir. Tarayıcı codec/container desteği yine sağlayıcıya göre değişebilir.
+- Bağlantı başarısızlığında CORS / yanlış adres / port olasılığı daha açık hata mesajıyla gösterilir.
+- Önceki hesabın favori/geçmiş anahtarı korunacak şekilde hesap kimliği hostname + kullanıcı adı üzerinden oluşturulur.
 
-DNS oturduktan sonra mutlaka:
-http://mavinokta.pro
-ile aç. https:// değil.
-
-GİRİŞ
-Sunucu adresi: http://orfoz60.top:2086
-Kullanıcı adı ve şifre: kendi IPTV hesabın.
-
-
-REV1 (3.1.0)
-- Yayınlar varsayılan olarak yüzen mini player'da açılır.
-- Oynatıcıdaki büyüt düğmesiyle tam ekran benzeri büyük moda geçilir, tekrar küçültülebilir.
-- Mobil navigasyon 5 ana sekmeye indirildi; diğer bölümler sağ üstteki ••• menüsünde.
-- Büyük kataloglar parça parça çizilir (Daha Fazla Göster), arama debounce kullanır.
-- EPG işleme ana thread yerine Web Worker'da yapılır; mobilde ağır blur efektleri azaltıldı.
-- Posterler lazy/async decode edilir.
-
-REV2:
+REV2
 - Canlı TV / Filmler / Diziler sayfalarında bölüm içi arama.
 - Kategoriler üstte yatay butonlar yerine kart/listeler halinde gösterilir.
 - Kategori seçilince yalnızca o kategorinin içerikleri açılır.
+
+REV1
+- Yüzen mini player + büyüt/küçült.
+- Mobil navigasyon sadeleştirmeleri.
+- Büyük kataloglarda parça parça çizim, arama debounce, EPG Web Worker, lazy poster.
+
+GITHUB PAGES GÜNCELLEME
+Mevcut repo kullanılıyorsa bu ZIP'in içindeki dosyaları repo köküne yükle ve aynı adlı dosyaların üzerine yazıp Commit et.
+DNS veya CNAME'i değiştirme.
+
+
+REV3.1: app.js ve styles.css dosya adları değiştirildi; Safari/GitHub Pages eski REV1 dosyasını önbellekten kullanamasın diye asset adları cache-bust edildi.
