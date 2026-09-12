@@ -47,3 +47,8 @@ REV1 (3.1.0)
 - Büyük kataloglar parça parça çizilir (Daha Fazla Göster), arama debounce kullanır.
 - EPG işleme ana thread yerine Web Worker'da yapılır; mobilde ağır blur efektleri azaltıldı.
 - Posterler lazy/async decode edilir.
+
+REV2:
+- Canlı TV / Filmler / Diziler sayfalarında bölüm içi arama.
+- Kategoriler üstte yatay butonlar yerine kart/listeler halinde gösterilir.
+- Kategori seçilince yalnızca o kategorinin içerikleri açılır.

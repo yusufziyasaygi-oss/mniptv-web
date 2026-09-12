@@ -557,7 +557,7 @@
           <header class="topbar">
             <div class="mobile-brand"><div class="brand-mark"><span>M</span><i></i></div></div>
             <div class="page-heading"><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>
-            ${state.route==='search' ? `<div class="search-box"><input id="globalSearch" value="${esc(state.query)}" placeholder="Film, dizi veya kanal ara…" autocomplete="off"><span>⌕</span></div>` : ''}
+            ${['live','movies','series','search'].includes(state.route) ? `<div class="search-box"><input id="globalSearch" value="${esc(state.query)}" placeholder="${state.route==='live'?'Kanal ara…':state.route==='movies'?'Film ara…':state.route==='series'?'Dizi ara…':'Film, dizi veya kanal ara…'}" autocomplete="off"><span>⌕</span></div>` : ''}
             <div class="top-actions">${state.offlineMode?'<span class="chip active">Çevrimdışı</span>':''}<button id="mobileMoreButton" class="mobile-more-button ${mobilePrimaryNav.has(state.route)?'':'active'}" type="button" aria-label="Diğer bölümler" title="Diğer">•••</button></div>
           </header>
           <div id="pageContent" class="content"></div>
@@ -635,11 +635,40 @@
 
   function renderCatalogPage(section) {
     const cats = state.categories[section] || [];
+    const q = normalized(state.query);
+    const browsingCategory = state.category !== 'all';
+
+    // Kategori ekranı artık üstte yatay chip olarak değil, içerik kartlarıyla aynı
+    // akışta bir ızgara olarak görünür. Arama yazılınca doğrudan o bölümdeki
+    // içerikler aranır; kategori seçilmişse arama yalnızca o kategori içinde kalır.
+    if (!browsingCategory && !q) {
+      if (!cats.length) return emptyState('Kategori bulunamadı','Bu bölümde gösterilecek kategori yok.');
+      return `<div class="catalog-intro"><strong>${esc(sectionLabel(section))} kategorileri</strong><span>Bir kategori seç; içerikler burada listelensin.</span></div>
+        <div class="category-grid">${cats.map(c=>renderCategoryCard(c,section)).join('')}</div>`;
+    }
+
     const allItems = filteredCatalog(section);
     const items = allItems.slice(0,state.pageLimit);
     const more = allItems.length>items.length ? `<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more> Daha Fazla Göster (${allItems.length-items.length}) </button></div>` : '';
-    return `<div class="category-row"><button class="chip ${state.category==='all'?'active':''}" data-category="all">Tümü</button>${cats.map(c=>`<button class="chip ${state.category===c.name?'active':''}" data-category="${esc(c.name)}">${esc(c.name)} · ${c.count}</button>`).join('')}</div>
-      ${items.length ? `<div class="media-grid ${section==='live'?'live-grid':''}">${items.map(renderCard).join('')}</div>${more}` : emptyState('İçerik bulunamadı','Bu kategoride gösterilecek içerik yok.')}`;
+    const heading = browsingCategory ? state.category : `“${state.query.trim()}” arama sonuçları`;
+    const sub = browsingCategory
+      ? `${allItems.length} içerik${q ? ' · kategori içinde arama' : ''}`
+      : `${allItems.length} sonuç · tüm ${sectionLabel(section).toLocaleLowerCase('tr-TR')} içinde`;
+
+    return `<div class="catalog-selection-bar">
+        <button class="secondary-button compact category-back-button" data-category-back>← Kategoriler</button>
+        <div><strong>${esc(heading)}</strong><span>${esc(sub)}</span></div>
+      </div>
+      ${items.length ? `<div class="media-grid ${section==='live'?'live-grid':''}">${items.map(renderCard).join('')}</div>${more}` : emptyState('İçerik bulunamadı',q?'Aramana uyan içerik yok.':'Bu kategoride gösterilecek içerik yok.')}`;
+  }
+
+  function renderCategoryCard(category, section) {
+    const icon = section==='live' ? '▣' : section==='movies' ? '◆' : '▤';
+    return `<button class="category-card" type="button" data-category="${esc(category.name)}" aria-label="${esc(category.name)}">
+      <span class="category-card-icon">${icon}</span>
+      <span class="category-card-copy"><strong>${esc(category.name)}</strong><small>${category.count} içerik</small></span>
+      <span class="category-card-arrow">›</span>
+    </button>`;
   }
 
   function filteredCatalog(section) {
@@ -739,7 +768,8 @@
 
   function bindPageActions(root){
     $$('[data-route-inline]',root).forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.routeInline)));
-    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;resetPageLimit();renderPage();}));
+    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;state.query='';const input=$('#globalSearch');if(input)input.value='';resetPageLimit();renderPage();}));
+    $$('[data-category-back]',root).forEach(b=>b.addEventListener('click',()=>{state.category='all';state.query='';const input=$('#globalSearch');if(input)input.value='';resetPageLimit();renderPage();}));
     $$('[data-load-more]',root).forEach(b=>b.addEventListener('click',()=>{state.pageLimit+=pageStep();renderPage();}));
     $$('[data-action]',root).forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();await handleAction(b.dataset.action,b.dataset.id);}));
   }
