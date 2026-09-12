@@ -38,3 +38,12 @@ ile aç. https:// değil.
 GİRİŞ
 Sunucu adresi: http://orfoz60.top:2086
 Kullanıcı adı ve şifre: kendi IPTV hesabın.
+
+
+REV1 (3.1.0)
+- Yayınlar varsayılan olarak yüzen mini player'da açılır.
+- Oynatıcıdaki büyüt düğmesiyle tam ekran benzeri büyük moda geçilir, tekrar küçültülebilir.
+- Mobil navigasyon 5 ana sekmeye indirildi; diğer bölümler sağ üstteki ••• menüsünde.
+- Büyük kataloglar parça parça çizilir (Daha Fazla Göster), arama debounce kullanır.
+- EPG işleme ana thread yerine Web Worker'da yapılır; mobilde ağır blur efektleri azaltıldı.
+- Posterler lazy/async decode edilir.

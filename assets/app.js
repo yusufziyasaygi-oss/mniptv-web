@@ -55,6 +55,11 @@
     downloadJobs: new Map(),
     sourceMode: 'xtream',
     longPress: null,
+    pageLimit: window.innerWidth <= 700 ? 40 : 72,
+    searchDebounce: null,
+    epgLoaded: false,
+    epgLoading: false,
+    epgSchedule: null,
   };
 
   const storage = {
@@ -93,8 +98,10 @@
   function sectionLabel(section) { return section === 'live' ? 'Canlı TV' : section === 'movies' ? 'Filmler' : 'Diziler'; }
   function iconFor(section) { return section === 'live' ? '▣' : section === 'movies' ? '◆' : '▤'; }
   function isOnline() { return navigator.onLine !== false; }
+  function pageStep() { return window.innerWidth <= 700 ? 40 : 72; }
+  function resetPageLimit() { state.pageLimit = pageStep(); }
 
-  const STATIC_GATEWAY_VERSION = '3.0.0-github-http-direct';
+  const STATIC_GATEWAY_VERSION = '3.1.0-web-rev1';
   const PROVIDER_HOSTNAME = 'orfoz60.top';
   const PROVIDER_HOST = 'orfoz60.top:2086';
   const PRIVATE_SESSION_KEY = 'mniptv:provider-session:v2';
@@ -424,7 +431,7 @@
           indexCatalog();
           state.loading = false;
           renderApp();
-          if (cached.epg) setTimeout(loadEPG, 3500);
+          if (cached.epg && state.route==='live') scheduleEPG(700);
           return;
         }
       } catch {}
@@ -442,7 +449,7 @@
       state.loading = false;
       renderApp();
       if (Array.isArray(result.warnings) && result.warnings.length) toast('Katalog kısmen yüklendi', 'Sağlayıcının reddettiği bölümler otomatik atlandı.');
-      if (result.epg) setTimeout(loadEPG, 3500);
+      if (result.epg && state.route==='live') scheduleEPG(700);
     } catch (e) {
       state.loading = false;
       const offline = availableOfflineSource();
@@ -452,13 +459,22 @@
   }
 
   function indexCatalog() {
-    state.itemById = new Map(state.catalog.map(item => [item.id, item]));
+    state.itemById = new Map();
     state.categories = {live:[],movies:[],series:[]};
-    for (const section of Object.keys(state.categories)) {
-      const counts = new Map();
-      state.catalog.filter(x=>x.section===section).forEach(x=>counts.set(x.group || 'Diğer',(counts.get(x.group||'Diğer')||0)+1));
-      state.categories[section] = [...counts.entries()].sort((a,b)=>a[0].localeCompare(b[0],'tr')).map(([name,count])=>({name,count}));
+    const counts = {live:new Map(),movies:new Map(),series:new Map()};
+    for (const item of state.catalog) {
+      state.itemById.set(item.id,item);
+      Object.defineProperty(item,'_search',{value:normalized(`${item.name || ''} ${item.group || ''}`),writable:true,configurable:true,enumerable:false});
+      if (counts[item.section]) {
+        const group=item.group||'Diğer';
+        counts[item.section].set(group,(counts[item.section].get(group)||0)+1);
+      }
     }
+    for (const section of Object.keys(state.categories)) {
+      state.categories[section] = [...counts[section].entries()].sort((a,b)=>a[0].localeCompare(b[0],'tr')).map(([name,count])=>({name,count}));
+    }
+    state.epgLoaded=false; state.epgLoading=false; state.epg.clear();
+    resetPageLimit();
   }
 
   function renderLogin(offlineInfo = null, error = '') {
@@ -519,6 +535,7 @@
     ['home','⌂','Ana Sayfa'],['live','▣','Canlı TV'],['movies','◆','Filmler'],['series','▤','Diziler'],
     ['continue','↻','Devam Et'],['favorites','★','Favoriler'],['downloads','↓','İndirilenler'],['search','⌕','Arama'],['settings','⚙','Ayarlar']
   ];
+  const mobilePrimaryNav = new Set(['home','live','movies','series','search']);
 
   function routeInfo() {
     const map = {
@@ -533,7 +550,7 @@
       <div class="layout">
         <aside class="sidebar">
           <div class="sidebar-brand"><div class="brand-mark"><span>M</span><i></i></div><strong>MN IPTV</strong></div>
-          <nav class="nav-list">${navItems.map(([id,icon,label])=>`<button class="nav-button ${state.route===id?'active':''}" data-route="${id}"><span class="nav-icon">${icon}</span><span class="nav-label">${label}</span></button>`).join('')}</nav>
+          <nav class="nav-list">${navItems.map(([id,icon,label])=>`<button class="nav-button ${state.route===id?'active':''} ${mobilePrimaryNav.has(id)?'mobile-primary':'mobile-secondary'}" data-route="${id}"><span class="nav-icon">${icon}</span><span class="nav-label">${label}</span></button>`).join('')}</nav>
           <div class="sidebar-footer"><div class="source-pill"><small>${state.offlineMode?'Çevrimdışı':'Bağlı kaynak'}</small><strong>${esc(state.source?.name||'MN IPTV')}</strong></div></div>
         </aside>
         <main class="main">
@@ -541,19 +558,32 @@
             <div class="mobile-brand"><div class="brand-mark"><span>M</span><i></i></div></div>
             <div class="page-heading"><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>
             ${state.route==='search' ? `<div class="search-box"><input id="globalSearch" value="${esc(state.query)}" placeholder="Film, dizi veya kanal ara…" autocomplete="off"><span>⌕</span></div>` : ''}
-            <div class="top-actions">${state.offlineMode?'<span class="chip active">Çevrimdışı</span>':''}</div>
+            <div class="top-actions">${state.offlineMode?'<span class="chip active">Çevrimdışı</span>':''}<button id="mobileMoreButton" class="mobile-more-button ${mobilePrimaryNav.has(state.route)?'':'active'}" type="button" aria-label="Diğer bölümler" title="Diğer">•••</button></div>
           </header>
           <div id="pageContent" class="content"></div>
         </main>
       </div>`;
     $$('[data-route]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.route)));
-    $('#globalSearch')?.addEventListener('input',e=>{state.query=e.target.value; renderPage();});
+    $('#mobileMoreButton')?.addEventListener('click',openMobileNav);
+    $('#globalSearch')?.addEventListener('input',e=>{
+      state.query=e.target.value; resetPageLimit(); clearTimeout(state.searchDebounce);
+      state.searchDebounce=setTimeout(renderPage,140);
+    });
     renderPage();
   }
 
   function navigate(route) {
     state.route = route; state.category='all'; if(route!=='search') state.query='';
+    resetPageLimit();
     history.replaceState(null,'',`#${route}`); renderApp();
+    if(route==='live') scheduleEPG(500);
+  }
+
+  function openMobileNav(){
+    const extra=navItems.filter(([id])=>!mobilePrimaryNav.has(id));
+    contextLayer.hidden=false;
+    contextMenu.innerHTML=extra.map(([id,icon,label])=>`<button type="button" data-mobile-route="${id}"><span style="display:inline-block;width:28px">${icon}</span>${esc(label)}</button>`).join('');
+    $$('[data-mobile-route]',contextMenu).forEach(b=>b.addEventListener('click',()=>{const route=b.dataset.mobileRoute;closeContext();navigate(route);}));
   }
 
   function renderPage() {
@@ -605,14 +635,16 @@
 
   function renderCatalogPage(section) {
     const cats = state.categories[section] || [];
-    const items = filteredCatalog(section);
+    const allItems = filteredCatalog(section);
+    const items = allItems.slice(0,state.pageLimit);
+    const more = allItems.length>items.length ? `<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more> Daha Fazla Göster (${allItems.length-items.length}) </button></div>` : '';
     return `<div class="category-row"><button class="chip ${state.category==='all'?'active':''}" data-category="all">Tümü</button>${cats.map(c=>`<button class="chip ${state.category===c.name?'active':''}" data-category="${esc(c.name)}">${esc(c.name)} · ${c.count}</button>`).join('')}</div>
-      ${items.length ? `<div class="media-grid ${section==='live'?'live-grid':''}">${items.map(renderCard).join('')}</div>` : emptyState('İçerik bulunamadı','Bu kategoride gösterilecek içerik yok.')}`;
+      ${items.length ? `<div class="media-grid ${section==='live'?'live-grid':''}">${items.map(renderCard).join('')}</div>${more}` : emptyState('İçerik bulunamadı','Bu kategoride gösterilecek içerik yok.')}`;
   }
 
   function filteredCatalog(section) {
     const q=normalized(state.query);
-    return state.catalog.filter(i=>i.section===section && (state.category==='all'||i.group===state.category) && (!q || normalized(`${i.name} ${i.group}`).includes(q)));
+    return state.catalog.filter(i=>i.section===section && (state.category==='all'||i.group===state.category) && (!q || (i._search||normalized(`${i.name} ${i.group}`)).includes(q)));
   }
 
   function renderContinue() {
@@ -643,8 +675,10 @@
 
   function renderSearch() {
     const q=normalized(state.query); if(!q) return emptyState('Ne izlemek istiyorsun?','Yukarıdaki arama alanına film, dizi, bölüm veya kanal adı yaz.');
-    const items=state.catalog.filter(i=>normalized(`${i.name} ${i.group}`).includes(q)).slice(0,300);
-    return items.length?`<div class="media-grid">${items.map(renderCard).join('')}</div>`:emptyState('Sonuç bulunamadı','Arama kelimelerini değiştirip tekrar dene.');
+    const all=state.catalog.filter(i=>(i._search||normalized(`${i.name} ${i.group}`)).includes(q));
+    const items=all.slice(0,state.pageLimit);
+    const more=all.length>items.length?`<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more>Daha Fazla Göster (${all.length-items.length})</button></div>`:'';
+    return items.length?`<div class="media-grid">${items.map(renderCard).join('')}</div>${more}`:emptyState('Sonuç bulunamadı','Arama kelimelerini değiştirip tekrar dene.');
   }
 
   function renderDownloads() {
@@ -684,7 +718,7 @@
     const subtitle=live?(epg?.now?.title||item.group):(item._resumeEpisode?`S${item._resumeEpisode.season||0} E${item._resumeEpisode.episode||0} · ${fmtTime(item._resumeEpisode.position)}`:item.group);
     const pct=h&&h.duration>0?clamp(h.position/h.duration*100,0,100):0;
     return `<article class="media-card ${live?'live-card':''}" tabindex="0" data-card-id="${esc(item.id)}">
-      <div class="poster">${img?`<img loading="lazy" src="${esc(img)}" alt="${esc(item.name)}" onerror="this.remove()">`:`<div class="poster-fallback">${esc(item.name)}</div>`}${live?'<span class="card-badge">CANLI</span>':''}${downloaded?'<span class="card-badge downloaded-badge">↓ İNDİRİLDİ</span>':''}<div class="card-play"><span>▶</span></div></div>
+      <div class="poster">${img?`<img loading="lazy" decoding="async" fetchpriority="low" src="${esc(img)}" alt="${esc(item.name)}" onerror="this.remove()">`:`<div class="poster-fallback">${esc(item.name)}</div>`}${live?'<span class="card-badge">CANLI</span>':''}${downloaded?'<span class="card-badge downloaded-badge">↓ İNDİRİLDİ</span>':''}<div class="card-play"><span>▶</span></div></div>
       <div class="card-meta"><div class="card-title">${esc(item.name)}</div><div class="card-subtitle">${esc(subtitle||sectionLabel(item.section))}</div>${pct>0?`<div class="progress-track"><i style="width:${pct}%"></i></div>`:''}</div>
     </article>`;
   }
@@ -705,7 +739,8 @@
 
   function bindPageActions(root){
     $$('[data-route-inline]',root).forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.routeInline)));
-    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;renderPage();}));
+    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;resetPageLimit();renderPage();}));
+    $$('[data-load-more]',root).forEach(b=>b.addEventListener('click',()=>{state.pageLimit+=pageStep();renderPage();}));
     $$('[data-action]',root).forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();await handleAction(b.dataset.action,b.dataset.id);}));
   }
 
@@ -841,19 +876,48 @@
     $('#logoutButton')?.addEventListener('click',async()=>{try{await api('session.php',{method:'DELETE'});}catch{}state.connected=false;state.catalog=[];state.itemById.clear();renderLogin(availableOfflineSource());});
   }
 
+  function scheduleEPG(delay=600){
+    if(state.epgLoaded||state.epgLoading||state.offlineMode)return;
+    clearTimeout(state.epgSchedule);
+    state.epgSchedule=setTimeout(()=>{if(state.route==='live')loadEPG();},delay);
+  }
+
+  function parseEPGWorker(buffer,wantedIds,now){
+    return new Promise((resolve,reject)=>{
+      const code=`self.onmessage=e=>{
+        const {buffer,wanted,now}=e.data;
+        const text=new TextDecoder().decode(buffer);
+        const wantedSet=new Set(wanted);
+        const out={};
+        const parseTime=raw=>{const m=String(raw||'').match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})?\s*([+-])(\d{2})(\d{2})?/);if(!m)return 0;let t=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0));const off=((+m[8])*60+(+m[9]||0))*60000;return m[7]==='+'?t-off:t+off;};
+        const decode=s=>String(s||'').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,'$1').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(+n));
+        const re=/<programme\b([^>]*)>([\s\S]*?)<\/programme>/gi;let m;
+        while((m=re.exec(text))){const attrs=m[1],body=m[2];const ch=(attrs.match(/\bchannel=["']([^"']+)["']/i)||[])[1];if(!ch||!wantedSet.has(ch))continue;const start=parseTime((attrs.match(/\bstart=["']([^"']+)["']/i)||[])[1]);const stop=parseTime((attrs.match(/\bstop=["']([^"']+)["']/i)||[])[1]);if(!start||!stop||stop<now-60000||start>now+8*3600000)continue;const title=decode((body.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||'Program').trim();(out[ch]||(out[ch]=[])).push({start,stop,title});}
+        const result={};for(const ch of wanted){const a=(out[ch]||[]).sort((x,y)=>x.start-y.start);const cur=a.find(p=>p.start<=now&&p.stop>now)||null;const next=a.find(p=>p.start>(cur?.start||now))||null;if(cur||next)result[ch]={now:cur,next};}
+        self.postMessage(result);
+      };`;
+      const url=URL.createObjectURL(new Blob([code],{type:'text/javascript'}));
+      const worker=new Worker(url);
+      worker.onmessage=e=>{URL.revokeObjectURL(url);worker.terminate();resolve(e.data||{});};
+      worker.onerror=e=>{URL.revokeObjectURL(url);worker.terminate();reject(e);};
+      worker.postMessage({buffer,wanted:wantedIds,now},[buffer]);
+    });
+  }
+
   async function loadEPG(){
-    if(state.offlineMode||!state.catalog.some(i=>i.section==='live'&&i.tvgId))return;
+    if(state.epgLoaded||state.epgLoading||state.offlineMode||!state.catalog.some(i=>i.section==='live'&&i.tvgId))return;
+    state.epgLoading=true;
     try{
       const source=privateSource();if(!source)return;let epgUrl='';
       if(source.type==='xtream')epgUrl=`http://${PROVIDER_HOST}/xmltv.php?username=${encodeURIComponent(source.username)}&password=${encodeURIComponent(source.password)}`;
       else if(source.epgUrl){try{epgUrl=providerProxyUrl(source.epgUrl);}catch{return;}}
-      if(!epgUrl)return;const res=await fetch(epgUrl,{cache:'no-store',credentials:'omit'});if(!res.ok)return;const text=await res.text();if(text.length>64*1024*1024)return;
-      const wanted=new Map();state.catalog.filter(i=>i.section==='live'&&i.tvgId).forEach(i=>{if(!wanted.has(i.tvgId))wanted.set(i.tvgId,[]);wanted.get(i.tvgId).push(i.id);});
-      const doc=new DOMParser().parseFromString(text,'application/xml');const now=Date.now();const byChannel=new Map();
-      for(const p of doc.querySelectorAll('programme')){const ch=p.getAttribute('channel');if(!wanted.has(ch))continue;const start=parseXmltvTime(p.getAttribute('start')),stop=parseXmltvTime(p.getAttribute('stop'));if(!start||!stop||stop<now-60000||start>now+8*3600000)continue;const title=p.querySelector('title')?.textContent?.trim()||'Program';if(!byChannel.has(ch))byChannel.set(ch,[]);byChannel.get(ch).push({start,stop,title});}
-      state.epg.clear();for(const [tvg,ids] of wanted){const programs=(byChannel.get(tvg)||[]).sort((a,b)=>a.start-b.start);const current=programs.find(p=>p.start<=now&&p.stop>now);const next=programs.find(p=>p.start>(current?.start||now));for(const id of ids)state.epg.set(id,{now:current,next});}
-      if(state.route==='live'||state.route==='home')renderPage();
-    }catch(e){console.warn('EPG',e);}
+      if(!epgUrl)return;const res=await fetch(epgUrl,{cache:'no-store',credentials:'omit'});if(!res.ok)return;const buffer=await res.arrayBuffer();if(buffer.byteLength>64*1024*1024)return;
+      const wanted=new Map();for(const i of state.catalog){if(i.section==='live'&&i.tvgId){if(!wanted.has(i.tvgId))wanted.set(i.tvgId,[]);wanted.get(i.tvgId).push(i.id);}}
+      const parsed=await parseEPGWorker(buffer,[...wanted.keys()],Date.now());
+      state.epg.clear();for(const [tvg,ids] of wanted){const data=parsed[tvg];if(!data)continue;for(const id of ids)state.epg.set(id,data);}
+      state.epgLoaded=true;
+      if(state.route==='live')renderPage();
+    }catch(e){console.warn('EPG',e);}finally{state.epgLoading=false;}
   }
   function parseXmltvTime(raw){if(!raw)return 0;const m=String(raw).match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})?\s*([+-])(\d{2})(\d{2})?/);if(!m)return 0;let t=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0));const off=((+m[8])*60+(+m[9]||0))*60000;return m[7]==='+'?t-off:t+off;}
 
@@ -888,7 +952,15 @@
   }
 
   function destroyHls(){if(state.hls){try{state.hls.destroy();}catch{}state.hls=null;}}
-  function stopPlayback(hide=true){if(state.currentItem)recordProgress(true);clearTimeout(state.controlsTimer);destroyHls();const v=playerEls.video;try{v.pause();v.removeAttribute('src');v.load();}catch{}state.currentItem=null;state.currentEpisodes=[];state.currentEpisodeIndex=-1;if(hide)playerEls.layer.hidden=true;playerEls.trackMenu.hidden=true;}
+  function setPlayerExpanded(expanded){
+    playerEls.layer.classList.toggle('expanded',!!expanded);
+    document.body.classList.toggle('player-expanded',!!expanded);
+    playerEls.fullscreen.textContent=expanded?'↙':'⛶';
+    playerEls.fullscreen.setAttribute('aria-label',expanded?'Oynatıcıyı küçült':'Oynatıcıyı büyüt');
+    playerEls.fullscreen.title=expanded?'Küçült':'Büyüt';
+    showControls(true);
+  }
+  function stopPlayback(hide=true){if(state.currentItem)recordProgress(true);clearTimeout(state.controlsTimer);destroyHls();const v=playerEls.video;try{v.pause();v.removeAttribute('src');v.load();}catch{}state.currentItem=null;state.currentEpisodes=[];state.currentEpisodeIndex=-1;if(hide){playerEls.layer.hidden=true;setPlayerExpanded(false);}playerEls.trackMenu.hidden=true;}
   function showPlayerError(message){playerEls.loading.hidden=true;playerEls.error.hidden=false;playerEls.errorText.textContent=message;showControls(true);}
   function updatePlayButton(){playerEls.play.textContent=playerEls.video.paused?'▶':'❚❚';}
   function updateEpisodeButtons(){const i=state.currentEpisodeIndex,n=state.currentEpisodes.length;playerEls.prev.disabled=!(i>0);playerEls.next.disabled=!(i>=0&&i<n-1);playerEls.prev.style.display=n?'grid':'none';playerEls.next.style.display=n?'grid':'none';}
@@ -912,6 +984,7 @@
     playerEls.volume.addEventListener('input',()=>{v.volume=+playerEls.volume.value;v.muted=false;updateMute();});
     playerEls.mute.addEventListener('click',()=>{v.muted=!v.muted;updateMute();});
     playerEls.fullscreen.addEventListener('click',toggleFullscreen);playerEls.pip.addEventListener('click',togglePiP);
+    $('#playerBackdrop')?.addEventListener('click',()=>setPlayerExpanded(false));
     playerEls.audio.addEventListener('click',()=>openTrackMenu('audio'));playerEls.subtitle.addEventListener('click',()=>openTrackMenu('subtitle'));
     playerEls.retry.addEventListener('click',()=>{const item=state.currentItem;if(item)startPlayback(item,{resume:true});});
     playerEls.nextUpButton.addEventListener('click',()=>playAdjacent(1));
@@ -922,10 +995,11 @@
     v.addEventListener('ended',()=>{recordProgress(true);if(state.currentEpisodeIndex>=0&&state.currentEpisodeIndex<state.currentEpisodes.length-1){const n=state.currentEpisodes[state.currentEpisodeIndex+1];playerEls.nextUpTitle.textContent=n.name;playerEls.nextUp.hidden=false;showControls(true);}else{showControls(true);}});
     v.addEventListener('error',()=>{if(v.error)showPlayerError(`Tarayıcı bu yayını oynatamadı (kod ${v.error.code}). Kaynak codec/container biçimi web ile uyumlu olmayabilir.`);});
     playerEls.player.addEventListener('click',e=>{if(e.target.closest('button,input,.track-menu,.next-up'))return;toggleControls();});
+    playerEls.player.addEventListener('dblclick',e=>{if(e.target.closest('button,input,.track-menu,.next-up'))return;setPlayerExpanded(!playerEls.layer.classList.contains('expanded'));});
     playerEls.controls.addEventListener('pointermove',()=>showControls());
   }
   function updateMute(){playerEls.mute.textContent=playerEls.video.muted||playerEls.video.volume===0?'🔇':'🔊';}
-  async function toggleFullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else await playerEls.player.requestFullscreen();}catch{toast('Tam ekran açılamadı');}}
+  async function toggleFullscreen(){ setPlayerExpanded(!playerEls.layer.classList.contains('expanded')); }
   async function togglePiP(){const v=playerEls.video;try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else if(v.requestPictureInPicture)await v.requestPictureInPicture();else if(v.webkitSupportsPresentationMode){v.webkitSetPresentationMode(v.webkitPresentationMode==='picture-in-picture'?'inline':'picture-in-picture');}else toast('PiP desteklenmiyor','Bu tarayıcı Picture in Picture özelliğini sunmuyor.');}catch{toast('PiP açılamadı','Tarayıcı önce oynatıcıya dokunmanı isteyebilir.');}}
 
   function updateTrackButtons(){const h=state.hls;playerEls.audio.style.opacity=h?.audioTracks?.length>1?'1':'.55';playerEls.subtitle.style.opacity=h?.subtitleTracks?.length?'1':'.55';}
@@ -947,7 +1021,7 @@
   function bindGlobalEvents(){
     bindPlayer();
     $('#modalBackdrop')?.addEventListener('click',closeModal);$('#contextBackdrop')?.addEventListener('click',closeContext);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!contextLayer.hidden)closeContext();else if(!modalLayer.hidden)closeModal();else if(!playerEls.layer.hidden)stopPlayback(true);}if(!playerEls.layer.hidden&&e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement?.tagName)){e.preventDefault();playerEls.video.paused?playerEls.video.play():playerEls.video.pause();}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!contextLayer.hidden)closeContext();else if(!modalLayer.hidden)closeModal();else if(!playerEls.layer.hidden){if(playerEls.layer.classList.contains('expanded'))setPlayerExpanded(false);else stopPlayback(true);}}if(!playerEls.layer.hidden&&e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement?.tagName)){e.preventDefault();playerEls.video.paused?playerEls.video.play():playerEls.video.pause();}});
     document.addEventListener('visibilitychange',async()=>{if(document.hidden&&state.settings.autoPiP&&!playerEls.layer.hidden&&!playerEls.video.paused){try{if(!document.pictureInPictureElement&&playerEls.video.requestPictureInPicture)await playerEls.video.requestPictureInPicture();}catch{}}});
     window.addEventListener('beforeunload',()=>recordProgress(true));
     window.addEventListener('online',()=>toast('İnternet bağlantısı geri geldi'));window.addEventListener('offline',()=>toast('Çevrimdışısın','İndirilen içerikler oynatılabilir.'));
