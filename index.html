@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05070b">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MN IPTV">
+  <meta name="description" content="MN IPTV — kişisel IPTV kaynakların için modern web oynatıcı.">
+  <title>MN IPTV</title>
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="assets/styles.css?v=9-github-http">
+</head>
+<body>
+  <div id="app" class="app-shell" aria-live="polite">
+    <div class="boot-screen">
+      <div class="brand-mark" aria-hidden="true"><span>M</span><i></i></div>
+      <strong>MN IPTV</strong>
+      <div class="boot-spinner"></div>
+    </div>
+  </div>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="playerLayer" class="player-layer" hidden>
+    <div id="playerBackdrop" class="player-backdrop"></div>
+    <section id="player" class="player" aria-label="Video oynatıcı">
+      <video id="video" playsinline preload="metadata"></video>
+      <div id="playerShade" class="player-shade"></div>
+
+      <div id="playerControls" class="player-controls visible">
+        <div class="player-topbar">
+          <button id="playerClose" class="icon-button glass" type="button" aria-label="Oynatıcıyı kapat">✕</button>
+          <div class="player-title-wrap">
+            <div id="playerEyebrow" class="eyebrow"></div>
+            <div id="playerTitle" class="player-title">MN IPTV</div>
+          </div>
+          <div class="player-top-actions">
+            <button id="audioButton" class="icon-button glass" type="button" aria-label="Ses parçası" title="Ses parçası">♫</button>
+            <button id="subtitleButton" class="icon-button glass" type="button" aria-label="Altyazı" title="Altyazı">CC</button>
+            <button id="pipButton" class="icon-button glass" type="button" aria-label="Resim içinde resim" title="Resim içinde resim">▣</button>
+          </div>
+        </div>
+
+        <div class="player-center-controls">
+          <button id="prevEpisodeButton" class="round-control episode-control" type="button" aria-label="Önceki bölüm" title="Önceki bölüm">⏮</button>
+          <button id="rewindButton" class="round-control secondary" type="button" aria-label="10 saniye geri">−10</button>
+          <button id="playPauseButton" class="round-control primary" type="button" aria-label="Oynat veya duraklat">▶</button>
+          <button id="forwardButton" class="round-control secondary" type="button" aria-label="10 saniye ileri">+10</button>
+          <button id="nextEpisodeButton" class="round-control episode-control" type="button" aria-label="Sonraki bölüm" title="Sonraki bölüm">⏭</button>
+        </div>
+
+        <div class="player-bottombar">
+          <div class="timeline-row">
+            <span id="currentTime" class="time-label">00:00</span>
+            <input id="seekBar" class="seek-bar" type="range" min="0" max="1000" value="0" step="1" aria-label="İlerleme">
+            <span id="durationTime" class="time-label">00:00</span>
+          </div>
+          <div class="player-bottom-actions">
+            <div id="liveBadge" class="live-badge" hidden><i></i> CANLI</div>
+            <div class="volume-wrap">
+              <button id="muteButton" class="icon-button bare" type="button" aria-label="Sesi aç veya kapat">🔊</button>
+              <input id="volumeBar" class="volume-bar" type="range" min="0" max="1" value="1" step="0.05" aria-label="Ses düzeyi">
+            </div>
+            <div class="spacer"></div>
+            <button id="fullscreenButton" class="icon-button bare" type="button" aria-label="Tam ekran">⛶</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="playerLoading" class="player-loading" hidden>
+        <div class="boot-spinner"></div>
+        <span>Yayın yükleniyor…</span>
+      </div>
+
+      <div id="playerError" class="player-error" hidden>
+        <strong>Yayın açılamadı</strong>
+        <p id="playerErrorText">Bu içerik tarayıcı tarafından oynatılamadı.</p>
+        <button id="retryPlayerButton" class="primary-button" type="button">Yeniden dene</button>
+      </div>
+
+      <div id="trackMenu" class="track-menu" hidden></div>
+      <div id="nextUp" class="next-up" hidden>
+        <span>Sıradaki</span>
+        <strong id="nextUpTitle"></strong>
+        <button id="nextUpButton" class="primary-button compact" type="button">Sonraki Bölüm</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="modalLayer" class="modal-layer" hidden>
+    <div id="modalBackdrop" class="modal-backdrop"></div>
+    <section id="modal" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section>
+  </div>
+
+  <div id="contextLayer" class="context-layer" hidden>
+    <div id="contextBackdrop" class="context-backdrop"></div>
+    <div id="contextMenu" class="context-menu" role="menu"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js" defer></script>
+  <script src="assets/app.js?v=9-github-http" defer></script>
+</body>
+</html>
