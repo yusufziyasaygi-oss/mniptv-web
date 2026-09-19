@@ -1,260 +1,120 @@
-name: Build REAL MN IPTV Native Apps
+name: Build MN IPTV macOS Web Parity
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - '.github/workflows/mniptv-native-build.yml'
-
-permissions:
-  contents: read
+      - '.github/workflows/mniptv-macos-web-parity.yml'
 
 env:
-  SOURCE_ZIP_ID: 1sFb6fL1MGloMQaS-RlAkm_XQUoxjel1F
-  SOURCE_ZIP_SHA256: a2437e344f184b4fe06556070f0334efba3c8232c491e8b62e1a67b5f89c8afc
+  SOURCE_ZIP_ID: 1YjHGpsyj6u4C_3nO8ofni_1Jg2bELyRy
+  SOURCE_ZIP_SHA256: 854a82fdcfa427e04ebad428f392e1661bf0ee5bc8dde7b6475f1c559289a863
 
 jobs:
-  android:
-    name: Android TV + Android phone
-    runs-on: ubuntu-latest
-    timeout-minutes: 50
-    steps:
-      - name: Download verified MN IPTV native sources
-        shell: bash
-        run: |
-          set -euxo pipefail
-          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o native.zip
-          echo "${SOURCE_ZIP_SHA256}  native.zip" | sha256sum -c -
-          unzip -q native.zip
-          grep -R '^package com.mavinokta.mniptv' native_ci_inputs/android/common-src/com/mavinokta/mniptv/*.kt >/dev/null
-          ! grep -R -E 'io\.github\.jqssun\.airplay|com\.mavinokta\.mncast' native_ci_inputs/android/common-src
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
-
-      - name: Install Android platform/build tools
-        shell: bash
-        run: |
-          set -euxo pipefail
-          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
-          test -x "$SDKMANAGER"
-          "$SDKMANAGER" --version
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
-
-      - name: Build release APKs from MN IPTV Kotlin source
-        working-directory: native_ci_inputs/android
-        shell: bash
-        run: |
-          set -euxo pipefail
-          gradle :tv:assembleRelease :mobile:assembleRelease --no-daemon --stacktrace --max-workers=2 '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8'
-          mkdir -p ../../android-out/signing-tools/lib
-          cp tv/build/outputs/apk/release/tv-release-unsigned.apk ../../android-out/MN-IPTV-TV-unsigned.apk
-          cp mobile/build/outputs/apk/release/mobile-release-unsigned.apk ../../android-out/MN-IPTV-Android-unsigned.apk
-          cp "$ANDROID_HOME/build-tools/35.0.0/apksigner" ../../android-out/signing-tools/
-          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" ../../android-out/signing-tools/lib/
-          chmod +x ../../android-out/signing-tools/apksigner
-
-      - name: Prove both APKs are MN IPTV, not MN Cast/AirPlay
-        shell: bash
-        run: |
-          set -euxo pipefail
-          for apk in android-out/MN-IPTV-*-unsigned.apk; do
-            "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | tee "$apk.badging.txt"
-            grep -q "package: name='com.mavinokta.mniptv'" "$apk.badging.txt"
-            "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 -v 4 "$apk"
-            unzip -p "$apk" 'classes*.dex' | strings > "$apk.dexstrings.txt"
-            grep -q 'com/mavinokta/mniptv' "$apk.dexstrings.txt"
-            ! grep -Eq 'io/github/jqssun/airplay|com/mavinokta/mncast' "$apk.dexstrings.txt"
-          done
-          # TV must be a true universal APK: ARM 32/64 + x86 32/64.
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            unzip -l android-out/MN-IPTV-TV-unsigned.apk | grep -q "lib/${abi}/libvlc.so"
-          done
-          # Phone release intentionally keeps the two physical-device ARM ABIs.
-          for abi in arm64-v8a armeabi-v7a; do
-            unzip -l android-out/MN-IPTV-Android-unsigned.apk | grep -q "lib/${abi}/libvlc.so"
-          done
-          ! unzip -l android-out/MN-IPTV-Android-unsigned.apk | grep -Eq 'lib/(x86|x86_64)/libvlc\.so'
-          sha256sum android-out/*.apk > android-out/SHA256SUMS-UNSIGNED.txt
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MN-IPTV-Android-UNSIGNED
-          path: |
-            android-out/MN-IPTV-TV-unsigned.apk
-            android-out/MN-IPTV-TV-unsigned.apk.badging.txt
-            android-out/MN-IPTV-Android-unsigned.apk
-            android-out/MN-IPTV-Android-unsigned.apk.badging.txt
-            android-out/SHA256SUMS-UNSIGNED.txt
-            android-out/signing-tools/
-          if-no-files-found: error
-          retention-days: 7
-
-  windows:
-    name: Windows x64
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Download verified MN IPTV native sources
-        shell: bash
-        run: |
-          set -euxo pipefail
-          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o native.zip
-          echo "${SOURCE_ZIP_SHA256}  native.zip" | sha256sum -c -
-          unzip -q native.zip
-          grep -q 'appName    = "MN IPTV"' native_ci_inputs/windows/main.go
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.23.x'
-
-      - name: Build real Win32 MN IPTV app
-        working-directory: native_ci_inputs/windows
-        shell: bash
-        run: |
-          set -euxo pipefail
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags='-s -w -H=windowsgui' -o ../../MN-IPTV-Windows.exe .
-          file ../../MN-IPTV-Windows.exe
-          strings ../../MN-IPTV-Windows.exe | grep -q 'MN IPTV'
-          strings ../../MN-IPTV-Windows.exe | grep -q 'player_api.php'
-          sha256sum ../../MN-IPTV-Windows.exe > ../../MN-IPTV-Windows.exe.sha256
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MN-IPTV-Windows
-          path: |
-            MN-IPTV-Windows.exe
-            MN-IPTV-Windows.exe.sha256
-          if-no-files-found: error
-          retention-days: 7
-
-  mac-arm64:
+  arm64:
     name: macOS Apple Silicon
     runs-on: macos-15
     timeout-minutes: 60
     steps:
-      - name: Download verified MN IPTV native sources
+      - name: Download verified 1.4.0 native source
         shell: bash
         run: |
           set -euxo pipefail
-          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o native.zip
-          echo "${SOURCE_ZIP_SHA256}  native.zip" | shasum -a 256 -c -
-          unzip -q native.zip
-          grep -q 'com.mavinokta.iptv' native_ci_inputs/macos/Info.plist
-          grep -q '1.3.1' native_ci_inputs/macos/Info.plist
-          ! grep -R -E 'WKWebView|WebView' native_ci_inputs/macos/Sources native_ci_inputs/macos/Native
+          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
+          echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
+          unzip -q source.zip
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.0'
+          ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
-      - name: Install libmpv build dependency
+      - name: Install native libmpv
         run: brew install mpv
 
-      - name: Build real Swift/AppKit/libmpv app
-        working-directory: native_ci_inputs/macos
+      - name: Build and verify arm64 app
+        working-directory: MN-IPTV
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 https://curl.se/ca/cacert.pem -o "$RUNNER_TEMP/cacert.pem"
           MAVI_CA_FILE="$RUNNER_TEMP/cacert.pem" bash scripts/build.sh
-          codesign --verify --deep --strict 'build/MN IPTV.app'
-          file 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
-          lipo -archs 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV' | grep -q arm64
-          bash scripts/create-dmg.sh
-          cp build/MN-IPTV.dmg build/MN-IPTV-Apple-Silicon.dmg
-          shasum -a 256 build/MN-IPTV-Apple-Silicon.dmg > build/MN-IPTV-Apple-Silicon.dmg.sha256
-          tar -czf build/MN-IPTV-Apple-Silicon.app.tgz -C build 'MN IPTV.app'
+          APP='build/MN IPTV.app'
+          codesign --verify --deep --strict "$APP"
+          file "$APP/Contents/MacOS/MaviNoktaIPTV"
+          lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | grep -q arm64
+          tar -czf build/MN-IPTV-arm64.app.tgz -C build 'MN IPTV.app'
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-Apple-Silicon
-          path: |
-            native_ci_inputs/macos/build/MN-IPTV-Apple-Silicon.dmg
-            native_ci_inputs/macos/build/MN-IPTV-Apple-Silicon.dmg.sha256
-            native_ci_inputs/macos/build/MN-IPTV-Apple-Silicon.app.tgz
+          name: MN-IPTV-macOS-Web-Parity-arm64
+          path: MN-IPTV/build/MN-IPTV-arm64.app.tgz
           if-no-files-found: error
           retention-days: 7
 
-  mac-intel:
+  intel:
     name: macOS Intel
     runs-on: macos-15-intel
     timeout-minutes: 60
     steps:
-      - name: Download verified MN IPTV native sources
+      - name: Download verified 1.4.0 native source
         shell: bash
         run: |
           set -euxo pipefail
-          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o native.zip
-          echo "${SOURCE_ZIP_SHA256}  native.zip" | shasum -a 256 -c -
-          unzip -q native.zip
-          grep -q 'com.mavinokta.iptv' native_ci_inputs/macos/Info.plist
-          grep -q '1.3.1' native_ci_inputs/macos/Info.plist
-          ! grep -R -E 'WKWebView|WebView' native_ci_inputs/macos/Sources native_ci_inputs/macos/Native
+          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
+          echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
+          unzip -q source.zip
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.0'
+          ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
-      - name: Install libmpv build dependency
+      - name: Install native libmpv
         run: brew install mpv
 
-      - name: Build real Swift/AppKit/libmpv app
-        working-directory: native_ci_inputs/macos
+      - name: Build and verify x86_64 app
+        working-directory: MN-IPTV
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 https://curl.se/ca/cacert.pem -o "$RUNNER_TEMP/cacert.pem"
           MAVI_CA_FILE="$RUNNER_TEMP/cacert.pem" bash scripts/build.sh
-          codesign --verify --deep --strict 'build/MN IPTV.app'
-          file 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
-          lipo -archs 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV' | grep -q x86_64
-          bash scripts/create-dmg.sh
-          cp build/MN-IPTV.dmg build/MN-IPTV-Intel.dmg
-          shasum -a 256 build/MN-IPTV-Intel.dmg > build/MN-IPTV-Intel.dmg.sha256
-          tar -czf build/MN-IPTV-Intel.app.tgz -C build 'MN IPTV.app'
+          APP='build/MN IPTV.app'
+          codesign --verify --deep --strict "$APP"
+          file "$APP/Contents/MacOS/MaviNoktaIPTV"
+          lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | grep -q x86_64
+          tar -czf build/MN-IPTV-intel.app.tgz -C build 'MN IPTV.app'
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-Intel
-          path: |
-            native_ci_inputs/macos/build/MN-IPTV-Intel.dmg
-            native_ci_inputs/macos/build/MN-IPTV-Intel.dmg.sha256
-            native_ci_inputs/macos/build/MN-IPTV-Intel.app.tgz
+          name: MN-IPTV-macOS-Web-Parity-intel
+          path: MN-IPTV/build/MN-IPTV-intel.app.tgz
           if-no-files-found: error
           retention-days: 7
 
-  mac-universal:
-    name: macOS Universal DMG
-    needs: [mac-arm64, mac-intel]
+  universal:
+    name: macOS Universal Web-Parity DMG
+    needs: [arm64, intel]
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: MN-IPTV-macOS-Apple-Silicon
+          name: MN-IPTV-macOS-Web-Parity-arm64
           path: arm-artifact
       - uses: actions/download-artifact@v4
         with:
-          name: MN-IPTV-macOS-Intel
+          name: MN-IPTV-macOS-Web-Parity-intel
           path: intel-artifact
 
-      - name: Merge both real native apps into one Universal 2 app
+      - name: Merge native apps into Universal 2 and make DMG
         shell: bash
         run: |
           set -euxo pipefail
           mkdir arm intel universal stage
-          tar -xzf arm-artifact/MN-IPTV-Apple-Silicon.app.tgz -C arm
-          tar -xzf intel-artifact/MN-IPTV-Intel.app.tgz -C intel
+          tar -xzf arm-artifact/MN-IPTV-arm64.app.tgz -C arm
+          tar -xzf intel-artifact/MN-IPTV-intel.app.tgz -C intel
           ditto 'arm/MN IPTV.app' 'universal/MN IPTV.app'
           ARM='arm/MN IPTV.app'
           INTEL='intel/MN IPTV.app'
           OUT='universal/MN IPTV.app'
 
-          # Merge every Mach-O that has the same bundle-relative path on both architectures.
-          # A few Homebrew libraries can carry different versioned filenames on Intel/ARM;
-          # those are paired below and copied under both names so each slice resolves its own load path.
           find "$ARM/Contents" -type f -print0 | while IFS= read -r -d '' f; do
             rel="${f#$ARM/}"
             other="$INTEL/$rel"
@@ -275,29 +135,20 @@ jobs:
             pattern="$1"
             arm_file="$(find "$ARM/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
             intel_file="$(find "$INTEL/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
-            test -n "$arm_file"
-            test -n "$intel_file"
-            arm_base="$(basename "$arm_file")"
-            intel_base="$(basename "$intel_file")"
+            test -n "$arm_file"; test -n "$intel_file"
+            arm_base="$(basename "$arm_file")"; intel_base="$(basename "$intel_file")"
             if [ "$arm_base" != "$intel_base" ]; then
               tmp="$RUNNER_TEMP/${arm_base}.alias-universal.$$"
               lipo -create "$arm_file" "$intel_file" -output "$tmp"
               cp "$tmp" "$OUT/Contents/Frameworks/$arm_base"
               cp "$tmp" "$OUT/Contents/Frameworks/$intel_base"
               chmod +x "$OUT/Contents/Frameworks/$arm_base" "$OUT/Contents/Frameworks/$intel_base" || true
-              echo "Aliased $arm_base <-> $intel_base"
             fi
           }
-
           merge_versioned_alias_pair 'libx265.*.dylib'
           merge_versioned_alias_pair 'libluajit-5.1.*.dylib'
 
-          # Every Intel framework filename must now exist in the universal bundle.
-          for f in "$INTEL/Contents/Frameworks"/*; do
-            test -e "$OUT/Contents/Frameworks/$(basename "$f")"
-          done
-
-          # Every Mach-O we ship must contain both slices.
+          for f in "$INTEL/Contents/Frameworks"/*; do test -e "$OUT/Contents/Frameworks/$(basename "$f")"; done
           find "$OUT/Contents" -type f -print0 | while IFS= read -r -d '' f; do
             if file "$f" | grep -q 'Mach-O'; then
               archs="$(lipo -archs "$f")"
@@ -315,6 +166,7 @@ jobs:
           lipo -archs "$OUT/Contents/MacOS/MaviNoktaIPTV" | tee universal-archs.txt
           grep -q arm64 universal-archs.txt
           grep -q x86_64 universal-archs.txt
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist" | grep -q '^1.4.0$'
 
           ditto "$OUT" 'stage/MN IPTV.app'
           ln -s /Applications stage/Applications
@@ -324,7 +176,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-Universal
+          name: MN-IPTV-macOS-Web-Parity-Universal
           path: |
             MN-IPTV-macOS.dmg
             MN-IPTV-macOS.dmg.sha256
