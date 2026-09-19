@@ -8,8 +8,8 @@ on:
       - '.github/workflows/mniptv-macos-web-parity.yml'
 
 env:
-  SOURCE_ZIP_ID: 1sd7kvoDewpiYhMlkQys1LI_Wr_J0sspT
-  SOURCE_ZIP_SHA256: 25eb7b2fa9b5d30d855fb11410481cf6a30f6db264e9fe1e81b5e33084b46b92
+  SOURCE_ZIP_ID: 1AJpoG0XTovZIvaEFDxWKCcJyqKa2IjEF
+  SOURCE_ZIP_SHA256: a94345aa9ddeed00a6b2ca0d6c287de0219092b79355f442773e86c1050726c0
 
 jobs:
   arm64:
@@ -17,14 +17,14 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     steps:
-      - name: Download verified 1.4.0 native source
+      - name: Download verified 1.4.2 native source
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
           echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.1'
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.2'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
       - name: Install native libmpv
@@ -55,14 +55,14 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 60
     steps:
-      - name: Download verified 1.4.0 native source
+      - name: Download verified 1.4.2 native source
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
           echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.1'
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.2'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
       - name: Install native libmpv
@@ -166,7 +166,7 @@ jobs:
           lipo -archs "$OUT/Contents/MacOS/MaviNoktaIPTV" | tee universal-archs.txt
           grep -q arm64 universal-archs.txt
           grep -q x86_64 universal-archs.txt
-          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist" | grep -q '^1.4.0$'
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist" | grep -q '^1.4.2$'
 
           ditto "$OUT" 'stage/MN IPTV.app'
           ln -s /Applications stage/Applications
