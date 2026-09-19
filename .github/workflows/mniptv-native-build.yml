@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 env:
-  SOURCE_ZIP_ID: 1qhomzJm6cfKLtU9ny-Mp9Zj0-oWCcXpA
-  SOURCE_ZIP_SHA256: f5040be21d67e6a7e61235f5e1810c34f2ee5ced6815c9853067815e334d97d2
+  SOURCE_ZIP_ID: 1sFb6fL1MGloMQaS-RlAkm_XQUoxjel1F
+  SOURCE_ZIP_SHA256: a2437e344f184b4fe06556070f0334efba3c8232c491e8b62e1a67b5f89c8afc
 
 jobs:
   android:
@@ -75,6 +75,15 @@ jobs:
             grep -q 'com/mavinokta/mniptv' "$apk.dexstrings.txt"
             ! grep -Eq 'io/github/jqssun/airplay|com/mavinokta/mncast' "$apk.dexstrings.txt"
           done
+          # TV must be a true universal APK: ARM 32/64 + x86 32/64.
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            unzip -l android-out/MN-IPTV-TV-unsigned.apk | grep -q "lib/${abi}/libvlc.so"
+          done
+          # Phone release intentionally keeps the two physical-device ARM ABIs.
+          for abi in arm64-v8a armeabi-v7a; do
+            unzip -l android-out/MN-IPTV-Android-unsigned.apk | grep -q "lib/${abi}/libvlc.so"
+          done
+          ! unzip -l android-out/MN-IPTV-Android-unsigned.apk | grep -Eq 'lib/(x86|x86_64)/libvlc\.so'
           sha256sum android-out/*.apk > android-out/SHA256SUMS-UNSIGNED.txt
 
       - uses: actions/upload-artifact@v4
