@@ -1,9 +1,11 @@
-MN IPTV Web — FINAL NATIVE CONTROLS
+MN IPTV FINAL DOWNLOAD LINK UPDATE — 2026-09-20
 
-- Custom fullscreen button/logic is no longer used by the UI.
-- HTML5 <video controls> is enabled permanently.
-- Fullscreen is delegated to Safari/Firefox/Chrome/iOS native video controls.
-- Custom center controls and custom bottom bar are hidden so they cannot intercept native controls.
-- Audio/subtitle/PiP/close actions in the top bar are preserved.
-- Legacy CSS page-expansion mode is neutralized and cannot act as fake fullscreen.
-- Asset names changed to app-native.js / styles-native.css for cache busting.
+- Eski/gecersiz APK ve DMG Drive dosyalari kaldirildi.
+- Android ve Android TV gercek Kotlin/Compose kaynaklarindan GitHub Actions ile derlendi.
+- Android APK'lari MN IPTV kalici release anahtariyla v1/v2/v3 imzalandi.
+- Android paket kimligi com.mavinokta.mniptv olarak dogrulandi.
+- MN Cast/AirPlay kodu bulunmadigi derlenmis DEX uzerinden kontrol edildi.
+- macOS gercek Swift/AppKit/libmpv kaynagindan Intel + Apple Silicon Universal 2 DMG olarak derlendi ve hdiutil ile dogrulandi.
+- Windows gercek MN IPTV Win32/Go kaynagindan derlendi.
+- Tum site indirme butonlari yeni Google Drive dosya kimliklerine yonlendirildi.
+- SHA256 baglantisi guncellendi.

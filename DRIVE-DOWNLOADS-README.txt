@@ -1,11 +1,15 @@
-MN IPTV — GitHub Pages + Google Drive indirme yapisi
-Tarih: 2026-09-19
+MN IPTV — Google Drive downloads
 
-Bu deploy paketinde APK/DMG/EXE dosyalari bulunmaz.
-Site indirme butonlari Google Drive klasorundeki dosyalara yonlendirilir.
-Boylece GitHub Pages dosya boyutu sinirina takilmaz.
+Bu GitHub Pages paketinde kurulum dosyalari depolanmaz.
+Indirme butonlari dogrudan asagidaki paylasilan Google Drive klasorundeki dogrulanmis MN IPTV dosyalarina gider:
 
-Drive klasoru:
+- MN-IPTV-Android.apk
+- MN-IPTV-TV.apk
+- MN-IPTV-macOS.dmg
+- MN-IPTV-Windows.exe
+- SHA256SUMS.txt
+
+Google Drive klasoru:
 https://drive.google.com/drive/folders/11c3Przq6kToYaGbhasYtZPJI0R9BOIa3?usp=sharing
 
-GitHub Pages'e bu ZIP'in ICINDEKILERI yukleyin.
+Android APK'lari arm64-v8a + armeabi-v7a fiziksel cihaz ABI'larini icerir ve MN IPTV release anahtariyla v1/v2/v3 imzalidir.

@@ -535,10 +535,10 @@
           <section class="public-download-card" aria-label="MN IPTV uygulamalarını indir">
             <div class="public-download-head"><div><strong>MN IPTV uygulamasını indir</strong><span>Platformunu seç ve doğrudan indir.</span></div></div>
             <div class="public-download-links">
-              <a href="https://drive.google.com/uc?export=download&id=1VV9_5Qp1lzwDMQli7qL8JIQwevEsu2RV" target="_blank" rel="noopener"><b></b><span><strong>macOS</strong><small>DMG</small></span></a>
-              <a href="https://drive.google.com/uc?export=download&id=1sIc-dNrvV7H19rQlAuaqfE9o_diJDTXP" target="_blank" rel="noopener"><b>⊞</b><span><strong>Windows</strong><small>EXE</small></span></a>
-              <a href="https://drive.google.com/uc?export=download&id=19h1O1fetzXTT-RjEqim6C8HtMfgSztat" target="_blank" rel="noopener"><b>◆</b><span><strong>Android</strong><small>APK</small></span></a>
-              <a href="https://drive.google.com/uc?export=download&id=1uc1mY4mtVhaIJW2nsjQOLdjIWB85G1Ki" target="_blank" rel="noopener"><b>▣</b><span><strong>Android TV</strong><small>APK</small></span></a>
+              <a href="https://drive.google.com/uc?export=download&id=1yeSmAepFYs56tFeIKL47TXqDmzlGTzSA" target="_blank" rel="noopener"><b></b><span><strong>macOS</strong><small>DMG</small></span></a>
+              <a href="https://drive.google.com/uc?export=download&id=1Fjbz7yuP1ZqrQ9y-rcz1aHUfoTLrwaM-" target="_blank" rel="noopener"><b>⊞</b><span><strong>Windows</strong><small>EXE</small></span></a>
+              <a href="https://drive.google.com/uc?export=download&id=1rQVpw3qMEZHoT6Lvf1ywjaJgwqQEsDwY" target="_blank" rel="noopener"><b>◆</b><span><strong>Android</strong><small>APK</small></span></a>
+              <a href="https://drive.google.com/uc?export=download&id=12Bne0unAR8b1pfVdwAXGKgxJlEPM8xiv" target="_blank" rel="noopener"><b>▣</b><span><strong>Android TV</strong><small>APK</small></span></a>
             </div>
           </section>
         </section>
@@ -758,14 +758,14 @@
 
   function renderApps(){
     const apps=[
-      {name:'macOS',file:'https://drive.google.com/uc?export=download&id=1VV9_5Qp1lzwDMQli7qL8JIQwevEsu2RV',format:'DMG',icon:'',desc:'Mac için masaüstü uygulaması'},
-      {name:'Windows',file:'https://drive.google.com/uc?export=download&id=1sIc-dNrvV7H19rQlAuaqfE9o_diJDTXP',format:'EXE',icon:'⊞',desc:'Windows için masaüstü uygulaması'},
-      {name:'Android',file:'https://drive.google.com/uc?export=download&id=19h1O1fetzXTT-RjEqim6C8HtMfgSztat',format:'APK',icon:'◆',desc:'Android telefon ve tabletler için'},
-      {name:'Android TV',file:'https://drive.google.com/uc?export=download&id=1uc1mY4mtVhaIJW2nsjQOLdjIWB85G1Ki',format:'APK',icon:'▣',desc:'Android TV ve Google TV için'}
+      {name:'macOS',file:'https://drive.google.com/uc?export=download&id=1yeSmAepFYs56tFeIKL47TXqDmzlGTzSA',format:'DMG',icon:'',desc:'Mac için masaüstü uygulaması'},
+      {name:'Windows',file:'https://drive.google.com/uc?export=download&id=1Fjbz7yuP1ZqrQ9y-rcz1aHUfoTLrwaM-',format:'EXE',icon:'⊞',desc:'Windows için masaüstü uygulaması'},
+      {name:'Android',file:'https://drive.google.com/uc?export=download&id=1rQVpw3qMEZHoT6Lvf1ywjaJgwqQEsDwY',format:'APK',icon:'◆',desc:'Android telefon ve tabletler için'},
+      {name:'Android TV',file:'https://drive.google.com/uc?export=download&id=12Bne0unAR8b1pfVdwAXGKgxJlEPM8xiv',format:'APK',icon:'▣',desc:'Android TV ve Google TV için'}
     ];
     return `<section class="apps-download-hero"><div><span class="eyebrow">MN IPTV</span><h2>Cihazına kur</h2><p>Platformunu seç. Kurulum dosyası Google Drive üzerinden indirilir.</p></div></section>
       <div class="apps-download-grid">${apps.map(a=>`<a class="app-download-card" href="${a.file}" target="_blank" rel="noopener"><div class="app-download-icon">${a.icon}</div><div class="app-download-copy"><strong>${a.name}</strong><span>${a.desc}</span><small>${a.format} · İndirmek için tıkla</small></div><div class="app-download-arrow">↓</div></a>`).join('')}</div>
-      <section class="settings-card apps-download-note"><h3>Kurulum dosyaları</h3><p>Bu sayfadaki bağlantılar MN IPTV dağıtım dosyalarını Google Drive üzerinden indirir. Web sürümünü kullanmaya devam etmek istersen herhangi bir şey indirmen gerekmez.</p><a class="checksum-link" href="https://drive.google.com/uc?export=download&id=1OHzRhx3zYgM84Py-2pxgHY04tecZiOgh" target="_blank" rel="noopener">SHA-256 doğrulama dosyasını indir</a></section>`;
+      <section class="settings-card apps-download-note"><h3>Kurulum dosyaları</h3><p>Bu sayfadaki bağlantılar MN IPTV dağıtım dosyalarını Google Drive üzerinden indirir. Web sürümünü kullanmaya devam etmek istersen herhangi bir şey indirmen gerekmez.</p><a class="checksum-link" href="https://drive.google.com/uc?export=download&id=1cYRhqEJqC6Uzyb4T_QHZrZsHcvzPRnKa" target="_blank" rel="noopener">SHA-256 doğrulama dosyasını indir</a></section>`;
   }
 
   function renderSettings(){
