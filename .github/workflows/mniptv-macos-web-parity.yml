@@ -7,9 +7,13 @@ on:
     paths:
       - '.github/workflows/mniptv-macos-web-parity.yml'
 
+concurrency:
+  group: mniptv-macos-web-parity
+  cancel-in-progress: true
+
 env:
-  SOURCE_ZIP_ID: 1ChL1ko-ZJQlrphYPrwx_2K4NeJuWlWUM
-  SOURCE_ZIP_SHA256: c11dfcf8f6b29beef93865831f57cc3d96042fdd74a2391c5a198588eabe16d5
+  # Stable Drive object. Its bytes can be replaced in-place without changing this workflow.
+  SOURCE_ZIP_ID: 1c9rDVm-2e8lp-81epimIDWIMcqwLq9rw
 
 jobs:
   arm64:
@@ -17,15 +21,19 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     steps:
-      - name: Download verified 1.4.3 native source
+      - name: Download latest native source
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
-          echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
+          shasum -a 256 source.zip | tee source-sha256.txt
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.3'
+          test -f 'MN-IPTV/Info.plist'
+          test -f 'MN-IPTV/scripts/build.sh'
+          test -d 'MN-IPTV/Sources'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist' | tee source-version.txt
+          swiftc -frontend -parse MN-IPTV/Sources/*.swift
 
       - name: Install native libmpv
         run: brew install mpv
@@ -41,12 +49,17 @@ jobs:
           codesign --verify --deep --strict "$APP"
           file "$APP/Contents/MacOS/MaviNoktaIPTV"
           lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | grep -q arm64
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist" > build/app-version.txt
           tar -czf build/MN-IPTV-arm64.app.tgz -C build 'MN IPTV.app'
+          cp ../source-sha256.txt build/source-sha256.txt
 
       - uses: actions/upload-artifact@v4
         with:
           name: MN-IPTV-macOS-Web-Parity-arm64
-          path: MN-IPTV/build/MN-IPTV-arm64.app.tgz
+          path: |
+            MN-IPTV/build/MN-IPTV-arm64.app.tgz
+            MN-IPTV/build/app-version.txt
+            MN-IPTV/build/source-sha256.txt
           if-no-files-found: error
           retention-days: 7
 
@@ -55,15 +68,19 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 60
     steps:
-      - name: Download verified 1.4.3 native source
+      - name: Download latest native source
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
-          echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
+          shasum -a 256 source.zip | tee source-sha256.txt
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.3'
+          test -f 'MN-IPTV/Info.plist'
+          test -f 'MN-IPTV/scripts/build.sh'
+          test -d 'MN-IPTV/Sources'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist' | tee source-version.txt
+          swiftc -frontend -parse MN-IPTV/Sources/*.swift
 
       - name: Install native libmpv
         run: brew install mpv
@@ -79,12 +96,17 @@ jobs:
           codesign --verify --deep --strict "$APP"
           file "$APP/Contents/MacOS/MaviNoktaIPTV"
           lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | grep -q x86_64
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist" > build/app-version.txt
           tar -czf build/MN-IPTV-intel.app.tgz -C build 'MN IPTV.app'
+          cp ../source-sha256.txt build/source-sha256.txt
 
       - uses: actions/upload-artifact@v4
         with:
           name: MN-IPTV-macOS-Web-Parity-intel
-          path: MN-IPTV/build/MN-IPTV-intel.app.tgz
+          path: |
+            MN-IPTV/build/MN-IPTV-intel.app.tgz
+            MN-IPTV/build/app-version.txt
+            MN-IPTV/build/source-sha256.txt
           if-no-files-found: error
           retention-days: 7
 
@@ -102,6 +124,15 @@ jobs:
         with:
           name: MN-IPTV-macOS-Web-Parity-intel
           path: intel-artifact
+
+      - name: Verify both architectures used identical source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cmp arm-artifact/source-sha256.txt intel-artifact/source-sha256.txt
+          cmp arm-artifact/app-version.txt intel-artifact/app-version.txt
+          cp arm-artifact/source-sha256.txt SOURCE-SHA256.txt
+          cp arm-artifact/app-version.txt APP-VERSION.txt
 
       - name: Merge native apps into Universal 2 and make DMG
         shell: bash
@@ -166,7 +197,9 @@ jobs:
           lipo -archs "$OUT/Contents/MacOS/MaviNoktaIPTV" | tee universal-archs.txt
           grep -q arm64 universal-archs.txt
           grep -q x86_64 universal-archs.txt
-          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist" | grep -q '^1.4.3$'
+          BUNDLE_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist")"
+          EXPECTED_VERSION="$(cat APP-VERSION.txt)"
+          test "$BUNDLE_VERSION" = "$EXPECTED_VERSION"
 
           ditto "$OUT" 'stage/MN IPTV.app'
           ln -s /Applications stage/Applications
@@ -181,5 +214,7 @@ jobs:
             MN-IPTV-macOS.dmg
             MN-IPTV-macOS.dmg.sha256
             universal-archs.txt
+            APP-VERSION.txt
+            SOURCE-SHA256.txt
           if-no-files-found: error
           retention-days: 7
