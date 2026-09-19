@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 env:
-  SOURCE_ZIP_ID: 1lBL4rjR6l-_QderDwPSsoXEOY4eif0be
-  SOURCE_ZIP_SHA256: 9484588dff12f1a0d9d87cbe2ed1c8ce4cef7757e6a583146fe6ba253751128c
+  SOURCE_ZIP_ID: 12MhwnZZN3HDgZDVA9N5Noc4TSlblu2BW
+  SOURCE_ZIP_SHA256: 351b8ebdb6e8e2cfef3134b7a819f1a8b73311b99343a8b586923733dba6735b
 
 jobs:
   android:
@@ -35,9 +35,6 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -47,8 +44,11 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" --version
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
 
       - name: Build release APKs from MN IPTV Kotlin source
         working-directory: native_ci_inputs/android
@@ -69,25 +69,25 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          for apk in native_ci_inputs/android-out/MN-IPTV-*-unsigned.apk; do
-            native_ci_inputs/android-out/signing-tools/aapt dump badging "$apk" | tee "$apk.badging.txt"
+          for apk in android-out/MN-IPTV-*-unsigned.apk; do
+            android-out/signing-tools/aapt dump badging "$apk" | tee "$apk.badging.txt"
             grep -q "package: name='com.mavinokta.mniptv'" "$apk.badging.txt"
             unzip -p "$apk" 'classes*.dex' | strings > "$apk.dexstrings.txt"
             grep -q 'com/mavinokta/mniptv' "$apk.dexstrings.txt"
             ! grep -Eq 'io/github/jqssun/airplay|com/mavinokta/mncast' "$apk.dexstrings.txt"
           done
-          sha256sum native_ci_inputs/android-out/*.apk > native_ci_inputs/android-out/SHA256SUMS-UNSIGNED.txt
+          sha256sum android-out/*.apk > android-out/SHA256SUMS-UNSIGNED.txt
 
       - uses: actions/upload-artifact@v4
         with:
           name: MN-IPTV-Android-UNSIGNED
           path: |
-            native_ci_inputs/android-out/MN-IPTV-TV-unsigned.apk
-            native_ci_inputs/android-out/MN-IPTV-TV-unsigned.apk.badging.txt
-            native_ci_inputs/android-out/MN-IPTV-Android-unsigned.apk
-            native_ci_inputs/android-out/MN-IPTV-Android-unsigned.apk.badging.txt
-            native_ci_inputs/android-out/SHA256SUMS-UNSIGNED.txt
-            native_ci_inputs/android-out/signing-tools/
+            android-out/MN-IPTV-TV-unsigned.apk
+            android-out/MN-IPTV-TV-unsigned.apk.badging.txt
+            android-out/MN-IPTV-Android-unsigned.apk
+            android-out/MN-IPTV-Android-unsigned.apk.badging.txt
+            android-out/SHA256SUMS-UNSIGNED.txt
+            android-out/signing-tools/
           if-no-files-found: error
           retention-days: 7
 
@@ -124,8 +124,8 @@ jobs:
         with:
           name: MN-IPTV-Windows
           path: |
-            native_ci_inputs/MN-IPTV-Windows.exe
-            native_ci_inputs/MN-IPTV-Windows.exe.sha256
+            MN-IPTV-Windows.exe
+            MN-IPTV-Windows.exe.sha256
           if-no-files-found: error
           retention-days: 7
 
@@ -159,8 +159,8 @@ jobs:
           file 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
           lipo -archs 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV' | grep -q arm64
           bash scripts/create-dmg.sh
-          shasum -a 256 build/MN-IPTV.dmg > build/MN-IPTV-Apple-Silicon.dmg.sha256
           cp build/MN-IPTV.dmg build/MN-IPTV-Apple-Silicon.dmg
+          shasum -a 256 build/MN-IPTV-Apple-Silicon.dmg > build/MN-IPTV-Apple-Silicon.dmg.sha256
           tar -czf build/MN-IPTV-Apple-Silicon.app.tgz -C build 'MN IPTV.app'
 
       - uses: actions/upload-artifact@v4
@@ -203,8 +203,8 @@ jobs:
           file 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
           lipo -archs 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV' | grep -q x86_64
           bash scripts/create-dmg.sh
-          shasum -a 256 build/MN-IPTV.dmg > build/MN-IPTV-Intel.dmg.sha256
           cp build/MN-IPTV.dmg build/MN-IPTV-Intel.dmg
+          shasum -a 256 build/MN-IPTV-Intel.dmg > build/MN-IPTV-Intel.dmg.sha256
           tar -czf build/MN-IPTV-Intel.app.tgz -C build 'MN IPTV.app'
 
       - uses: actions/upload-artifact@v4
@@ -244,7 +244,6 @@ jobs:
           INTEL='intel/MN IPTV.app'
           OUT='universal/MN IPTV.app'
 
-          # Merge every Mach-O executable/dylib present in the app bundle.
           find "$ARM/Contents" -type f -print0 | while IFS= read -r -d '' f; do
             rel="${f#$ARM/}"
             other="$INTEL/$rel"
@@ -263,12 +262,10 @@ jobs:
             fi
           done
 
-          # Framework file sets must match; otherwise a universal package would be incomplete.
           (cd "$ARM/Contents/Frameworks" && find . -type f | sort) > arm.frameworks
           (cd "$INTEL/Contents/Frameworks" && find . -type f | sort) > intel.frameworks
           diff -u arm.frameworks intel.frameworks
 
-          # Re-sign the merged app ad-hoc. No Apple Developer ID is embedded in CI.
           find "$OUT/Contents/Frameworks" -type f -print0 | while IFS= read -r -d '' f; do
             if file "$f" | grep -q 'Mach-O'; then codesign --force --sign - "$f"; fi
           done
