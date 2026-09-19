@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 env:
-  SOURCE_ZIP_ID: 12MhwnZZN3HDgZDVA9N5Noc4TSlblu2BW
-  SOURCE_ZIP_SHA256: 351b8ebdb6e8e2cfef3134b7a819f1a8b73311b99343a8b586923733dba6735b
+  SOURCE_ZIP_ID: 1qhomzJm6cfKLtU9ny-Mp9Zj0-oWCcXpA
+  SOURCE_ZIP_SHA256: f5040be21d67e6a7e61235f5e1810c34f2ee5ced6815c9853067815e334d97d2
 
 jobs:
   android:
@@ -244,27 +244,60 @@ jobs:
           INTEL='intel/MN IPTV.app'
           OUT='universal/MN IPTV.app'
 
+          # Merge every Mach-O that has the same bundle-relative path on both architectures.
+          # A few Homebrew libraries can carry different versioned filenames on Intel/ARM;
+          # those are paired below and copied under both names so each slice resolves its own load path.
           find "$ARM/Contents" -type f -print0 | while IFS= read -r -d '' f; do
             rel="${f#$ARM/}"
             other="$INTEL/$rel"
             out="$OUT/$rel"
             if file "$f" | grep -q 'Mach-O'; then
-              test -f "$other"
-              file "$other" | grep -q 'Mach-O'
-              tmp="$RUNNER_TEMP/$(basename "$rel").universal.$$"
-              lipo -create "$f" "$other" -output "$tmp"
-              mv "$tmp" "$out"
-              chmod +x "$out" || true
-              archs="$(lipo -archs "$out")"
-              echo "$rel => $archs"
+              if [ -f "$other" ] && file "$other" | grep -q 'Mach-O'; then
+                tmp="$RUNNER_TEMP/$(basename "$rel").universal.$$"
+                lipo -create "$f" "$other" -output "$tmp"
+                mv "$tmp" "$out"
+                chmod +x "$out" || true
+              else
+                echo "Deferred versioned Mach-O alias: $rel"
+              fi
+            fi
+          done
+
+          merge_versioned_alias_pair() {
+            pattern="$1"
+            arm_file="$(find "$ARM/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
+            intel_file="$(find "$INTEL/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
+            test -n "$arm_file"
+            test -n "$intel_file"
+            arm_base="$(basename "$arm_file")"
+            intel_base="$(basename "$intel_file")"
+            if [ "$arm_base" != "$intel_base" ]; then
+              tmp="$RUNNER_TEMP/${arm_base}.alias-universal.$$"
+              lipo -create "$arm_file" "$intel_file" -output "$tmp"
+              cp "$tmp" "$OUT/Contents/Frameworks/$arm_base"
+              cp "$tmp" "$OUT/Contents/Frameworks/$intel_base"
+              chmod +x "$OUT/Contents/Frameworks/$arm_base" "$OUT/Contents/Frameworks/$intel_base" || true
+              echo "Aliased $arm_base <-> $intel_base"
+            fi
+          }
+
+          merge_versioned_alias_pair 'libx265.*.dylib'
+          merge_versioned_alias_pair 'libluajit-5.1.*.dylib'
+
+          # Every Intel framework filename must now exist in the universal bundle.
+          for f in "$INTEL/Contents/Frameworks"/*; do
+            test -e "$OUT/Contents/Frameworks/$(basename "$f")"
+          done
+
+          # Every Mach-O we ship must contain both slices.
+          find "$OUT/Contents" -type f -print0 | while IFS= read -r -d '' f; do
+            if file "$f" | grep -q 'Mach-O'; then
+              archs="$(lipo -archs "$f")"
+              echo "${f#$OUT/} => $archs"
               echo "$archs" | grep -q arm64
               echo "$archs" | grep -q x86_64
             fi
           done
-
-          (cd "$ARM/Contents/Frameworks" && find . -type f | sort) > arm.frameworks
-          (cd "$INTEL/Contents/Frameworks" && find . -type f | sort) > intel.frameworks
-          diff -u arm.frameworks intel.frameworks
 
           find "$OUT/Contents/Frameworks" -type f -print0 | while IFS= read -r -d '' f; do
             if file "$f" | grep -q 'Mach-O'; then codesign --force --sign - "$f"; fi
