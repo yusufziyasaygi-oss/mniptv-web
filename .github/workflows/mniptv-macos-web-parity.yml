@@ -8,8 +8,8 @@ on:
       - '.github/workflows/mniptv-macos-web-parity.yml'
 
 env:
-  SOURCE_ZIP_ID: 1YjHGpsyj6u4C_3nO8ofni_1Jg2bELyRy
-  SOURCE_ZIP_SHA256: 854a82fdcfa427e04ebad428f392e1661bf0ee5bc8dde7b6475f1c559289a863
+  SOURCE_ZIP_ID: 1sd7kvoDewpiYhMlkQys1LI_Wr_J0sspT
+  SOURCE_ZIP_SHA256: 25eb7b2fa9b5d30d855fb11410481cf6a30f6db264e9fe1e81b5e33084b46b92
 
 jobs:
   arm64:
@@ -24,7 +24,7 @@ jobs:
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
           echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.0'
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.1'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
       - name: Install native libmpv
@@ -62,7 +62,7 @@ jobs:
           curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
           echo "${SOURCE_ZIP_SHA256}  source.zip" | shasum -a 256 -c -
           unzip -q source.zip
-          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.0'
+          grep -A1 CFBundleShortVersionString MN-IPTV/Info.plist | grep -q '1.4.1'
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
 
       - name: Install native libmpv
