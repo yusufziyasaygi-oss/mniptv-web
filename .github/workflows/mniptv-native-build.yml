@@ -61,17 +61,16 @@ jobs:
           cp mobile/build/outputs/apk/release/mobile-release-unsigned.apk ../../android-out/MN-IPTV-Android-unsigned.apk
           cp "$ANDROID_HOME/build-tools/35.0.0/apksigner" ../../android-out/signing-tools/
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" ../../android-out/signing-tools/lib/
-          cp "$ANDROID_HOME/build-tools/35.0.0/zipalign" ../../android-out/signing-tools/
-          cp "$ANDROID_HOME/build-tools/35.0.0/aapt" ../../android-out/signing-tools/
-          chmod +x ../../android-out/signing-tools/apksigner ../../android-out/signing-tools/zipalign ../../android-out/signing-tools/aapt
+          chmod +x ../../android-out/signing-tools/apksigner
 
       - name: Prove both APKs are MN IPTV, not MN Cast/AirPlay
         shell: bash
         run: |
           set -euxo pipefail
           for apk in android-out/MN-IPTV-*-unsigned.apk; do
-            android-out/signing-tools/aapt dump badging "$apk" | tee "$apk.badging.txt"
+            "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | tee "$apk.badging.txt"
             grep -q "package: name='com.mavinokta.mniptv'" "$apk.badging.txt"
+            "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 -v 4 "$apk"
             unzip -p "$apk" 'classes*.dex' | strings > "$apk.dexstrings.txt"
             grep -q 'com/mavinokta/mniptv' "$apk.dexstrings.txt"
             ! grep -Eq 'io/github/jqssun/airplay|com/mavinokta/mncast' "$apk.dexstrings.txt"
