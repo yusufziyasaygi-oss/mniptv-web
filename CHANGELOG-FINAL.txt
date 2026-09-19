@@ -1,0 +1,9 @@
+MN IPTV Web — FINAL NATIVE CONTROLS
+
+- Custom fullscreen button/logic is no longer used by the UI.
+- HTML5 <video controls> is enabled permanently.
+- Fullscreen is delegated to Safari/Firefox/Chrome/iOS native video controls.
+- Custom center controls and custom bottom bar are hidden so they cannot intercept native controls.
+- Audio/subtitle/PiP/close actions in the top bar are preserved.
+- Legacy CSS page-expansion mode is neutralized and cannot act as fake fullscreen.
+- Asset names changed to app-native.js / styles-native.css for cache busting.

@@ -10,10 +10,10 @@
   <meta name="apple-mobile-web-app-title" content="MN IPTV">
   <meta name="description" content="MN IPTV — kişisel IPTV kaynakların için modern web oynatıcı.">
   <title>MN IPTV</title>
-  <!-- build: REV3.1 generic providers / cache-busted assets -->
+  <!-- build: RELEASE downloads + native browser video controls -->
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="assets/styles-rev31.css">
+  <link rel="stylesheet" href="assets/styles-release.css">
 </head>
 <body>
   <div id="app" class="app-shell" aria-live="polite">
@@ -29,7 +29,7 @@
   <div id="playerLayer" class="player-layer" hidden>
     <div id="playerBackdrop" class="player-backdrop"></div>
     <section id="player" class="player" aria-label="Video oynatıcı">
-      <video id="video" playsinline preload="metadata"></video>
+      <video id="video" controls playsinline preload="metadata"></video>
       <div id="playerShade" class="player-shade"></div>
 
       <div id="playerControls" class="player-controls visible">
@@ -67,7 +67,10 @@
               <input id="volumeBar" class="volume-bar" type="range" min="0" max="1" value="1" step="0.05" aria-label="Ses düzeyi">
             </div>
             <div class="spacer"></div>
-            <button id="fullscreenButton" class="icon-button bare" type="button" aria-label="Oynatıcıyı büyüt" title="Büyüt / Küçült">⛶</button>
+            <button id="fullscreenButton" class="fullscreen-button" type="button" aria-label="Tam ekrana geç" title="Tam ekran">
+              <span id="fullscreenGlyph" class="fullscreen-glyph" aria-hidden="true">⛶</span>
+              <span id="fullscreenLabel" class="fullscreen-label">Tam ekran</span>
+            </button>
           </div>
         </div>
       </div>
@@ -101,8 +104,7 @@
     <div id="contextBackdrop" class="context-backdrop"></div>
     <div id="contextMenu" class="context-menu" role="menu"></div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js" defer></script>
-  <script src="assets/app-rev31.js" defer></script>
+  <script src="assets/app-release.js" defer></script>
 </body>
 </html>
