@@ -1,16 +1,14 @@
-MN IPTV - TEK DEPLOY PAKETI
-===========================
-Bu ZIP'in icindekilerin tamamini sitenin web kokune yukleyin ve eski dosyalarin uzerine yazin.
+MN IPTV / mavinokta.pro — DEPLOY PAKETİ
 
-Ana sayfa: index.html
-Aktif JS: assets/app-release.js
-Aktif CSS: assets/styles-release.css
+Bu klasör GitHub Pages için doğrudan deploy edilebilir.
 
-Kurulum dosyalari:
-- downloads/MN-IPTV-TV.apk
-- downloads/MN-IPTV-Android.apk
-- downloads/MN-IPTV-macOS.dmg
-- downloads/MN-IPTV-Windows.exe
-- downloads/SHA256SUMS.txt
+Güncellenen indirme bağlantıları:
+- macOS: MN-IPTV-macOS.dmg
+- Windows: MN-IPTV-Windows.exe
+- Android: MN-IPTV-Android.apk
+- Android TV / Google TV: MN-IPTV-TV.apk
+- SHA-256 doğrulama dosyası
 
-Giris ekraninda ve uygulama menusu icindeki "Uygulamalari Indir" bolumunde 4 platform icin direkt indirme baglantilari vardir.
+Not:
+Web uygulamasının mevcut üretim JS/CSS dosyaları, mevcut GitHub commit'ine sabitlenmiş jsDelivr bağlantılarından yüklenir.
+Böylece bu deploy paketi, çalışan web uygulamasını değiştirmeden yalnızca indirme yönlendirmelerini düzeltir.
