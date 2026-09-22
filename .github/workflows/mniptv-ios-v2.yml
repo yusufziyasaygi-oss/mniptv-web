@@ -1,0 +1,153 @@
+name: Build MN IPTV iOS 2.0.0
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/mniptv-ios-v2.yml'
+
+concurrency:
+  group: mniptv-ios-v2
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_ZIP_ID: 1tCfmRgKmB4j1LHGUSCx-fXc4keDiS1Mx
+  EXPECTED_SOURCE_SHA256: 82276e3f9b2e998bbf509c9641c1595b29c6ee61ad2e8587ae45df841e890a65
+  EXPECTED_VERSION: 2.0.0
+  EXPECTED_BUILD: '20'
+
+jobs:
+  build:
+    name: iOS Simulator + Device Compile
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Download and validate source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 --retry-all-errors \
+            "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" \
+            -o source.zip
+          ACTUAL_SHA="$(shasum -a 256 source.zip | awk '{print $1}')"
+          echo "Source SHA-256: $ACTUAL_SHA"
+          test "$ACTUAL_SHA" = "$EXPECTED_SOURCE_SHA256"
+          unzip -q source.zip
+          test -d MN-IPTV-iOS
+          cd MN-IPTV-iOS
+          test -f project.yml
+          test -f Info.plist
+          test -f Podfile
+          test -f App/MNIPTVApp.swift
+          test -f App/PowerServices.swift
+          test -f App/PowerScreens.swift
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist)"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' Info.plist)"
+          test "$VERSION" = "$EXPECTED_VERSION"
+          test "$BUILD" = "$EXPECTED_BUILD"
+          swiftc -frontend -parse Shared/*.swift App/*.swift
+
+      - name: Install XcodeGen and CocoaPods
+        shell: bash
+        run: |
+          set -euxo pipefail
+          command -v xcodegen >/dev/null 2>&1 || brew install xcodegen
+          if ! command -v pod >/dev/null 2>&1; then
+            brew install cocoapods
+          fi
+          xcodegen --version
+          pod --version
+
+      - name: Generate Xcode project and install MobileVLCKit
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          xcodegen generate
+          pod install --repo-update
+          test -d MNIPTV.xcworkspace
+          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -showBuildSettings >/dev/null
+
+      - name: Build iPhone Simulator
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-simulator
+          xcodebuild \
+            -workspace MNIPTV.xcworkspace \
+            -scheme MNIPTV \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee simulator-build.log
+
+          SIM_APP='build-simulator/Build/Products/Release-iphonesimulator/MNIPTV.app'
+          test -d "$SIM_APP"
+          SIM_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$SIM_APP/Info.plist")"
+          SIM_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SIM_APP/Info.plist")"
+          test "$SIM_VERSION" = "$EXPECTED_VERSION"
+          test "$SIM_BUILD" = "$EXPECTED_BUILD"
+          ditto -c -k --sequesterRsrc --keepParent "$SIM_APP" MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+
+      - name: Build generic iOS device app without signing
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-device
+          xcodebuild \
+            -workspace MNIPTV.xcworkspace \
+            -scheme MNIPTV \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build-device \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee device-build.log
+
+          APP='build-device/Build/Products/Release-iphoneos/MNIPTV.app'
+          test -d "$APP"
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist")"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Info.plist")"
+          BUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")"
+          test "$VERSION" = "$EXPECTED_VERSION"
+          test "$BUILD" = "$EXPECTED_BUILD"
+          test "$BUNDLE" = 'com.mavinokta.iptv.ios'
+
+          mkdir -p unsigned/Payload
+          ditto "$APP" unsigned/Payload/MNIPTV.app
+          (cd unsigned && zip -qry ../MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa Payload)
+          ditto -c -k --sequesterRsrc --keepParent "$APP" MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
+
+          cat > BUILD-INFO.txt <<EOF
+          MN IPTV iOS
+          Version: ${VERSION}
+          Build: ${BUILD}
+          Bundle: ${BUNDLE}
+          Device app: unsigned (Apple signing required before installation)
+          Source SHA-256: ${EXPECTED_SOURCE_SHA256}
+          EOF
+          shasum -a 256 MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip MN-IPTV-iOS-v2.0.0-Simulator.app.zip > SHA256SUMS.txt
+
+      - name: Upload iOS compile artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-iOS-v2.0.0-COMPILED-UNSIGNED
+          path: |
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+            MN-IPTV-iOS/BUILD-INFO.txt
+            MN-IPTV-iOS/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
