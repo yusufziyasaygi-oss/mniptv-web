@@ -71,7 +71,10 @@ jobs:
           xcodegen generate
           pod install --repo-update
           test -d MNIPTV.xcworkspace
-          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -showBuildSettings >/dev/null
+          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -showBuildSettings \
+            MARKETING_VERSION="$EXPECTED_VERSION" \
+            CURRENT_PROJECT_VERSION="$EXPECTED_BUILD" \
+            | grep -E 'MARKETING_VERSION|CURRENT_PROJECT_VERSION|PRODUCT_BUNDLE_IDENTIFIER' || true
 
       - name: Build iPhone Simulator
         working-directory: MN-IPTV-iOS
@@ -86,6 +89,8 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build-simulator \
+            MARKETING_VERSION="$EXPECTED_VERSION" \
+            CURRENT_PROJECT_VERSION="$EXPECTED_BUILD" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             build | tee simulator-build.log
@@ -111,6 +116,8 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build-device \
+            MARKETING_VERSION="$EXPECTED_VERSION" \
+            CURRENT_PROJECT_VERSION="$EXPECTED_BUILD" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             build | tee device-build.log
