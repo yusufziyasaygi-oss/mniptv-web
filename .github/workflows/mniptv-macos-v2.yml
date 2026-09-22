@@ -1,4 +1,4 @@
-name: Build MN IPTV macOS 2.0.0 Universal
+name: Build MN IPTV macOS 2.0.1 Audio Hotfix Universal
 
 on:
   workflow_dispatch:
@@ -12,10 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SOURCE_ZIP_ID: 1c9rDVm-2e8lp-81epimIDWIMcqwLq9rw
-  EXPECTED_VERSION: 2.0.0
-  EXPECTED_BUILD: "20"
-  EXPECTED_SOURCE_SHA256: 9cf0e0a7cc423ed877f0edb5e4394115c91bb079bc98816c6194d970252727dc
+  SOURCE_ZIP_ID: 1Cvm5pJ_jkbGRKcNE0Z_94hFXexFjorAT
+  EXPECTED_VERSION: 2.0.1
+  EXPECTED_BUILD: "21"
+  EXPECTED_SOURCE_SHA256: f0fb47d78179ac6f572d824883bbc58520499fb6baccb69612461f94adefc20c
 
 jobs:
   arm64:
@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 70
     steps:
-      - name: Download and validate 2.0.0 source
+      - name: Download and validate 2.0.1 audio-hotfix source
         shell: bash
         run: |
           set -euxo pipefail
@@ -31,8 +31,8 @@ jobs:
             "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" \
             -o source.zip
           shasum -a 256 source.zip | tee source-sha256.txt
-          ACTUAL_SOURCE_SHA256="$(shasum -a 256 source.zip | awk '{print $1}')"
-          test "$ACTUAL_SOURCE_SHA256" = "$EXPECTED_SOURCE_SHA256"
+          ACTUAL_SHA="$(shasum -a 256 source.zip | awk '{print $1}')"
+          test "$ACTUAL_SHA" = "$EXPECTED_SOURCE_SHA256"
           unzip -q source.zip
           test -f 'MN-IPTV/Info.plist'
           test -f 'MN-IPTV/scripts/build.sh'
@@ -45,6 +45,9 @@ jobs:
           printf '%s\n' "$VERSION" > source-version.txt
           printf '%s\n' "$BUILD" > source-build.txt
           swiftc -frontend -parse MN-IPTV/Sources/*.swift
+          grep -q '{"ao", "coreaudio"}' MN-IPTV/Native/MaviMPVBridge.m
+          grep -q 'mpv_set_property(_handle' MN-IPTV/Native/MaviMPVBridge.m
+          grep -q 'recoverAudioIfNeeded' MN-IPTV/Sources/PlayerEngine.swift
 
       - name: Install libmpv
         shell: bash
@@ -92,7 +95,7 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 70
     steps:
-      - name: Download and validate 2.0.0 source
+      - name: Download and validate 2.0.1 audio-hotfix source
         shell: bash
         run: |
           set -euxo pipefail
@@ -100,8 +103,8 @@ jobs:
             "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" \
             -o source.zip
           shasum -a 256 source.zip | tee source-sha256.txt
-          ACTUAL_SOURCE_SHA256="$(shasum -a 256 source.zip | awk '{print $1}')"
-          test "$ACTUAL_SOURCE_SHA256" = "$EXPECTED_SOURCE_SHA256"
+          ACTUAL_SHA="$(shasum -a 256 source.zip | awk '{print $1}')"
+          test "$ACTUAL_SHA" = "$EXPECTED_SOURCE_SHA256"
           unzip -q source.zip
           test -f 'MN-IPTV/Info.plist'
           test -f 'MN-IPTV/scripts/build.sh'
@@ -114,6 +117,9 @@ jobs:
           printf '%s\n' "$VERSION" > source-version.txt
           printf '%s\n' "$BUILD" > source-build.txt
           swiftc -frontend -parse MN-IPTV/Sources/*.swift
+          grep -q '{"ao", "coreaudio"}' MN-IPTV/Native/MaviMPVBridge.m
+          grep -q 'mpv_set_property(_handle' MN-IPTV/Native/MaviMPVBridge.m
+          grep -q 'recoverAudioIfNeeded' MN-IPTV/Sources/PlayerEngine.swift
 
       - name: Install libmpv
         shell: bash
@@ -262,7 +268,7 @@ jobs:
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
 
-          tar -czf MN-IPTV-macOS-Universal-v2.0.0.app.tgz -C universal 'MN IPTV.app'
+          tar -czf MN-IPTV-macOS-Universal-v2.0.1.app.tgz -C universal 'MN IPTV.app'
 
       - name: Create robust DMG
         shell: bash
@@ -350,11 +356,11 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-v2.0.0-Universal-FINAL
+          name: MN-IPTV-macOS-v2.0.1-AUDIO-HOTFIX-Universal-FINAL
           path: |
             MN-IPTV-macOS.dmg
             MN-IPTV-macOS.dmg.sha256
-            MN-IPTV-macOS-Universal-v2.0.0.app.tgz
+            MN-IPTV-macOS-Universal-v2.0.1.app.tgz
             universal-archs.txt
             APP-VERSION.txt
             APP-BUILD.txt
