@@ -1,4 +1,4 @@
-name: Build MN IPTV macOS 2.0.1 Audio Hotfix Universal
+name: Build MN IPTV macOS 2.0.2 Volume Slider Fix Universal
 
 on:
   workflow_dispatch:
@@ -13,8 +13,10 @@ concurrency:
 
 env:
   SOURCE_ZIP_ID: 1Cvm5pJ_jkbGRKcNE0Z_94hFXexFjorAT
-  EXPECTED_VERSION: 2.0.1
-  EXPECTED_BUILD: "21"
+  SOURCE_VERSION: 2.0.1
+  SOURCE_BUILD: "21"
+  EXPECTED_VERSION: 2.0.2
+  EXPECTED_BUILD: "22"
   EXPECTED_SOURCE_SHA256: f0fb47d78179ac6f572d824883bbc58520499fb6baccb69612461f94adefc20c
 
 jobs:
@@ -23,7 +25,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 70
     steps:
-      - name: Download and validate 2.0.1 audio-hotfix source
+      - name: Download, validate and patch 2.0.1 source
         shell: bash
         run: |
           set -euxo pipefail
@@ -40,11 +42,20 @@ jobs:
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
           VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
           BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
+          test "$VERSION" = "$SOURCE_VERSION"
+          test "$BUILD" = "$SOURCE_BUILD"
+          printf '%s' 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBwbGlzdGxpYgpyb290ID0gUGF0aCgiTU4tSVBUViIpCnAgPSByb290IC8gIlNvdXJjZXMvUGxheWVyVmlldy5zd2lmdCIKcyA9IHAucmVhZF90ZXh0KCkKb2xkID0gJyAgICAgICAgbGV0IHZvbHVtZUNlbGwgPSBZb3VUdWJlU2xpZGVyQ2VsbCgpOyB2b2x1bWVDZWxsLmFjY2VudENvbG9yID0gLndoaXRlOyB2b2x1bWVDZWxsLmtub2JEaWFtZXRlciA9IDEwOyB2b2x1bWVTbGlkZXIuY2VsbCA9IHZvbHVtZUNlbGxcbiAgICAgICAgdGltZWxpbmUuc2V0QWNjZXNzaWJpbGl0eUxhYmVsKEwoIk95bmF0bWEga29udW11IikpXG4gICAgICAgIHZvbHVtZVNsaWRlci5pc0NvbnRpbnVvdXMgPSB0cnVlXG4nCm5ldyA9ICcgICAgICAgIGxldCB2b2x1bWVDZWxsID0gWW91VHViZVNsaWRlckNlbGwoKTsgdm9sdW1lQ2VsbC5hY2NlbnRDb2xvciA9IC53aGl0ZTsgdm9sdW1lQ2VsbC5rbm9iRGlhbWV0ZXIgPSAxMDsgdm9sdW1lU2xpZGVyLmNlbGwgPSB2b2x1bWVDZWxsXG4gICAgICAgIC8vIFJlcGxhY2luZyBOU1NsaWRlckNlbGwgcmVzZXRzIGl0cyBudW1lcmljIHJhbmdlLiBSZS1hcHBseSAwLi4uMTAwLlxuICAgICAgICB2b2x1bWVTbGlkZXIubWluVmFsdWUgPSAwXG4gICAgICAgIHZvbHVtZVNsaWRlci5tYXhWYWx1ZSA9IDEwMFxuICAgICAgICB2b2x1bWVTbGlkZXIuZG91YmxlVmFsdWUgPSA4MFxuICAgICAgICB0aW1lbGluZS5zZXRBY2Nlc3NpYmlsaXR5TGFiZWwoTCgiT3luYXRtYSBrb251bXUiKSlcbiAgICAgICAgdm9sdW1lU2xpZGVyLmlzQ29udGludW91cyA9IHRydWVcbicKaWYgb2xkIG5vdCBpbiBzOiByYWlzZSBTeXN0ZW1FeGl0KCJ2b2x1bWUgc2xpZGVyIHBhdGNoIGFuY2hvciBtaXNzaW5nIikKcC53cml0ZV90ZXh0KHMucmVwbGFjZShvbGQsIG5ldykpCnAgPSByb290IC8gIlNvdXJjZXMvQXBwRmVhdHVyZXMuc3dpZnQiCnMgPSBwLnJlYWRfdGV4dCgpCm9sZCA9ICcgICAgQG9iamMgZnVuYyBjaGFuZ2VWb2x1bWUoKSB7IGVuZ2luZS52b2x1bWUgPSBwbGF5ZXJWaWV3LnZvbHVtZVNsaWRlci5kb3VibGVWYWx1ZSB9XG4nCm5ldyA9ICcgICAgQG9iamMgZnVuYyBjaGFuZ2VWb2x1bWUoKSB7XG4gICAgICAgIGxldCB2YWx1ZSA9IG1pbigxMDAsIG1heCgwLCBwbGF5ZXJWaWV3LnZvbHVtZVNsaWRlci5kb3VibGVWYWx1ZSkpXG4gICAgICAgIHBsYXllclZpZXcudm9sdW1lU2xpZGVyLmRvdWJsZVZhbHVlID0gdmFsdWVcbiAgICAgICAgZW5naW5lLnZvbHVtZSA9IHZhbHVlXG4gICAgICAgIGlmIHZhbHVlID4gMCwgZW5naW5lLmlzTXV0ZWQgeyBlbmdpbmUudG9nZ2xlTXV0ZSgpIH1cbiAgICB9XG4nCmlmIG9sZCBub3QgaW4gczogcmFpc2UgU3lzdGVtRXhpdCgiY2hhbmdlVm9sdW1lIHBhdGNoIGFuY2hvciBtaXNzaW5nIikKcC53cml0ZV90ZXh0KHMucmVwbGFjZShvbGQsIG5ldykpCnAgPSByb290IC8gIlNvdXJjZXMvUGxheWVyRW5naW5lLnN3aWZ0IgpzID0gcC5yZWFkX3RleHQoKQpvbGQgPSAnICAgIHZhciB2b2x1bWU6IERvdWJsZSA9IDgwIHsgZGlkU2V0IHsgXyA9IGJyaWRnZT8uc2V0KG51bWJlcjogbWluKDEwMCwgbWF4KDAsIHZvbHVtZSkpLCBwcm9wZXJ0eTogInZvbHVtZSIpIH0gfVxuJwpuZXcgPSAnICAgIHZhciB2b2x1bWU6IERvdWJsZSA9IDgwIHtcbiAgICAgICAgZGlkU2V0IHtcbiAgICAgICAgICAgIGxldCBub3JtYWxpemVkID0gbWluKDEwMCwgbWF4KDAsIHZvbHVtZSkpXG4gICAgICAgICAgICBpZiBub3JtYWxpemVkICE9IHZvbHVtZSB7IHZvbHVtZSA9IG5vcm1hbGl6ZWQ7IHJldHVybiB9XG4gICAgICAgICAgICBfID0gYnJpZGdlPy5zZXQobnVtYmVyOiBub3JtYWxpemVkLCBwcm9wZXJ0eTogInZvbHVtZSIpXG4gICAgICAgIH1cbiAgICB9XG4nCmlmIG9sZCBub3QgaW4gczogcmFpc2UgU3lzdGVtRXhpdCgiZW5naW5lIHZvbHVtZSBwYXRjaCBhbmNob3IgbWlzc2luZyIpCnAud3JpdGVfdGV4dChzLnJlcGxhY2Uob2xkLCBuZXcpKQppbmZvID0gcm9vdCAvICJJbmZvLnBsaXN0Igp3aXRoIGluZm8ub3BlbigicmIiKSBhcyBmOiBkID0gcGxpc3RsaWIubG9hZChmKQpkWyJDRkJ1bmRsZVNob3J0VmVyc2lvblN0cmluZyJdID0gIjIuMC4yIgpkWyJDRkJ1bmRsZVZlcnNpb24iXSA9ICIyMiIKd2l0aCBpbmZvLm9wZW4oIndiIikgYXMgZjogcGxpc3RsaWIuZHVtcChkLCBmLCBzb3J0X2tleXM9RmFsc2UpCg==' | base64 --decode > "$RUNNER_TEMP/mniptv-volume-fix.py"
+          python3 "$RUNNER_TEMP/mniptv-volume-fix.py"
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
           printf '%s\n' "$VERSION" > source-version.txt
           printf '%s\n' "$BUILD" > source-build.txt
           swiftc -frontend -parse MN-IPTV/Sources/*.swift
+          grep -q 'volumeSlider.minValue = 0' MN-IPTV/Sources/PlayerView.swift
+          grep -q 'volumeSlider.maxValue = 100' MN-IPTV/Sources/PlayerView.swift
+          grep -q 'let value = min(100, max(0, playerView.volumeSlider.doubleValue))' MN-IPTV/Sources/AppFeatures.swift
           grep -q '{"ao", "coreaudio"}' MN-IPTV/Native/MaviMPVBridge.m
           grep -q 'mpv_set_property(_handle' MN-IPTV/Native/MaviMPVBridge.m
           grep -q 'recoverAudioIfNeeded' MN-IPTV/Sources/PlayerEngine.swift
@@ -95,7 +106,7 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 70
     steps:
-      - name: Download and validate 2.0.1 audio-hotfix source
+      - name: Download, validate and patch 2.0.1 source
         shell: bash
         run: |
           set -euxo pipefail
@@ -112,11 +123,20 @@ jobs:
           ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
           VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
           BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
+          test "$VERSION" = "$SOURCE_VERSION"
+          test "$BUILD" = "$SOURCE_BUILD"
+          printf '%s' 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBwbGlzdGxpYgpyb290ID0gUGF0aCgiTU4tSVBUViIpCnAgPSByb290IC8gIlNvdXJjZXMvUGxheWVyVmlldy5zd2lmdCIKcyA9IHAucmVhZF90ZXh0KCkKb2xkID0gJyAgICAgICAgbGV0IHZvbHVtZUNlbGwgPSBZb3VUdWJlU2xpZGVyQ2VsbCgpOyB2b2x1bWVDZWxsLmFjY2VudENvbG9yID0gLndoaXRlOyB2b2x1bWVDZWxsLmtub2JEaWFtZXRlciA9IDEwOyB2b2x1bWVTbGlkZXIuY2VsbCA9IHZvbHVtZUNlbGxcbiAgICAgICAgdGltZWxpbmUuc2V0QWNjZXNzaWJpbGl0eUxhYmVsKEwoIk95bmF0bWEga29udW11IikpXG4gICAgICAgIHZvbHVtZVNsaWRlci5pc0NvbnRpbnVvdXMgPSB0cnVlXG4nCm5ldyA9ICcgICAgICAgIGxldCB2b2x1bWVDZWxsID0gWW91VHViZVNsaWRlckNlbGwoKTsgdm9sdW1lQ2VsbC5hY2NlbnRDb2xvciA9IC53aGl0ZTsgdm9sdW1lQ2VsbC5rbm9iRGlhbWV0ZXIgPSAxMDsgdm9sdW1lU2xpZGVyLmNlbGwgPSB2b2x1bWVDZWxsXG4gICAgICAgIC8vIFJlcGxhY2luZyBOU1NsaWRlckNlbGwgcmVzZXRzIGl0cyBudW1lcmljIHJhbmdlLiBSZS1hcHBseSAwLi4uMTAwLlxuICAgICAgICB2b2x1bWVTbGlkZXIubWluVmFsdWUgPSAwXG4gICAgICAgIHZvbHVtZVNsaWRlci5tYXhWYWx1ZSA9IDEwMFxuICAgICAgICB2b2x1bWVTbGlkZXIuZG91YmxlVmFsdWUgPSA4MFxuICAgICAgICB0aW1lbGluZS5zZXRBY2Nlc3NpYmlsaXR5TGFiZWwoTCgiT3luYXRtYSBrb251bXUiKSlcbiAgICAgICAgdm9sdW1lU2xpZGVyLmlzQ29udGludW91cyA9IHRydWVcbicKaWYgb2xkIG5vdCBpbiBzOiByYWlzZSBTeXN0ZW1FeGl0KCJ2b2x1bWUgc2xpZGVyIHBhdGNoIGFuY2hvciBtaXNzaW5nIikKcC53cml0ZV90ZXh0KHMucmVwbGFjZShvbGQsIG5ldykpCnAgPSByb290IC8gIlNvdXJjZXMvQXBwRmVhdHVyZXMuc3dpZnQiCnMgPSBwLnJlYWRfdGV4dCgpCm9sZCA9ICcgICAgQG9iamMgZnVuYyBjaGFuZ2VWb2x1bWUoKSB7IGVuZ2luZS52b2x1bWUgPSBwbGF5ZXJWaWV3LnZvbHVtZVNsaWRlci5kb3VibGVWYWx1ZSB9XG4nCm5ldyA9ICcgICAgQG9iamMgZnVuYyBjaGFuZ2VWb2x1bWUoKSB7XG4gICAgICAgIGxldCB2YWx1ZSA9IG1pbigxMDAsIG1heCgwLCBwbGF5ZXJWaWV3LnZvbHVtZVNsaWRlci5kb3VibGVWYWx1ZSkpXG4gICAgICAgIHBsYXllclZpZXcudm9sdW1lU2xpZGVyLmRvdWJsZVZhbHVlID0gdmFsdWVcbiAgICAgICAgZW5naW5lLnZvbHVtZSA9IHZhbHVlXG4gICAgICAgIGlmIHZhbHVlID4gMCwgZW5naW5lLmlzTXV0ZWQgeyBlbmdpbmUudG9nZ2xlTXV0ZSgpIH1cbiAgICB9XG4nCmlmIG9sZCBub3QgaW4gczogcmFpc2UgU3lzdGVtRXhpdCgiY2hhbmdlVm9sdW1lIHBhdGNoIGFuY2hvciBtaXNzaW5nIikKcC53cml0ZV90ZXh0KHMucmVwbGFjZShvbGQsIG5ldykpCnAgPSByb290IC8gIlNvdXJjZXMvUGxheWVyRW5naW5lLnN3aWZ0IgpzID0gcC5yZWFkX3RleHQoKQpvbGQgPSAnICAgIHZhciB2b2x1bWU6IERvdWJsZSA9IDgwIHsgZGlkU2V0IHsgXyA9IGJyaWRnZT8uc2V0KG51bWJlcjogbWluKDEwMCwgbWF4KDAsIHZvbHVtZSkpLCBwcm9wZXJ0eTogInZvbHVtZSIpIH0gfVxuJwpuZXcgPSAnICAgIHZhciB2b2x1bWU6IERvdWJsZSA9IDgwIHtcbiAgICAgICAgZGlkU2V0IHtcbiAgICAgICAgICAgIGxldCBub3JtYWxpemVkID0gbWluKDEwMCwgbWF4KDAsIHZvbHVtZSkpXG4gICAgICAgICAgICBpZiBub3JtYWxpemVkICE9IHZvbHVtZSB7IHZvbHVtZSA9IG5vcm1hbGl6ZWQ7IHJldHVybiB9XG4gICAgICAgICAgICBfID0gYnJpZGdlPy5zZXQobnVtYmVyOiBub3JtYWxpemVkLCBwcm9wZXJ0eTogInZvbHVtZSIpXG4gICAgICAgIH1cbiAgICB9XG4nCmlmIG9sZCBub3QgaW4gczogcmFpc2UgU3lzdGVtRXhpdCgiZW5naW5lIHZvbHVtZSBwYXRjaCBhbmNob3IgbWlzc2luZyIpCnAud3JpdGVfdGV4dChzLnJlcGxhY2Uob2xkLCBuZXcpKQppbmZvID0gcm9vdCAvICJJbmZvLnBsaXN0Igp3aXRoIGluZm8ub3BlbigicmIiKSBhcyBmOiBkID0gcGxpc3RsaWIubG9hZChmKQpkWyJDRkJ1bmRsZVNob3J0VmVyc2lvblN0cmluZyJdID0gIjIuMC4yIgpkWyJDRkJ1bmRsZVZlcnNpb24iXSA9ICIyMiIKd2l0aCBpbmZvLm9wZW4oIndiIikgYXMgZjogcGxpc3RsaWIuZHVtcChkLCBmLCBzb3J0X2tleXM9RmFsc2UpCg==' | base64 --decode > "$RUNNER_TEMP/mniptv-volume-fix.py"
+          python3 "$RUNNER_TEMP/mniptv-volume-fix.py"
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
           printf '%s\n' "$VERSION" > source-version.txt
           printf '%s\n' "$BUILD" > source-build.txt
           swiftc -frontend -parse MN-IPTV/Sources/*.swift
+          grep -q 'volumeSlider.minValue = 0' MN-IPTV/Sources/PlayerView.swift
+          grep -q 'volumeSlider.maxValue = 100' MN-IPTV/Sources/PlayerView.swift
+          grep -q 'let value = min(100, max(0, playerView.volumeSlider.doubleValue))' MN-IPTV/Sources/AppFeatures.swift
           grep -q '{"ao", "coreaudio"}' MN-IPTV/Native/MaviMPVBridge.m
           grep -q 'mpv_set_property(_handle' MN-IPTV/Native/MaviMPVBridge.m
           grep -q 'recoverAudioIfNeeded' MN-IPTV/Sources/PlayerEngine.swift
@@ -268,7 +288,7 @@ jobs:
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
 
-          tar -czf MN-IPTV-macOS-Universal-v2.0.1.app.tgz -C universal 'MN IPTV.app'
+          tar -czf MN-IPTV-macOS-Universal-v2.0.2.app.tgz -C universal 'MN IPTV.app'
 
       - name: Create robust DMG
         shell: bash
@@ -356,11 +376,11 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-v2.0.1-AUDIO-HOTFIX-Universal-FINAL
+          name: MN-IPTV-macOS-v2.0.2-VOLUME-SLIDER-FIX-Universal-FINAL
           path: |
             MN-IPTV-macOS.dmg
             MN-IPTV-macOS.dmg.sha256
-            MN-IPTV-macOS-Universal-v2.0.1.app.tgz
+            MN-IPTV-macOS-Universal-v2.0.2.app.tgz
             universal-archs.txt
             APP-VERSION.txt
             APP-BUILD.txt
