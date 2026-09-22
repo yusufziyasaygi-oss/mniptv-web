@@ -1,358 +1,153 @@
-name: Build MN IPTV macOS 2.0.0 Universal
+name: Build MN IPTV iOS 2.0.0
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - '.github/workflows/mniptv-macos-v2.yml'
+      - '.github/workflows/mniptv-ios-v2.yml'
 
 concurrency:
-  group: mniptv-macos-v2
+  group: mniptv-ios-v2
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
-  SOURCE_ZIP_ID: 1Cvm5pJ_jkbGRKcNE0Z_94hFXexFjorAT
+  SOURCE_ZIP_ID: 1tCfmRgKmB4j1LHGUSCx-fXc4keDiS1Mx
+  EXPECTED_SOURCE_SHA256: 82276e3f9b2e998bbf509c9641c1595b29c6ee61ad2e8587ae45df841e890a65
   EXPECTED_VERSION: 2.0.0
-  EXPECTED_BUILD: "20"
+  EXPECTED_BUILD: '20'
 
 jobs:
-  arm64:
-    name: Apple Silicon build
+  build:
+    name: iOS Simulator + Device Compile
     runs-on: macos-15
-    timeout-minutes: 70
+    timeout-minutes: 60
+
     steps:
-      - name: Download and validate 2.0.0 source
+      - name: Download and validate source
         shell: bash
         run: |
           set -euxo pipefail
           curl -L --fail --retry 6 --retry-all-errors \
             "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" \
             -o source.zip
-          shasum -a 256 source.zip | tee source-sha256.txt
+          ACTUAL_SHA="$(shasum -a 256 source.zip | awk '{print $1}')"
+          echo "Source SHA-256: $ACTUAL_SHA"
+          test "$ACTUAL_SHA" = "$EXPECTED_SOURCE_SHA256"
           unzip -q source.zip
-          test -f 'MN-IPTV/Info.plist'
-          test -f 'MN-IPTV/scripts/build.sh'
-          test -d 'MN-IPTV/Sources'
-          ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
-          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
-          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
+          test -d MN-IPTV-iOS
+          cd MN-IPTV-iOS
+          test -f project.yml
+          test -f Info.plist
+          test -f Podfile
+          test -f App/MNIPTVApp.swift
+          test -f App/PowerServices.swift
+          test -f App/PowerScreens.swift
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist)"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' Info.plist)"
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
-          printf '%s\n' "$VERSION" > source-version.txt
-          printf '%s\n' "$BUILD" > source-build.txt
-          swiftc -frontend -parse MN-IPTV/Sources/*.swift
+          swiftc -frontend -parse Shared/*.swift App/*.swift
 
-      - name: Install libmpv
+      - name: Install XcodeGen and CocoaPods
         shell: bash
         run: |
           set -euxo pipefail
-          brew update-reset || true
-          brew install mpv
+          command -v xcodegen >/dev/null 2>&1 || brew install xcodegen
+          if ! command -v pod >/dev/null 2>&1; then
+            brew install cocoapods
+          fi
+          xcodegen --version
+          pod --version
 
-      - name: Build and verify arm64 app
-        working-directory: MN-IPTV
+      - name: Generate Xcode project and install MobileVLCKit
+        working-directory: MN-IPTV-iOS
         shell: bash
         run: |
           set -euxo pipefail
-          curl -L --fail --retry 5 https://curl.se/ca/cacert.pem -o "$RUNNER_TEMP/cacert.pem"
-          MAVI_CA_FILE="$RUNNER_TEMP/cacert.pem" bash scripts/build.sh
-          APP='build/MN IPTV.app'
+          xcodegen generate
+          pod install --repo-update
+          test -d MNIPTV.xcworkspace
+          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -showBuildSettings >/dev/null
+
+      - name: Build iPhone Simulator
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-simulator
+          xcodebuild \
+            -workspace MNIPTV.xcworkspace \
+            -scheme MNIPTV \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee simulator-build.log
+
+          SIM_APP='build-simulator/Build/Products/Release-iphonesimulator/MNIPTV.app'
+          test -d "$SIM_APP"
+          SIM_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$SIM_APP/Info.plist")"
+          SIM_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SIM_APP/Info.plist")"
+          test "$SIM_VERSION" = "$EXPECTED_VERSION"
+          test "$SIM_BUILD" = "$EXPECTED_BUILD"
+          ditto -c -k --sequesterRsrc --keepParent "$SIM_APP" MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+
+      - name: Build generic iOS device app without signing
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-device
+          xcodebuild \
+            -workspace MNIPTV.xcworkspace \
+            -scheme MNIPTV \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build-device \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build | tee device-build.log
+
+          APP='build-device/Build/Products/Release-iphoneos/MNIPTV.app'
           test -d "$APP"
-          codesign --verify --deep --strict "$APP"
-          file "$APP/Contents/MacOS/MaviNoktaIPTV"
-          lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | tee build/archs.txt
-          grep -q arm64 build/archs.txt
-          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
-          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist")"
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist")"
+          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Info.plist")"
+          BUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")"
           test "$VERSION" = "$EXPECTED_VERSION"
           test "$BUILD" = "$EXPECTED_BUILD"
-          printf '%s\n' "$VERSION" > build/app-version.txt
-          printf '%s\n' "$BUILD" > build/app-build.txt
-          tar -czf build/MN-IPTV-arm64.app.tgz -C build 'MN IPTV.app'
-          cp ../source-sha256.txt build/source-sha256.txt
+          test "$BUNDLE" = 'com.mavinokta.iptv.ios'
 
-      - uses: actions/upload-artifact@v4
+          mkdir -p unsigned/Payload
+          ditto "$APP" unsigned/Payload/MNIPTV.app
+          (cd unsigned && zip -qry ../MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa Payload)
+          ditto -c -k --sequesterRsrc --keepParent "$APP" MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
+
+          cat > BUILD-INFO.txt <<EOF
+          MN IPTV iOS
+          Version: ${VERSION}
+          Build: ${BUILD}
+          Bundle: ${BUNDLE}
+          Device app: unsigned (Apple signing required before installation)
+          Source SHA-256: ${EXPECTED_SOURCE_SHA256}
+          EOF
+          shasum -a 256 MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip MN-IPTV-iOS-v2.0.0-Simulator.app.zip > SHA256SUMS.txt
+
+      - name: Upload iOS compile artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-macOS-v2-arm64
+          name: MN-IPTV-iOS-v2.0.0-COMPILED-UNSIGNED
           path: |
-            MN-IPTV/build/MN-IPTV-arm64.app.tgz
-            MN-IPTV/build/app-version.txt
-            MN-IPTV/build/app-build.txt
-            MN-IPTV/build/source-sha256.txt
-            MN-IPTV/build/archs.txt
-          if-no-files-found: error
-          retention-days: 14
-
-  intel:
-    name: Intel build
-    runs-on: macos-15-intel
-    timeout-minutes: 70
-    steps:
-      - name: Download and validate 2.0.0 source
-        shell: bash
-        run: |
-          set -euxo pipefail
-          curl -L --fail --retry 6 --retry-all-errors \
-            "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" \
-            -o source.zip
-          shasum -a 256 source.zip | tee source-sha256.txt
-          unzip -q source.zip
-          test -f 'MN-IPTV/Info.plist'
-          test -f 'MN-IPTV/scripts/build.sh'
-          test -d 'MN-IPTV/Sources'
-          ! grep -R -E 'WKWebView|WebView' MN-IPTV/Sources MN-IPTV/Native
-          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'MN-IPTV/Info.plist')"
-          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'MN-IPTV/Info.plist')"
-          test "$VERSION" = "$EXPECTED_VERSION"
-          test "$BUILD" = "$EXPECTED_BUILD"
-          printf '%s\n' "$VERSION" > source-version.txt
-          printf '%s\n' "$BUILD" > source-build.txt
-          swiftc -frontend -parse MN-IPTV/Sources/*.swift
-
-      - name: Install libmpv
-        shell: bash
-        run: |
-          set -euxo pipefail
-          brew update-reset || true
-          brew install mpv
-
-      - name: Build and verify x86_64 app
-        working-directory: MN-IPTV
-        shell: bash
-        run: |
-          set -euxo pipefail
-          curl -L --fail --retry 5 https://curl.se/ca/cacert.pem -o "$RUNNER_TEMP/cacert.pem"
-          MAVI_CA_FILE="$RUNNER_TEMP/cacert.pem" bash scripts/build.sh
-          APP='build/MN IPTV.app'
-          test -d "$APP"
-          codesign --verify --deep --strict "$APP"
-          file "$APP/Contents/MacOS/MaviNoktaIPTV"
-          lipo -archs "$APP/Contents/MacOS/MaviNoktaIPTV" | tee build/archs.txt
-          grep -q x86_64 build/archs.txt
-          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
-          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist")"
-          test "$VERSION" = "$EXPECTED_VERSION"
-          test "$BUILD" = "$EXPECTED_BUILD"
-          printf '%s\n' "$VERSION" > build/app-version.txt
-          printf '%s\n' "$BUILD" > build/app-build.txt
-          tar -czf build/MN-IPTV-intel.app.tgz -C build 'MN IPTV.app'
-          cp ../source-sha256.txt build/source-sha256.txt
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MN-IPTV-macOS-v2-intel
-          path: |
-            MN-IPTV/build/MN-IPTV-intel.app.tgz
-            MN-IPTV/build/app-version.txt
-            MN-IPTV/build/app-build.txt
-            MN-IPTV/build/source-sha256.txt
-            MN-IPTV/build/archs.txt
-          if-no-files-found: error
-          retention-days: 14
-
-  universal:
-    name: Universal 2 app + DMG
-    needs: [arm64, intel]
-    runs-on: macos-15
-    timeout-minutes: 35
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: MN-IPTV-macOS-v2-arm64
-          path: arm-artifact
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: MN-IPTV-macOS-v2-intel
-          path: intel-artifact
-
-      - name: Verify inputs
-        shell: bash
-        run: |
-          set -euxo pipefail
-          cmp arm-artifact/source-sha256.txt intel-artifact/source-sha256.txt
-          cmp arm-artifact/app-version.txt intel-artifact/app-version.txt
-          cmp arm-artifact/app-build.txt intel-artifact/app-build.txt
-          test "$(cat arm-artifact/app-version.txt)" = "$EXPECTED_VERSION"
-          test "$(cat arm-artifact/app-build.txt)" = "$EXPECTED_BUILD"
-          cp arm-artifact/source-sha256.txt SOURCE-SHA256.txt
-          cp arm-artifact/app-version.txt APP-VERSION.txt
-          cp arm-artifact/app-build.txt APP-BUILD.txt
-
-      - name: Merge Universal 2 app
-        shell: bash
-        run: |
-          set -euxo pipefail
-          mkdir arm intel universal
-          tar -xzf arm-artifact/MN-IPTV-arm64.app.tgz -C arm
-          tar -xzf intel-artifact/MN-IPTV-intel.app.tgz -C intel
-          ditto 'arm/MN IPTV.app' 'universal/MN IPTV.app'
-
-          ARM='arm/MN IPTV.app'
-          INTEL='intel/MN IPTV.app'
-          OUT='universal/MN IPTV.app'
-
-          find "$ARM/Contents" -type f -print0 | while IFS= read -r -d '' f; do
-            rel="${f#$ARM/}"
-            other="$INTEL/$rel"
-            out="$OUT/$rel"
-            if file "$f" | grep -q 'Mach-O'; then
-              if [ -f "$other" ] && file "$other" | grep -q 'Mach-O'; then
-                mkdir -p "$(dirname "$out")"
-                tmp="$RUNNER_TEMP/$(basename "$rel").universal.$$"
-                lipo -create "$f" "$other" -output "$tmp"
-                mv "$tmp" "$out"
-                chmod +x "$out" || true
-              else
-                echo "Deferred versioned alias: $rel"
-              fi
-            fi
-          done
-
-          merge_versioned_alias_pair() {
-            pattern="$1"
-            arm_file="$(find "$ARM/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
-            intel_file="$(find "$INTEL/Contents/Frameworks" -maxdepth 1 -type f -name "$pattern" | head -n 1)"
-            test -n "$arm_file"
-            test -n "$intel_file"
-            arm_base="$(basename "$arm_file")"
-            intel_base="$(basename "$intel_file")"
-            if [ "$arm_base" != "$intel_base" ]; then
-              tmp="$RUNNER_TEMP/${arm_base}.alias-universal.$$"
-              lipo -create "$arm_file" "$intel_file" -output "$tmp"
-              cp "$tmp" "$OUT/Contents/Frameworks/$arm_base"
-              cp "$tmp" "$OUT/Contents/Frameworks/$intel_base"
-              chmod +x "$OUT/Contents/Frameworks/$arm_base" "$OUT/Contents/Frameworks/$intel_base" || true
-            fi
-          }
-
-          merge_versioned_alias_pair 'libx265.*.dylib'
-          merge_versioned_alias_pair 'libluajit-5.1.*.dylib'
-
-          for f in "$INTEL/Contents/Frameworks"/*; do
-            test -e "$OUT/Contents/Frameworks/$(basename "$f")"
-          done
-
-          find "$OUT/Contents" -type f -print0 | while IFS= read -r -d '' f; do
-            if file "$f" | grep -q 'Mach-O'; then
-              archs="$(lipo -archs "$f")"
-              echo "${f#$OUT/} => $archs"
-              echo "$archs" | grep -q arm64
-              echo "$archs" | grep -q x86_64
-            fi
-          done
-
-          find "$OUT/Contents/Frameworks" -type f -print0 | while IFS= read -r -d '' f; do
-            if file "$f" | grep -q 'Mach-O'; then codesign --force --sign - "$f"; fi
-          done
-          codesign --force --deep --sign - "$OUT"
-          codesign --verify --deep --strict "$OUT"
-          lipo -archs "$OUT/Contents/MacOS/MaviNoktaIPTV" | tee universal-archs.txt
-          grep -q arm64 universal-archs.txt
-          grep -q x86_64 universal-archs.txt
-
-          VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$OUT/Contents/Info.plist")"
-          BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$OUT/Contents/Info.plist")"
-          test "$VERSION" = "$EXPECTED_VERSION"
-          test "$BUILD" = "$EXPECTED_BUILD"
-
-          tar -czf MN-IPTV-macOS-Universal-v2.0.0.app.tgz -C universal 'MN IPTV.app'
-
-      - name: Create robust DMG
-        shell: bash
-        run: |
-          set -euxo pipefail
-          OUT="$PWD/universal/MN IPTV.app"
-          STAGE="$RUNNER_TEMP/mniptv-dmg-stage"
-          MOUNT="$RUNNER_TEMP/mniptv-dmg-mount"
-          SPARSE="$RUNNER_TEMP/MN-IPTV-build"
-
-          rm -rf "$STAGE" "$MOUNT" "$SPARSE.sparseimage" MN-IPTV-macOS.dmg
-          mkdir -p "$STAGE" "$MOUNT"
-          ditto "$OUT" "$STAGE/MN IPTV.app"
-          ln -s /Applications "$STAGE/Applications"
-
-          # Clean any stale mounts from a prior hdiutil attempt on the hosted runner.
-          find /Volumes -maxdepth 1 -type d -name 'MN IPTV*' -print0 2>/dev/null | while IFS= read -r -d '' m; do
-            hdiutil detach "$m" -force || diskutil unmount force "$m" || true
-          done
-
-          STAGE_MB="$(du -sm "$STAGE" | awk '{print $1}')"
-          IMAGE_MB="$((STAGE_MB + 160))"
-
-          created=0
-          for attempt in 1 2 3; do
-            rm -f "$SPARSE.sparseimage"
-            if hdiutil create -size "${IMAGE_MB}m" -fs HFS+ -volname 'MN IPTV' -type SPARSE -ov "$SPARSE"; then
-              created=1
-              break
-            fi
-            echo "Sparse image create attempt $attempt failed; retrying…"
-            sleep 4
-          done
-          test "$created" = 1
-
-          attached=0
-          for attempt in 1 2 3; do
-            rm -rf "$MOUNT"; mkdir -p "$MOUNT"
-            if hdiutil attach "$SPARSE.sparseimage" -mountpoint "$MOUNT" -nobrowse -noverify -noautoopen; then
-              attached=1
-              break
-            fi
-            hdiutil detach "$MOUNT" -force || true
-            sleep 4
-          done
-          test "$attached" = 1
-
-          cleanup() {
-            hdiutil detach "$MOUNT" -force || diskutil unmount force "$MOUNT" || true
-          }
-          trap cleanup EXIT
-
-          ditto "$STAGE/MN IPTV.app" "$MOUNT/MN IPTV.app"
-          ln -s /Applications "$MOUNT/Applications"
-          sync
-          hdiutil detach "$MOUNT" -force
-          trap - EXIT
-
-          converted=0
-          for attempt in 1 2 3; do
-            rm -f MN-IPTV-macOS.dmg
-            if hdiutil convert "$SPARSE.sparseimage" -format UDZO -imagekey zlib-level=9 -o MN-IPTV-macOS.dmg; then
-              converted=1
-              break
-            fi
-            echo "DMG convert attempt $attempt failed; retrying…"
-            sleep 4
-          done
-          test "$converted" = 1
-
-          hdiutil verify MN-IPTV-macOS.dmg
-          shasum -a 256 MN-IPTV-macOS.dmg | tee MN-IPTV-macOS.dmg.sha256
-          test -s MN-IPTV-macOS.dmg
-
-      - name: Final verification summary
-        shell: bash
-        run: |
-          set -euxo pipefail
-          echo "Version: $(cat APP-VERSION.txt)"
-          echo "Build: $(cat APP-BUILD.txt)"
-          echo "Architectures: $(cat universal-archs.txt)"
-          cat MN-IPTV-macOS.dmg.sha256
-          test "$(cat APP-VERSION.txt)" = "$EXPECTED_VERSION"
-          test "$(cat APP-BUILD.txt)" = "$EXPECTED_BUILD"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MN-IPTV-macOS-v2.0.0-Universal-FINAL
-          path: |
-            MN-IPTV-macOS.dmg
-            MN-IPTV-macOS.dmg.sha256
-            MN-IPTV-macOS-Universal-v2.0.0.app.tgz
-            universal-archs.txt
-            APP-VERSION.txt
-            APP-BUILD.txt
-            SOURCE-SHA256.txt
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+            MN-IPTV-iOS/BUILD-INFO.txt
+            MN-IPTV-iOS/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
