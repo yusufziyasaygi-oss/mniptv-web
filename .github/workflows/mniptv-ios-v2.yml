@@ -1,4 +1,4 @@
-name: Build MN IPTV iOS 2.0.0
+name: Build MN IPTV iOS 2.0.1
 
 on:
   workflow_dispatch:
@@ -16,9 +16,9 @@ permissions:
 
 env:
   SOURCE_ZIP_ID: 1tCfmRgKmB4j1LHGUSCx-fXc4keDiS1Mx
-  EXPECTED_SOURCE_SHA256: 494d0160c78551ec806355605fe64c9f44ca83d2c0fb60aa9f1f48245b68790b
-  EXPECTED_VERSION: 2.0.0
-  EXPECTED_BUILD: '20'
+  EXPECTED_SOURCE_SHA256: 07e33a3bd0a6d02a02eb66c94e6f8040439620005afd0f3c25f981eef982589d
+  EXPECTED_VERSION: 2.0.1
+  EXPECTED_BUILD: '21'
 
 jobs:
   build:
@@ -105,7 +105,7 @@ jobs:
           SIM_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SIM_APP/Info.plist")"
           test "$SIM_VERSION" = "$EXPECTED_VERSION"
           test "$SIM_BUILD" = "$EXPECTED_BUILD"
-          ditto -c -k --sequesterRsrc --keepParent "$SIM_APP" MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+          ditto -c -k --sequesterRsrc --keepParent "$SIM_APP" MN-IPTV-iOS-v2.0.1-Simulator.app.zip
 
       - name: Build generic iOS device app without signing
         working-directory: MN-IPTV-iOS
@@ -137,8 +137,8 @@ jobs:
 
           mkdir -p unsigned/Payload
           ditto "$APP" unsigned/Payload/MNIPTV.app
-          (cd unsigned && zip -qry ../MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa Payload)
-          ditto -c -k --sequesterRsrc --keepParent "$APP" MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
+          (cd unsigned && zip -qry ../MN-IPTV-iOS-v2.0.1-UNSIGNED.ipa Payload)
+          ditto -c -k --sequesterRsrc --keepParent "$APP" MN-IPTV-iOS-v2.0.1-UNSIGNED.app.zip
 
           cat > BUILD-INFO.txt <<EOF
           MN IPTV iOS
@@ -148,16 +148,16 @@ jobs:
           Device app: unsigned (Apple signing required before installation)
           Source SHA-256: ${EXPECTED_SOURCE_SHA256}
           EOF
-          shasum -a 256 MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip MN-IPTV-iOS-v2.0.0-Simulator.app.zip > SHA256SUMS.txt
+          shasum -a 256 MN-IPTV-iOS-v2.0.1-UNSIGNED.ipa MN-IPTV-iOS-v2.0.1-UNSIGNED.app.zip MN-IPTV-iOS-v2.0.1-Simulator.app.zip > SHA256SUMS.txt
 
       - name: Upload iOS compile artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: MN-IPTV-iOS-v2.0.0-COMPILED-UNSIGNED
+          name: MN-IPTV-iOS-v2.0.1-COMPILED-UNSIGNED
           path: |
-            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.ipa
-            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-UNSIGNED.app.zip
-            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.0-Simulator.app.zip
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.1-UNSIGNED.ipa
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.1-UNSIGNED.app.zip
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.1-Simulator.app.zip
             MN-IPTV-iOS/BUILD-INFO.txt
             MN-IPTV-iOS/SHA256SUMS.txt
           if-no-files-found: error
