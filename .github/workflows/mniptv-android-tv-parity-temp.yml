@@ -1,0 +1,84 @@
+name: Build MN IPTV Android TV-Parity Clean
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/mniptv-android-tv-parity-temp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_ZIP_ID: 1rdqfMPxTmjjXN77t_fFB0NKWHQWuTjqA
+  SOURCE_ZIP_SHA256: 3896726a298589ebe622b39886f020c1e47f816f0bf62030daafb578dc55499b
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Download source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 5 "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o native.zip
+          echo "${SOURCE_ZIP_SHA256}  native.zip" | sha256sum -c -
+          unzip -q native.zip
+          grep -q 'fun MainTvApp' native_ci_inputs/android/common-src/com/mavinokta/mniptv/MainActivity.kt
+          grep -q 'android.intent.category.LAUNCHER' native_ci_inputs/android/mobile/src/main/AndroidManifest.xml
+          grep -q 'sensorLandscape' native_ci_inputs/android/mobile/src/main/AndroidManifest.xml
+          grep -q 'jniLibs.useLegacyPackaging = true' native_ci_inputs/android/mobile/build.gradle.kts
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Install Android build tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+
+      - name: Build clean phone APK
+        working-directory: native_ci_inputs/android
+        shell: bash
+        run: |
+          set -euxo pipefail
+          gradle :mobile:assembleRelease --no-daemon --stacktrace --max-workers=2 '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8'
+          mkdir -p ../../android-out/signing-tools/lib
+          cp mobile/build/outputs/apk/release/mobile-release-unsigned.apk ../../android-out/MN-IPTV-Android-TV-Parity-unsigned.apk
+          cp "$ANDROID_HOME/build-tools/35.0.0/apksigner" ../../android-out/signing-tools/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" ../../android-out/signing-tools/lib/
+          chmod +x ../../android-out/signing-tools/apksigner
+
+      - name: Validate package
+        shell: bash
+        run: |
+          set -euxo pipefail
+          APK=android-out/MN-IPTV-Android-TV-Parity-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee android-out/badging.txt
+          grep -q "package: name='com.mavinokta.mniptv' versionCode='201'" android-out/badging.txt
+          grep -q "launchable-activity: name='com.mavinokta.mniptv.MainActivity'" android-out/badging.txt
+          grep -q "uses-feature-not-required: name='android.hardware.touchscreen'" android-out/badging.txt
+          ! grep -q "uses-feature: name='android.software.leanback'" android-out/badging.txt
+          grep -q "uses-feature: name='android.hardware.screen.landscape'" android-out/badging.txt
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 -v 4 "$APK"
+          unzip -t "$APK"
+          test $(stat -c%s "$APK") -lt 120000000
+          sha256sum "$APK" > android-out/SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-Android-TV-Parity-CLEAN-UNSIGNED
+          path: android-out/
+          if-no-files-found: error
+          retention-days: 1
