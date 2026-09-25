@@ -1,0 +1,113 @@
+name: Build MN IPTV iOS Android Parity
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/mniptv-ios-android-parity-temp.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: mniptv-ios-android-parity
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SOURCE_ZIP_ID: 1dGxt5DyICe9zqjOuwZsJDguSbPi7OkH_
+  EXPECTED_SOURCE_SHA256: ad671a1ccc536803f4ca435f64fb6259ca8670c67177b6fe610076e7c77ac94f
+  EXPECTED_VERSION: 2.0.2
+  EXPECTED_BUILD: '23'
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Download and validate source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 --retry-all-errors "https://drive.google.com/uc?export=download&id=${SOURCE_ZIP_ID}" -o source.zip
+          ACTUAL_SHA="$(shasum -a 256 source.zip | awk '{print $1}')"
+          test "$ACTUAL_SHA" = "$EXPECTED_SOURCE_SHA256"
+          unzip -q source.zip
+          cd MN-IPTV-iOS
+          test -f App/AndroidParityUI.swift
+          grep -q 'AndroidParityLoginScreen' App/AndroidParityUI.swift
+          grep -q 'AndroidParityHomeScreen' App/AndroidParityUI.swift
+          grep -q 'AndroidParitySportsScreen' App/AndroidParityUI.swift
+          grep -q 'bootstrapped' App/LibraryModel.swift
+          swiftc -frontend -parse Shared/*.swift App/*.swift
+
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          set -euxo pipefail
+          command -v xcodegen >/dev/null 2>&1 || brew install xcodegen
+          command -v pod >/dev/null 2>&1 || brew install cocoapods
+
+      - name: Generate workspace
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          xcodegen generate
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $EXPECTED_VERSION" Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $EXPECTED_BUILD" Info.plist
+          pod install --repo-update
+          test -d MNIPTV.xcworkspace
+
+      - name: Build simulator
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-simulator
+          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build-simulator MARKETING_VERSION="$EXPECTED_VERSION" CURRENT_PROJECT_VERSION="$EXPECTED_BUILD" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build | tee simulator-build.log
+          SIM_APP='build-simulator/Build/Products/Release-iphonesimulator/MNIPTV.app'
+          test -d "$SIM_APP"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SIM_APP/Info.plist")" = "$EXPECTED_BUILD"
+          ORIENTATIONS="$(/usr/libexec/PlistBuddy -c 'Print :UISupportedInterfaceOrientations' "$SIM_APP/Info.plist")"
+          echo "$ORIENTATIONS" | grep -q UIInterfaceOrientationLandscapeLeft
+          ! echo "$ORIENTATIONS" | grep -q UIInterfaceOrientationPortrait
+          ditto -c -k --sequesterRsrc --keepParent "$SIM_APP" MN-IPTV-iOS-v2.0.2-Android-Parity-Simulator.app.zip
+
+      - name: Build generic device app unsigned
+        working-directory: MN-IPTV-iOS
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build-device
+          xcodebuild -workspace MNIPTV.xcworkspace -scheme MNIPTV -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build-device MARKETING_VERSION="$EXPECTED_VERSION" CURRENT_PROJECT_VERSION="$EXPECTED_BUILD" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build | tee device-build.log
+          APP='build-device/Build/Products/Release-iphoneos/MNIPTV.app'
+          test -d "$APP"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist")" = "$EXPECTED_VERSION"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Info.plist")" = "$EXPECTED_BUILD"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")" = 'com.mavinokta.iptv.ios'
+          mkdir -p unsigned/Payload
+          ditto "$APP" unsigned/Payload/MNIPTV.app
+          (cd unsigned && zip -qry ../MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.ipa Payload)
+          ditto -c -k --sequesterRsrc --keepParent "$APP" MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.app.zip
+          cat > BUILD-INFO.txt <<EOF
+          MN IPTV iOS Android Parity
+          Version: ${EXPECTED_VERSION}
+          Build: ${EXPECTED_BUILD}
+          Bundle: com.mavinokta.iptv.ios
+          Orientation: landscape-only
+          Device app: unsigned (Apple signing required)
+          EOF
+          shasum -a 256 MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.ipa MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.app.zip MN-IPTV-iOS-v2.0.2-Android-Parity-Simulator.app.zip > SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-COMPILED-UNSIGNED
+          path: |
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.ipa
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.2-ANDROID-PARITY-UNSIGNED.app.zip
+            MN-IPTV-iOS/MN-IPTV-iOS-v2.0.2-Android-Parity-Simulator.app.zip
+            MN-IPTV-iOS/BUILD-INFO.txt
+            MN-IPTV-iOS/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 7
