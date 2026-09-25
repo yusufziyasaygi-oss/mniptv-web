@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 env:
-  SOURCE_ZIP_ID: 1z0K6Oy7pW0Dp98g6IOz1epSfxeeUB-AX
-  EXPECTED_SOURCE_SHA256: aa257b413b21e549c98028f8954e91624f3a75df8c41329ee1f51c70ff3c61c7
+  SOURCE_ZIP_ID: 1RXgqcDt5Cvu326UpURknYZS1tS4pS58n
+  EXPECTED_SOURCE_SHA256: 5521223f602e644a82c26bc61ff90a6007ab115187653a051909c3486c661467
   EXPECTED_VERSION: 2.0.2
   EXPECTED_BUILD: '23'
 
@@ -30,7 +30,7 @@ jobs:
           unzip -q source.zip
           cd MN-IPTV-iOS
           grep -q 'AndroidParityLoginScreen' App/MNIPTVApp.swift
-          grep -q 'prompt: Text(title).foregroundStyle(MNParityTheme.textMuted)' App/AndroidParityUI.swift
+          grep -q 'prompt: Text(title).foregroundColor(MNParityTheme.textMuted)' App/AndroidParityUI.swift
           grep -q 'tint(.white)' App/AndroidParityUI.swift
           swiftc -frontend -parse Shared/*.swift App/*.swift
 
