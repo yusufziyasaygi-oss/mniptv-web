@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 env:
-  SOURCE_ZIP_ID: 1dGxt5DyICe9zqjOuwZsJDguSbPi7OkH_
-  EXPECTED_SOURCE_SHA256: ad671a1ccc536803f4ca435f64fb6259ca8670c67177b6fe610076e7c77ac94f
+  SOURCE_ZIP_ID: 1z0K6Oy7pW0Dp98g6IOz1epSfxeeUB-AX
+  EXPECTED_SOURCE_SHA256: aa257b413b21e549c98028f8954e91624f3a75df8c41329ee1f51c70ff3c61c7
   EXPECTED_VERSION: 2.0.2
   EXPECTED_BUILD: '23'
 
@@ -36,7 +36,7 @@ jobs:
           cd MN-IPTV-iOS
           test -f App/AndroidParityUI.swift
           grep -q 'AndroidParityLoginScreen' App/AndroidParityUI.swift
-          grep -q 'AndroidParityHomeScreen' App/AndroidParityUI.swift
+          grep -q 'AndroidParityHomeScreen' App/AndroidParityUI.swift\n          grep -q 'tint(.white)' App/AndroidParityUI.swift\n          grep -q 'prompt: Text(title).foregroundStyle(MNParityTheme.textMuted)' App/AndroidParityUI.swift
           grep -q 'AndroidParitySportsScreen' App/AndroidParityUI.swift
           grep -q 'bootstrapped' App/LibraryModel.swift
           swiftc -frontend -parse Shared/*.swift App/*.swift
