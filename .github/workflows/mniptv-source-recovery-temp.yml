@@ -1,0 +1,68 @@
+name: Recover MN IPTV latest sources
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/mniptv-source-recovery-temp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Recover Android TV/parity source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 "https://drive.google.com/uc?export=download&id=1rdqfMPxTmjjXN77t_fFB0NKWHQWuTjqA" -o android-tv-parity-source.zip
+          echo "3896726a298589ebe622b39886f020c1e47f816f0bf62030daafb578dc55499b  android-tv-parity-source.zip" | sha256sum -c -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-RECOVERED-ANDROID-TV-PARITY-SOURCE
+          path: android-tv-parity-source.zip
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Recover Android phone v2.0.2 source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 "https://drive.google.com/uc?export=download&id=1Lk18CwAG3bnjVYL7zlp1YLKbHAvUYo-G" -o android-phone-v2.0.2-source.zip
+          echo "6210800bfd087da73c7fde45f664063e34eb4ad70c36303777825495494975e9  android-phone-v2.0.2-source.zip" | sha256sum -c -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-RECOVERED-ANDROID-PHONE-v2.0.2-SOURCE
+          path: android-phone-v2.0.2-source.zip
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Recover iOS v2.0.3 source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 "https://drive.google.com/uc?export=download&id=1z6Z8oGv2UQ3FZqXW-6jOciLSZvEoUyPY" -o ios-v2.0.3-source.zip
+          echo "7de6cee79516c98fed072f15566ce5af498f0d7451f48f1812722f280bb1cd4f  ios-v2.0.3-source.zip" | sha256sum -c -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-RECOVERED-IOS-v2.0.3-SOURCE
+          path: ios-v2.0.3-source.zip
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Recover native baseline with Windows source
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -L --fail --retry 6 "https://drive.google.com/uc?export=download&id=1sFb6fL1MGloMQaS-RlAkm_XQUoxjel1F" -o native-baseline-source.zip
+          echo "a2437e344f184b4fe06556070f0334efba3c8232c491e8b62e1a67b5f89c8afc  native-baseline-source.zip" | sha256sum -c -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MN-IPTV-RECOVERED-NATIVE-BASELINE-SOURCE
+          path: native-baseline-source.zip
+          if-no-files-found: error
+          retention-days: 1
