@@ -1,0 +1,47 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07090d"><title>MN Player 0.2.1 İndir · MN Products</title><meta name="robots" content="noindex"><link rel="stylesheet" href="/assets/products.css"><style>
+.download-box{max-width:720px;margin:72px auto 96px}.download-box h1{font-size:clamp(38px,7vw,64px);letter-spacing:-.055em;margin:12px 0 18px}.download-box p{color:var(--muted)}.dl-status{margin-top:26px;padding:24px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,var(--panel2),var(--panel))}.progress{height:8px;border-radius:999px;background:#ffffff10;overflow:hidden;margin:18px 0}.progress>i{display:block;height:100%;width:0;background:#fff;transition:width .25s ease}.hash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;word-break:break-all;color:#7e8b9d}.error{color:#ff8f8f!important}
+</style></head><body><div class="wrap"><nav class="nav"><a class="brand" href="/">MN<i></i>PRODUCTS</a></nav><a class="back" href="/products/mn-player/">← MN Player</a><main class="download-box"><div class="eyebrow">MN Player / v0.2.1</div><h1 id="title">Paket hazırlanıyor</h1><p id="desc">Doğru platform paketi seçiliyor.</p><div class="dl-status"><strong id="status">Hazırlanıyor…</strong><div class="progress"><i id="bar"></i></div><p id="detail">Dosya parçaları mavinokta.pro üzerinden alınacak ve tarayıcıda tek ZIP halinde birleştirilecek.</p><div class="actions"><button class="btn primary" id="start" type="button">İndirmeyi Başlat</button></div><p class="hash" id="hash"></p></div></main><footer>© 2026 MN Products · Mavi Nokta</footer></div><script>
+const builds={
+ windows:{title:"Windows x64",file:"MN-PLAY-0.2.1-Windows-x64.zip",size:"125.5 MB",final:"16806bd9a7c378f999021786b253780606df7bad558b8c3e52a2a01768839293",parts:[
+  ["/downloads/mn-player/data/win.part0","efd671b180cb45846a7d842a19c35b55c653ec4b485f43ce58676a2c9bc0c195"],
+  ["/downloads/mn-player/data/win.part1","df77961fa45db196aee002c5261019b5382eaa2964575a547c7adf7e97f201ce"]
+ ]},
+ "mac-arm":{title:"macOS · Apple Silicon",file:"MN-PLAY-0.2.1-macOS-Apple-Silicon.zip",size:"80.0 MB",final:"c5f7d9174a64508371eae345c84bf4ebd239068c71c5d2bfc47bd5182065474a",parts:[
+  ["/downloads/mn-player/data/mac-arm.part0","9fa82ae691786740f2813d4a639219e162b198832c7d96255dcad81eb1317561"],
+  ["/downloads/mn-player/data/mac-arm.part1","31d11e9b208f5d118a249c48d6b2c0c05a7af9ebe4644dae0137a4416178724d"]
+ ]},
+ "mac-intel":{title:"macOS · Intel / Catalina",file:"MN-PLAY-0.2.1-macOS-Intel-Catalina.zip",size:"89.6 MB",final:"7d90a5ae8bc4dcf640d7c506b01a3e2a861d7949852545377b3612619e56672e",parts:[
+  ["/downloads/mn-player/data/mac-intel.part0","a62a438f6d9a50818f726af56300573ba3e98363e6d40ea5b1e80c343e7c0f7a"],
+  ["/downloads/mn-player/data/mac-intel.part1","609b941b416e9931e0cf8a868ce0618964af87f1c93d58d1a095e48db3223b17"]
+ ]}
+};
+const q=new URLSearchParams(location.search), key=q.get("platform"), b=builds[key];
+const title=document.getElementById("title"),desc=document.getElementById("desc"),status=document.getElementById("status"),detail=document.getElementById("detail"),bar=document.getElementById("bar"),btn=document.getElementById("start"),hash=document.getElementById("hash");
+function hex(buf){return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+if(!b){title.textContent="Platform seçilemedi";desc.textContent="MN Player sayfasından Windows veya macOS sürümünü seç.";btn.disabled=true}
+else{title.textContent=b.title;desc.textContent="MN Player 0.2.1 · "+b.size;hash.textContent="Paket SHA-256: "+b.final}
+let running=false;
+async function start(){
+ if(!b||running)return; running=true;btn.disabled=true;btn.textContent="Hazırlanıyor…";status.textContent="İndiriliyor";detail.classList.remove("error");
+ try{
+  if(!window.crypto?.subtle)throw new Error("Bu tarayıcı bütünlük doğrulamasını desteklemiyor.");
+  const chunks=[];
+  for(let i=0;i<b.parts.length;i++){
+   detail.textContent="Parça "+(i+1)+"/"+b.parts.length+" indiriliyor ve doğrulanıyor…";
+   bar.style.width=Math.round((i/b.parts.length)*100)+"%";
+   const r=await fetch(b.parts[i][0],{cache:"no-store"});
+   if(!r.ok)throw new Error("Dosya parçası indirilemedi (HTTP "+r.status+").");
+   const a=await r.arrayBuffer();
+   const h=hex(await crypto.subtle.digest("SHA-256",a));
+   if(h!==b.parts[i][1])throw new Error("Bütünlük kontrolü başarısız oldu. Lütfen tekrar dene.");
+   chunks.push(a);bar.style.width=Math.round(((i+1)/b.parts.length)*100)+"%";
+  }
+  status.textContent="Hazır";detail.textContent="Paket doğrulandı. İndirme başlatılıyor…";
+  const blob=new Blob(chunks,{type:"application/zip"}),u=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=u;a.download=b.file;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),120000);
+  btn.disabled=false;btn.textContent="Tekrar İndir";running=false;detail.textContent="İndirme başladı. Dosya adı: "+b.file;
+ }catch(e){status.textContent="İndirme tamamlanamadı";detail.textContent=e.message||String(e);detail.classList.add("error");bar.style.width="0%";btn.disabled=false;btn.textContent="Tekrar Dene";running=false}
+}
+btn.addEventListener("click",start);
+if(b&&q.get("auto")==="1")setTimeout(start,250);
+</script></body></html>
