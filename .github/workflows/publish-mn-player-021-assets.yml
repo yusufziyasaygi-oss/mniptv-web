@@ -31,7 +31,7 @@ jobs:
 
           fetch_part() {
             id="$1"; wrapper="$2"; member="$3"; output="$4"; expected="$5"
-            gdown --id "$id" -O "/tmp/mnplay/$wrapper"
+            gdown "$id" -O "/tmp/mnplay/$wrapper"
             unzip -p "/tmp/mnplay/$wrapper" "$member" > "downloads/mn-player/data/$output"
             echo "$expected  downloads/mn-player/data/$output" | sha256sum -c -
           }
