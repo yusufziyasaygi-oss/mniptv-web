@@ -1,0 +1,74 @@
+name: Publish MN PLAY 0.2.1 Assets
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-mn-player-021-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Drive downloader
+        run: python -m pip install --quiet gdown
+
+      - name: Download and unwrap distribution parts
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf downloads/mn-player/data
+          mkdir -p downloads/mn-player/data /tmp/mnplay
+
+          fetch_part() {
+            id="$1"; wrapper="$2"; member="$3"; output="$4"; expected="$5"
+            gdown --id "$id" -O "/tmp/mnplay/$wrapper"
+            unzip -p "/tmp/mnplay/$wrapper" "$member" > "downloads/mn-player/data/$output"
+            echo "$expected  downloads/mn-player/data/$output" | sha256sum -c -
+          }
+
+          fetch_part "1Lb7kyOPyotUEMnmhk4x_x0bCtDAUj7vW" "win0.zip" "windows.part0" "win.part0" "efd671b180cb45846a7d842a19c35b55c653ec4b485f43ce58676a2c9bc0c195"
+          fetch_part "10mlUMdOnJtOBsWx7ErrxHpvS1WhugB-d" "win1.zip" "windows.part1" "win.part1" "df77961fa45db196aee002c5261019b5382eaa2964575a547c7adf7e97f201ce"
+
+          fetch_part "1X5b5QCMCQM-5ViiH-nbENe_eoXPYMJMg" "arm0.zip" "mac-arm.part0" "mac-arm.part0" "9fa82ae691786740f2813d4a639219e162b198832c7d96255dcad81eb1317561"
+          fetch_part "1p5z9yBSA3EMZrOMi6J-QfWmUPpSTJPrc" "arm1.zip" "mac-arm.part1" "mac-arm.part1" "31d11e9b208f5d118a249c48d6b2c0c05a7af9ebe4644dae0137a4416178724d"
+
+          fetch_part "1u4CoZha7cCTsb62U9oaN4mby7dYi1wTY" "intel0.zip" "mac-intel.part0" "mac-intel.part0" "a62a438f6d9a50818f726af56300573ba3e98363e6d40ea5b1e80c343e7c0f7a"
+          fetch_part "15D-lySj74ZXEV62L9K82ABHKVyQYDUyw" "intel1.zip" "mac-intel.part1" "mac-intel.part1" "609b941b416e9931e0cf8a868ce0618964af87f1c93d58d1a095e48db3223b17"
+
+          cat downloads/mn-player/data/win.part0 downloads/mn-player/data/win.part1 > /tmp/mnplay/windows.zip
+          echo "16806bd9a7c378f999021786b253780606df7bad558b8c3e52a2a01768839293  /tmp/mnplay/windows.zip" | sha256sum -c -
+          unzip -tq /tmp/mnplay/windows.zip
+
+          cat downloads/mn-player/data/mac-arm.part0 downloads/mn-player/data/mac-arm.part1 > /tmp/mnplay/arm.zip
+          echo "c5f7d9174a64508371eae345c84bf4ebd239068c71c5d2bfc47bd5182065474a  /tmp/mnplay/arm.zip" | sha256sum -c -
+          unzip -tq /tmp/mnplay/arm.zip
+
+          cat downloads/mn-player/data/mac-intel.part0 downloads/mn-player/data/mac-intel.part1 > /tmp/mnplay/intel.zip
+          echo "7d90a5ae8bc4dcf640d7c506b01a3e2a861d7949852545377b3612619e56672e  /tmp/mnplay/intel.zip" | sha256sum -c -
+          unzip -tq /tmp/mnplay/intel.zip
+
+          ls -lh downloads/mn-player/data
+
+      - name: Commit published assets
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git config user.name "mn-products-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add downloads/mn-player/data
+          if git diff --cached --quiet; then
+            echo "Assets already current."
+            exit 0
+          fi
+          git commit -m "Publish MN PLAY 0.2.1 distribution assets"
+          git push
