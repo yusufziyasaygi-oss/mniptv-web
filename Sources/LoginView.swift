@@ -61,11 +61,11 @@ struct LoginView: View {
             focus = form.server.isEmpty ? .server : nil
         }
         .onSubmit {
-            switch focus {
-            case .server: focus = .user
-            case .user: focus = .pass
-            default: connect()
-            }
+            // Enter connects as soon as every field is filled; otherwise jump to the first empty one.
+            if form.server.trimmingCharacters(in: .whitespaces).isEmpty { focus = .server }
+            else if form.username.trimmingCharacters(in: .whitespaces).isEmpty { focus = .user }
+            else if form.password.isEmpty { focus = .pass }
+            else { connect() }
         }
     }
 
