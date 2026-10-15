@@ -126,12 +126,16 @@ static void requestFrame(void *context) {
 @implementation MaviMPVSurface
 - (instancetype)init {
     if ((self = [super initWithFrame:NSMakeRect(0, 0, 800, 450)])) {
+        // Layer-hosting (layer assigned before wantsLayer): AppKit never draws into or
+        // replaces the layer contents, so only the OpenGL output is shown.
+        MaviMPVLayer *layer = [[MaviMPVLayer alloc] init];
+        layer.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
+        self.layer = layer;
         self.wantsLayer = YES;
         self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawDuringViewResize;
     }
     return self;
 }
-- (CALayer *)makeBackingLayer { return [[MaviMPVLayer alloc] init]; }
 - (MaviMPVLayer *)videoLayer { return (MaviMPVLayer *)self.layer; }
 - (BOOL)acceptsFirstResponder { return NO; }
 - (NSView *)hitTest:(NSPoint)point { return nil; }
