@@ -1,87 +1,142 @@
 #import "MaviMPVBridge.h"
 #import <OpenGL/gl3.h>
+#import <OpenGL/OpenGL.h>
+#import <QuartzCore/QuartzCore.h>
 #include <mpv/client.h>
 #include <mpv/render_gl.h>
 #include <dlfcn.h>
 #include <math.h>
 
-@interface MaviMPVSurface : NSOpenGLView
-- (int)attach:(mpv_handle *)handle;
+// Layer-hosted OpenGL surface (CAOpenGLLayer). Works inside SwiftUI's layer-backed
+// view tree, unlike NSOpenGLView which renders black or corrupted there.
+@interface MaviMPVLayer : CAOpenGLLayer
+@property(nonatomic, assign) mpv_handle *handle;
+@property(nonatomic, assign) int rendererError;
 - (void)closeRenderer;
 @end
+
 static void *resolveGL(void *context, const char *name) { return dlsym(RTLD_DEFAULT, name); }
 static void requestFrame(void *context) {
-    MaviMPVSurface *view = (__bridge MaviMPVSurface *)context;
-    dispatch_async(dispatch_get_main_queue(), ^{ view.needsDisplay = YES; });
+    MaviMPVLayer *layer = (__bridge MaviMPVLayer *)context;
+    dispatch_async(dispatch_get_main_queue(), ^{ [layer setNeedsDisplay]; });
 }
-@implementation MaviMPVSurface {
+
+@implementation MaviMPVLayer {
     mpv_render_context *_renderer;
+    CGLContextObj _context;
 }
 - (instancetype)init {
-    NSOpenGLPixelFormatAttribute attrs[] = {
-        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-        NSOpenGLPFAAccelerated, NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAColorSize, 24, NSOpenGLPFAAlphaSize, 8, 0
-    };
-    NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
-    if (!format) {
-        // No hardware renderer (virtual machines, some external displays): fall back to any 3.2 core renderer.
-        NSOpenGLPixelFormatAttribute fallback[] = {
-            NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
-            NSOpenGLPFADoubleBuffer, NSOpenGLPFAColorSize, 24, NSOpenGLPFAAlphaSize, 8, 0
-        };
-        format = [[NSOpenGLPixelFormat alloc] initWithAttributes:fallback];
+    if ((self = [super init])) {
+        self.asynchronous = NO;
+        self.needsDisplayOnBoundsChange = YES;
+        self.backgroundColor = NSColor.blackColor.CGColor;
+        self.opaque = YES;
     }
-    if (!format) return nil;
-    self = [super initWithFrame:NSMakeRect(0, 0, 800, 450) pixelFormat:format];
-    if (self) self.wantsBestResolutionOpenGLSurface = YES;
     return self;
 }
-- (int)attach:(mpv_handle *)handle {
-    [self.openGLContext makeCurrentContext];
-    if (!self.openGLContext) return MPV_ERROR_UNSUPPORTED;
-    GLint swap = 1; [self.openGLContext setValues:&swap forParameter:NSOpenGLCPSwapInterval];
-    mpv_opengl_init_params gl = {.get_proc_address = resolveGL};
-    mpv_render_param params[] = {
-        {MPV_RENDER_PARAM_API_TYPE, MPV_RENDER_API_TYPE_OPENGL},
-        {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl},
-        {MPV_RENDER_PARAM_INVALID, NULL}
+- (CGLPixelFormatObj)copyCGLPixelFormatForDisplayMask:(uint32_t)mask {
+    CGLPixelFormatAttribute accelerated[] = {
+        kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
+        kCGLPFADoubleBuffer, kCGLPFAAccelerated, kCGLPFAAllowOfflineRenderers,
+        kCGLPFAColorSize, (CGLPixelFormatAttribute)24, kCGLPFAAlphaSize, (CGLPixelFormatAttribute)8, 0
     };
-    int result = mpv_render_context_create(&_renderer, handle, params);
-    if (result >= 0) mpv_render_context_set_update_callback(_renderer, requestFrame, (__bridge void *)self);
-    return result;
+    CGLPixelFormatAttribute fallback[] = {
+        kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
+        kCGLPFADoubleBuffer, kCGLPFAAllowOfflineRenderers,
+        kCGLPFAColorSize, (CGLPixelFormatAttribute)24, kCGLPFAAlphaSize, (CGLPixelFormatAttribute)8, 0
+    };
+    CGLPixelFormatObj pixelFormat = NULL;
+    GLint count = 0;
+    CGLChoosePixelFormat(accelerated, &pixelFormat, &count);
+    if (!pixelFormat) CGLChoosePixelFormat(fallback, &pixelFormat, &count);
+    if (!pixelFormat) pixelFormat = [super copyCGLPixelFormatForDisplayMask:mask];
+    return pixelFormat;
 }
-- (void)viewDidMoveToWindow {
-    [super viewDidMoveToWindow];
-    [self.openGLContext update]; self.needsDisplay = YES;
+- (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat {
+    CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
+    GLint swap = 1;
+    if (context) CGLSetParameter(context, kCGLCPSwapInterval, &swap);
+    return context;
 }
-- (void)reshape { [super reshape]; [self.openGLContext update]; self.needsDisplay = YES; }
-- (void)drawRect:(NSRect)dirtyRect {
-    [self.openGLContext makeCurrentContext];
-    NSRect pixels = [self convertRectToBacking:self.bounds];
-    if (pixels.size.width < 1 || pixels.size.height < 1) return;
-    glViewport(0, 0, (GLsizei)pixels.size.width, (GLsizei)pixels.size.height);
-    glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT);
-    if (_renderer) {
-        mpv_render_context_update(_renderer);
-        mpv_opengl_fbo fbo = {.fbo = 0, .w = (int)pixels.size.width, .h = (int)pixels.size.height};
+- (BOOL)canDrawInCGLContext:(CGLContextObj)ctx pixelFormat:(CGLPixelFormatObj)pf
+               forLayerTime:(CFTimeInterval)t displayTime:(const CVTimeStamp *)ts {
+    return YES;
+}
+- (void)drawInCGLContext:(CGLContextObj)ctx pixelFormat:(CGLPixelFormatObj)pf
+            forLayerTime:(CFTimeInterval)t displayTime:(const CVTimeStamp *)ts {
+    CGLSetCurrentContext(ctx);
+    if (!_renderer && _handle) {
+        mpv_opengl_init_params gl = {.get_proc_address = resolveGL};
+        mpv_render_param params[] = {
+            {MPV_RENDER_PARAM_API_TYPE, MPV_RENDER_API_TYPE_OPENGL},
+            {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl},
+            {MPV_RENDER_PARAM_INVALID, NULL}
+        };
+        int result = mpv_render_context_create(&_renderer, _handle, params);
+        if (result >= 0) {
+            _context = ctx;
+            CGLRetainContext(ctx);
+            mpv_render_context_set_update_callback(_renderer, requestFrame, (__bridge void *)self);
+        } else {
+            _renderer = NULL;
+            _rendererError = result;
+        }
+    }
+    GLint fbo = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
+    GLint viewport[4] = {0, 0, 0, 0};
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (_renderer && viewport[2] > 0 && viewport[3] > 0) {
+        mpv_opengl_fbo target = {.fbo = (int)fbo, .w = viewport[2], .h = viewport[3]};
         int flip = 1, block = 0;
         mpv_render_param params[] = {
-            {MPV_RENDER_PARAM_OPENGL_FBO, &fbo}, {MPV_RENDER_PARAM_FLIP_Y, &flip},
+            {MPV_RENDER_PARAM_OPENGL_FBO, &target}, {MPV_RENDER_PARAM_FLIP_Y, &flip},
             {MPV_RENDER_PARAM_BLOCK_FOR_TARGET_TIME, &block}, {MPV_RENDER_PARAM_INVALID, NULL}
         };
         mpv_render_context_render(_renderer, params);
     }
-    [self.openGLContext flushBuffer];
+    glFlush();
+    [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
     if (_renderer) mpv_render_context_report_swap(_renderer);
 }
 - (void)closeRenderer {
     if (!_renderer) return;
-    [self.openGLContext makeCurrentContext];
+    if (_context) CGLSetCurrentContext(_context);
     mpv_render_context_set_update_callback(_renderer, NULL, NULL);
-    mpv_render_context_free(_renderer); _renderer = NULL;
+    mpv_render_context_free(_renderer);
+    _renderer = NULL;
+    if (_context) { CGLReleaseContext(_context); _context = NULL; }
 }
 - (void)dealloc { [self closeRenderer]; }
+@end
+
+@interface MaviMPVSurface : NSView
+@property(nonatomic, readonly) MaviMPVLayer *videoLayer;
+@end
+@implementation MaviMPVSurface
+- (instancetype)init {
+    if ((self = [super initWithFrame:NSMakeRect(0, 0, 800, 450)])) {
+        self.wantsLayer = YES;
+        self.layerContentsRedrawPolicy = NSViewLayerContentsRedrawDuringViewResize;
+    }
+    return self;
+}
+- (CALayer *)makeBackingLayer { return [[MaviMPVLayer alloc] init]; }
+- (MaviMPVLayer *)videoLayer { return (MaviMPVLayer *)self.layer; }
+- (BOOL)acceptsFirstResponder { return NO; }
+- (NSView *)hitTest:(NSPoint)point { return nil; }
+- (void)viewDidChangeBackingProperties {
+    [super viewDidChangeBackingProperties];
+    self.layer.contentsScale = self.window.backingScaleFactor ?: 2.0;
+    [self.layer setNeedsDisplay];
+}
+- (void)viewDidMoveToWindow {
+    [super viewDidMoveToWindow];
+    if (self.window) self.layer.contentsScale = self.window.backingScaleFactor ?: 2.0;
+    [self.layer setNeedsDisplay];
+}
 @end
 
 static id nodeObject(mpv_node *node) {
@@ -140,7 +195,7 @@ static id nodeObject(mpv_node *node) {
     }
     _initializationStage = @"initialize";
     int result = mpv_initialize(_handle);
-    if (result >= 0) { _initializationStage = @"render"; result = [_video attach:_handle]; }
+    if (result >= 0) { _initializationStage = @"render"; _video.videoLayer.handle = _handle; [_video.videoLayer setNeedsDisplay]; }
     if (result < 0) { _initializationError = result; [self shutdown]; }
     return self;
 }
@@ -225,7 +280,8 @@ static id nodeObject(mpv_node *node) {
         const char *stop[] = {"stop", NULL};
         mpv_command_async(_handle, 0, stop);
     }
-    [_video closeRenderer];
+    [_video.videoLayer closeRenderer];
+    _video.videoLayer.handle = NULL;
     mpv_handle *old = _handle; _handle = NULL;
     // Network teardown must not block AppKit's main thread.
     if (old) dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{ mpv_terminate_destroy(old); });
