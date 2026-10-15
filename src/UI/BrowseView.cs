@@ -276,8 +276,7 @@ public sealed class BrowseView : Grid
     {
         if (_area == Area.Search && _search.IsKeyboardFocused) return;
         if (_area == Area.Search) _area = Area.Sidebar;
-        Keyboard.ClearFocus();
-        Window.GetWindow(this)?.Focus();
+        MainWindow.ParkFocus(this);
     }
 
     private void OnModelChanged(string what)
@@ -425,8 +424,7 @@ public sealed class BrowseView : Grid
 
     private void LeaveSearch()
     {
-        Keyboard.ClearFocus();
-        Window.GetWindow(this)?.Focus();
+        MainWindow.ParkFocus(this);
         if (_ordered.Count > 0)
         {
             _area = Area.Grid;
@@ -476,8 +474,7 @@ public sealed class BrowseView : Grid
                     LeaveSearch();
                     return true;
                 case System.Windows.Input.Key.Escape:
-                    Keyboard.ClearFocus();
-                    Window.GetWindow(this)?.Focus();
+                    MainWindow.ParkFocus(this);
                     _area = Area.Sidebar;
                     return true;
                 default:

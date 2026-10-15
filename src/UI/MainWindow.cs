@@ -64,6 +64,9 @@ public sealed class MainWindow : Window, IShell
     private readonly Grid _screens = new();
     private readonly Grid _dialogHost = new();
     private readonly ToastView _toast = new();
+    /// Invisible element that holds keyboard focus while no text box is in use, so that
+    /// WPF does not hand focus back to the last text box when the window is focused.
+    private readonly Border _focusSink = new() { Focusable = true, FocusVisualStyle = null, Width = 0, Height = 0 };
     private PlayerWindow? _overlayWindow;
 
     private LoginView? _login;
@@ -105,6 +108,7 @@ public sealed class MainWindow : Window, IShell
         }
         KeyboardNavigation.SetTabNavigation(_screens, KeyboardNavigationMode.Cycle);
 
+        _root.Children.Add(_focusSink);
         _root.Children.Add(_video);
         _root.Children.Add(_screens);
         _root.Children.Add(_dialogHost);
@@ -121,7 +125,7 @@ public sealed class MainWindow : Window, IShell
         {
             PlaybackEngine.VideoWindow = _video.VideoHandle;
             _model.StartIfNeeded();
-            Focus();
+            if (_login == null) ParkFocus();
         };
         Closing += OnClosing;
 
@@ -234,7 +238,7 @@ public sealed class MainWindow : Window, IShell
         if (top is not PlayerRoute && IsLoaded)
         {
             Activate();
-            if (_login == null && _changeAccount == null) Focus();
+            if (_login == null && _changeAccount == null) ParkFocus();
         }
     }
 
@@ -271,6 +275,14 @@ public sealed class MainWindow : Window, IShell
         o.Height = _root.ActualHeight;
     }
 
+    public void ParkFocus()
+    {
+        FocusManager.SetFocusedElement(this, _focusSink);
+        Keyboard.Focus(_focusSink);
+    }
+
+    public static void ParkFocus(DependencyObject from) => (Window.GetWindow(from) as MainWindow)?.ParkFocus();
+
     // dialogs
 
     public void Present(ChoiceDialog dialog)
@@ -282,7 +294,7 @@ public sealed class MainWindow : Window, IShell
             if (_dialog != dialog) return;
             _dialogHost.Children.Clear();
             _dialog = null;
-            Focus();
+            if (_login == null && _changeAccount == null) ParkFocus();
         };
         _dialogHost.Children.Add(dialog);
     }
