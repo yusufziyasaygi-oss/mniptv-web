@@ -498,7 +498,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAccountDialog() {
         val acc = store.account ?: return
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Hesap")
             .setMessage("${acc.username}\n${acc.server}")
             .setPositiveButton("Hesabı değiştir") { _, _ ->
@@ -512,7 +512,9 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Liste yenileniyor", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Kapat", null)
-            .show()
+            .create()
+        dialog.setOnShowListener { dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.requestFocus() }
+        dialog.show()
     }
 
     // ---------------------------------------------------------------- keys
