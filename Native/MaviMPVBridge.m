@@ -18,20 +18,20 @@
 @property(nonatomic, assign) int lastViewportW;
 @property(nonatomic, assign) int lastViewportH;
 - (void)closeRenderer;
+- (void)renderNow;
 @end
 
 static void *resolveGL(void *context, const char *name) { return dlsym(RTLD_DEFAULT, name); }
-static void requestFrame(void *context) {
-    MaviMPVLayer *layer = (__bridge MaviMPVLayer *)context;
-    dispatch_async(dispatch_get_main_queue(), ^{ [layer setNeedsDisplay]; });
-}
+static void requestFrame(void *context);
 
 @implementation MaviMPVLayer {
     mpv_render_context *_renderer;
     CGLContextObj _context;
+    dispatch_queue_t _queue;
 }
 - (instancetype)init {
     if ((self = [super init])) {
+        _queue = dispatch_queue_create("com.mavinokta.iptv.render", DISPATCH_QUEUE_SERIAL);
         self.asynchronous = NO;
         self.needsDisplayOnBoundsChange = YES;
         self.backgroundColor = NSColor.blackColor.CGColor;
@@ -58,10 +58,40 @@ static void requestFrame(void *context) {
     return pixelFormat;
 }
 - (CGLContextObj)copyCGLContextForPixelFormat:(CGLPixelFormatObj)pixelFormat {
-    CGLContextObj context = [super copyCGLContextForPixelFormat:pixelFormat];
+    CGLContextObj context = NULL;
+    CGLCreateContext(pixelFormat, NULL, &context);
+    if (!context) return [super copyCGLContextForPixelFormat:pixelFormat];
     GLint swap = 1;
-    if (context) CGLSetParameter(context, kCGLCPSwapInterval, &swap);
+    CGLSetParameter(context, kCGLCPSwapInterval, &swap);
+    CGLEnable(context, kCGLCEMPEngine);
     return context;
+}
+- (void)ensureRendererInContext:(CGLContextObj)ctx {
+    if (_renderer || !_handle) return;
+    mpv_opengl_init_params gl = {.get_proc_address = resolveGL};
+    mpv_render_param params[] = {
+        {MPV_RENDER_PARAM_API_TYPE, MPV_RENDER_API_TYPE_OPENGL},
+        {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl},
+        {MPV_RENDER_PARAM_INVALID, NULL}
+    };
+    int result = mpv_render_context_create(&_renderer, _handle, params);
+    if (result >= 0) {
+        _context = ctx;
+        CGLRetainContext(ctx);
+        mpv_render_context_set_update_callback(_renderer, requestFrame, (__bridge void *)self);
+    } else {
+        _renderer = NULL;
+        _rendererError = result;
+    }
+}
+/// Called for every new mpv frame: draw right away on the render queue (as IINA does),
+/// instead of waiting for Core Animation to schedule a redraw.
+- (void)renderNow {
+    dispatch_async(_queue, ^{ [self display]; });
+}
+- (void)display {
+    [super display];
+    [CATransaction flush];
 }
 - (BOOL)canDrawInCGLContext:(CGLContextObj)ctx pixelFormat:(CGLPixelFormatObj)pf
                forLayerTime:(CFTimeInterval)t displayTime:(const CVTimeStamp *)ts {
@@ -69,33 +99,16 @@ static void requestFrame(void *context) {
 }
 - (void)drawInCGLContext:(CGLContextObj)ctx pixelFormat:(CGLPixelFormatObj)pf
             forLayerTime:(CFTimeInterval)t displayTime:(const CVTimeStamp *)ts {
+    CGLLockContext(ctx);
     CGLSetCurrentContext(ctx);
-    if (!_renderer && _handle) {
-        mpv_opengl_init_params gl = {.get_proc_address = resolveGL};
-        mpv_render_param params[] = {
-            {MPV_RENDER_PARAM_API_TYPE, MPV_RENDER_API_TYPE_OPENGL},
-            {MPV_RENDER_PARAM_OPENGL_INIT_PARAMS, &gl},
-            {MPV_RENDER_PARAM_INVALID, NULL}
-        };
-        int result = mpv_render_context_create(&_renderer, _handle, params);
-        if (result >= 0) {
-            _context = ctx;
-            CGLRetainContext(ctx);
-            mpv_render_context_set_update_callback(_renderer, requestFrame, (__bridge void *)self);
-        } else {
-            _renderer = NULL;
-            _rendererError = result;
-        }
-    }
+    [self ensureRendererInContext:ctx];
     GLint fbo = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fbo);
     GLint viewport[4] = {0, 0, 0, 0};
     glGetIntegerv(GL_VIEWPORT, viewport);
     _frames++;
     _lastViewportW = viewport[2];
     _lastViewportH = viewport[3];
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
     if (_renderer && viewport[2] > 0 && viewport[3] > 0) {
         mpv_opengl_fbo target = {.fbo = (int)fbo, .w = viewport[2], .h = viewport[3]};
         int flip = 1, block = 0;
@@ -105,21 +118,32 @@ static void requestFrame(void *context) {
         };
         mpv_render_context_render(_renderer, params);
         _renderedFrames++;
+    } else {
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
     glFlush();
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
     if (_renderer) mpv_render_context_report_swap(_renderer);
+    CGLUnlockContext(ctx);
 }
 - (void)closeRenderer {
-    if (!_renderer) return;
-    if (_context) CGLSetCurrentContext(_context);
-    mpv_render_context_set_update_callback(_renderer, NULL, NULL);
-    mpv_render_context_free(_renderer);
-    _renderer = NULL;
-    if (_context) { CGLReleaseContext(_context); _context = NULL; }
+    dispatch_sync(_queue, ^{
+        if (!self->_renderer) return;
+        if (self->_context) { CGLLockContext(self->_context); CGLSetCurrentContext(self->_context); }
+        mpv_render_context_set_update_callback(self->_renderer, NULL, NULL);
+        mpv_render_context_free(self->_renderer);
+        self->_renderer = NULL;
+        if (self->_context) { CGLUnlockContext(self->_context); CGLReleaseContext(self->_context); self->_context = NULL; }
+    });
 }
 - (void)dealloc { [self closeRenderer]; }
 @end
+
+static void requestFrame(void *context) {
+    MaviMPVLayer *layer = (__bridge MaviMPVLayer *)context;
+    [layer renderNow];
+}
 
 @interface MaviMPVSurface : NSView
 @property(nonatomic, readonly) MaviMPVLayer *videoLayer;
@@ -210,7 +234,7 @@ static id nodeObject(mpv_node *node) {
     }
     _initializationStage = @"initialize";
     int result = mpv_initialize(_handle);
-    if (result >= 0) { _initializationStage = @"render"; _video.videoLayer.handle = _handle; [_video.videoLayer setNeedsDisplay]; }
+    if (result >= 0) { _initializationStage = @"render"; _video.videoLayer.handle = _handle; [_video.videoLayer renderNow]; }
     if (result < 0) { _initializationError = result; [self shutdown]; }
     return self;
 }

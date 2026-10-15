@@ -63,6 +63,18 @@ jobs:
           ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null > out/smoke/diagnostic-list.txt
           for f in ~/Library/Logs/DiagnosticReports/*MaviNokta*; do [ -f "$f" ] && cp "$f" out/smoke/; done
           cat out/smoke/finished.txt || echo "NOT FINISHED"
+          # Repeat run to check that rendering is consistent, not lucky.
+          mkdir -p out/smoke2
+          MN_SMOKE_DIR="$PWD/out/smoke2" MN_SMOKE_SERVER="http://127.0.0.1:8080" \
+            "build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV" > out/smoke2/app-stdout.txt 2>&1 &
+          APP_PID=$!
+          for i in $(seq 1 360); do
+            [ -f out/smoke2/finished.txt ] && break
+            kill -0 $APP_PID 2>/dev/null || break
+            sleep 1
+          done
+          sleep 2
+          kill $APP_PID 2>/dev/null
           exit 0
 
       - name: Collect outputs
