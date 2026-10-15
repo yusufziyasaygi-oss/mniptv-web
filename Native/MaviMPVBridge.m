@@ -12,6 +12,10 @@
 @interface MaviMPVLayer : CAOpenGLLayer
 @property(nonatomic, assign) mpv_handle *handle;
 @property(nonatomic, assign) int rendererError;
+@property(nonatomic, assign) long frames;
+@property(nonatomic, assign) long renderedFrames;
+@property(nonatomic, assign) int lastViewportW;
+@property(nonatomic, assign) int lastViewportH;
 - (void)closeRenderer;
 @end
 
@@ -86,6 +90,9 @@ static void requestFrame(void *context) {
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo);
     GLint viewport[4] = {0, 0, 0, 0};
     glGetIntegerv(GL_VIEWPORT, viewport);
+    _frames++;
+    _lastViewportW = viewport[2];
+    _lastViewportH = viewport[3];
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     if (_renderer && viewport[2] > 0 && viewport[3] > 0) {
@@ -96,6 +103,7 @@ static void requestFrame(void *context) {
             {MPV_RENDER_PARAM_BLOCK_FOR_TARGET_TIME, &block}, {MPV_RENDER_PARAM_INVALID, NULL}
         };
         mpv_render_context_render(_renderer, params);
+        _renderedFrames++;
     }
     glFlush();
     [super drawInCGLContext:ctx pixelFormat:pf forLayerTime:t displayTime:ts];
@@ -274,6 +282,14 @@ static id nodeObject(mpv_node *node) {
     NSString *position = [NSString stringWithFormat:@"%.6f", seconds];
     const char *args[] = {"seek", position.UTF8String, absolute ? "absolute+exact" : "relative+exact", NULL};
     return mpv_command_async(_handle, 3, args);
+}
+- (NSString *)diagnostics {
+    MaviMPVLayer *l = _video.videoLayer;
+    NSRect b = _video.bounds;
+    return [NSString stringWithFormat:@"layer=%@ frames=%ld rendered=%ld rerr=%d vp=%dx%d bounds=%.0fx%.0f window=%d hidden=%d super=%@",
+            NSStringFromClass(l.class), l.frames, l.renderedFrames, l.rendererError, l.lastViewportW, l.lastViewportH,
+            b.size.width, b.size.height, _video.window != nil, _video.isHiddenOrHasHiddenAncestor,
+            NSStringFromClass(_video.superview.class)];
 }
 - (void)shutdown {
     if (_handle) {

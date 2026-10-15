@@ -13,6 +13,7 @@ struct TrackOption: Hashable {
 enum PlaybackEngine {
     private static var instance: MaviMPVBridge?
     private(set) static var failure: String?
+    static var peek: MaviMPVBridge? { instance }
 
     static var shared: MaviMPVBridge? {
         if let i = instance { return i }
