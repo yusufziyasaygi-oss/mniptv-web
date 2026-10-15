@@ -63,6 +63,18 @@ jobs:
           ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null > out/smoke/diagnostic-list.txt
           for f in ~/Library/Logs/DiagnosticReports/*MaviNokta*; do [ -f "$f" ] && cp "$f" out/smoke/; done
           cat out/smoke/finished.txt || echo "NOT FINISHED"
+          # Second run with hardware decoding disabled, to isolate GPU/VideoToolbox issues.
+          mkdir -p out/smoke-nohw
+          MN_HWDEC=no MN_SMOKE_DIR="$PWD/out/smoke-nohw" MN_SMOKE_SERVER="http://127.0.0.1:8080" \
+            "build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV" > out/smoke-nohw/app-stdout.txt 2>&1 &
+          APP_PID=$!
+          for i in $(seq 1 360); do
+            [ -f out/smoke-nohw/finished.txt ] && break
+            kill -0 $APP_PID 2>/dev/null || break
+            sleep 1
+          done
+          sleep 2
+          kill $APP_PID 2>/dev/null
           exit 0
 
       - name: Collect outputs

@@ -39,7 +39,10 @@ final class SmokeRunner {
     private func log(_ text: String) {
         let p = model.activePlayer
         let state = p.map { "pos=\(String(format: "%.1f", $0.position)) dur=\(String(format: "%.0f", $0.duration)) h=\($0.videoHeight) status=\($0.status) cur=\($0.current)" } ?? "-"
-        let diag = PlaybackEngine.peek?.diagnostics() ?? "engine=nil"
+        var diag = PlaybackEngine.peek?.diagnostics() ?? "engine=nil"
+        if let e = PlaybackEngine.peek {
+            diag += " hwdec=\(e.text("hwdec-current")) pixfmt=\(e.text("video-params/pixelformat")) hwpix=\(e.text("video-params/hw-pixelformat"))"
+        }
         let line = "\(text) | section=\(model.section.title) route=\(model.route.count) tiles=\(model.tiles.count) | \(state) | \(diag)"
         lines.append(line)
         try? lines.joined(separator: "\n").write(to: dir.appendingPathComponent("steps.txt"), atomically: true, encoding: .utf8)

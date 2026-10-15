@@ -6,6 +6,7 @@
 #include <mpv/render_gl.h>
 #include <dlfcn.h>
 #include <math.h>
+#include <stdlib.h>
 
 // Layer-hosted OpenGL surface (CAOpenGLLayer). Works inside SwiftUI's layer-backed
 // view tree, unlike NSOpenGLView which renders black or corrupted there.
@@ -199,6 +200,8 @@ static id nodeObject(mpv_node *node) {
         int result = mpv_set_option_string(_handle, options[i][0], options[i][1]);
         if (result < 0) { _initializationError = result; [self shutdown]; return self; }
     }
+    const char *hwOverride = getenv("MN_HWDEC");
+    if (hwOverride && *hwOverride) mpv_set_option_string(_handle, "hwdec", hwOverride);
     NSString *certificates = [NSBundle.mainBundle pathForResource:@"CACertificates" ofType:@"pem"];
     if (!certificates && [[NSFileManager defaultManager] fileExistsAtPath:@"/etc/ssl/cert.pem"]) certificates = @"/etc/ssl/cert.pem";
     if (certificates) {
