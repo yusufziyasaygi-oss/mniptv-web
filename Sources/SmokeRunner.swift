@@ -42,6 +42,7 @@ final class SmokeRunner {
         var diag = PlaybackEngine.peek?.diagnostics() ?? "engine=nil"
         if let e = PlaybackEngine.peek {
             diag += " hwdec=\(e.text("hwdec-current")) pixfmt=\(e.text("video-params/pixelformat")) hwpix=\(e.text("video-params/hw-pixelformat"))"
+            diag += " vid=\(e.text("vid")) voconf=\(e.text("vo-configured")) out=\(e.text("video-out-params/w"))x\(e.text("video-out-params/h")) drops=\(e.text("frame-drop-count"))/\(e.text("decoder-frame-drop-count")) vo=\(e.text("current-vo")) container=\(e.text("file-format"))"
         }
         let line = "\(text) | section=\(model.section.title) route=\(model.route.count) tiles=\(model.tiles.count) | \(state) | \(diag)"
         lines.append(line)
