@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>MNIPTV</AssemblyName>
+    <RootNamespace>MNIPTV</RootNamespace>
+    <StartupObject>MNIPTV.Program</StartupObject>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <ApplicationIcon>assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>2.1.0</Version>
+    <FileVersion>2.1.0.0</FileVersion>
+    <Product>MN IPTV</Product>
+    <Company>Mavi Nokta</Company>
+    <Copyright>Mavi Nokta</Copyright>
+    <Description>MN IPTV</Description>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PlatformTarget>x64</PlatformTarget>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>tr;en</SatelliteResourceLanguages>
+    <TieredPGO>true</TieredPGO>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>CA1416</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="assets\app.ico" />
+    <None Include="assets\cacert.pem" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="cacert.pem" />
+    <None Include="native\libmpv-2.dll" Condition="Exists('native\libmpv-2.dll')" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="libmpv-2.dll" />
+    <Compile Remove="ci\**;installer\**;out\**" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,8 @@
+bin/
+obj/
+publish/
+out/
+native/
+mpvdl/
+mvpx/
+ci/media/
