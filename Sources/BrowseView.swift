@@ -37,7 +37,7 @@ struct BrowseView: View {
         .onKeyPress(phases: .down) { press in handleKey(press) }
         .onAppear {
             sideIndex = model.section.rawValue
-            keyFocus = true
+            reclaimFocus()
         }
         .onChange(of: model.section) {
             sideIndex = model.section.rawValue
@@ -56,7 +56,7 @@ struct BrowseView: View {
             if model.tiles.isEmpty && area == .grid { area = model.section.kind != nil ? .categories : .sidebar }
         }
         .onChange(of: model.route.isEmpty) {
-            if model.route.isEmpty { keyFocus = true }
+            if model.route.isEmpty { reclaimFocus() }
         }
     }
 
@@ -255,6 +255,14 @@ struct BrowseView: View {
     }
 
     // MARK: actions
+
+    private func reclaimFocus() {
+        keyFocus = true
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if model.route.isEmpty && !searchFocus { keyFocus = true }
+        }
+    }
 
     private func activateSidebar() {
         keyFocus = true

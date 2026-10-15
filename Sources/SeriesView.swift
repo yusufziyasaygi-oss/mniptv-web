@@ -62,7 +62,13 @@ struct SeriesView: View {
         .focused($keyFocus)
         .focusEffectDisabled()
         .onKeyPress(phases: .down) { handleKey($0) }
-        .onAppear { keyFocus = true }
+        .onAppear {
+            keyFocus = true
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                keyFocus = true
+            }
+        }
         .task(id: entry.id) { await load() }
         .confirmationDialog(pendingTitle, isPresented: $askResume, titleVisibility: .visible) {
             if let pp = pendingPlay {

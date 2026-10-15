@@ -1,12 +1,18 @@
 import AppKit
 import SwiftUI
 
+/// Container that never takes keyboard focus or mouse events away from SwiftUI.
+final class PassiveContainerView: NSView {
+    override var acceptsFirstResponder: Bool { false }
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
+}
+
 /// Hosts the libmpv OpenGL surface.
 struct MPVSurfaceView: NSViewRepresentable {
     let surface: NSView
 
     func makeNSView(context: Context) -> NSView {
-        let container = NSView()
+        let container = PassiveContainerView()
         container.wantsLayer = true
         container.layer?.backgroundColor = NSColor.black.cgColor
         attach(surface, to: container)
@@ -109,6 +115,10 @@ struct PlayerScreen: View {
         }
         .onAppear {
             keyFocus = true
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                keyFocus = true
+            }
             model.activePlayer = player
             player.onFinished = { model.back() }
             player.start()
