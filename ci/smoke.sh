@@ -21,6 +21,26 @@ step() {
 }
 key() { for k in "$@"; do adb shell input keyevent "$k"; sleep 0.7; done; }
 longok() { adb shell input keyevent --longpress KEYCODE_DPAD_CENTER; sleep 1; }
+top_activity() { adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity"; }
+# Leave player/series screens until the catalogue is in front.
+to_main() {
+  for i in 1 2 3 4 5; do
+    if top_activity | grep -q "ui.MainActivity"; then return; fi
+    adb shell input keyevent KEYCODE_BACK; sleep 1.5
+  done
+}
+# Deterministic menu selection: far left, top, then N rows down, then OK.
+menu() {
+  to_main
+  key KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT
+  key KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+  local n=$1
+  while [ "$n" -gt 0 ]; do key KEYCODE_DPAD_DOWN; n=$((n-1)); done
+  sleep 1
+  key KEYCODE_DPAD_CENTER
+  sleep 3
+}
+
 hide_ime() {
   if adb shell dumpsys input_method | grep -q "mInputShown=true"; then
     adb shell input keyevent KEYCODE_BACK
@@ -57,15 +77,14 @@ key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
 sleep 6
 step 03-home-live
 
-# 2. Live TV: menu -> categories -> grid -> play
+# 2. Live TV (menu index 1)
+menu 1
+step 04-live-categories-focus
 key KEYCODE_DPAD_RIGHT
 sleep 1
-step 04-categories-focus
-key KEYCODE_DPAD_RIGHT
-sleep 1
-step 05-grid-focus
+step 05-live-grid-focus
 key KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT
-step 06-grid-moved
+step 06-live-grid-moved
 key KEYCODE_DPAD_CENTER
 sleep 7
 step 07-live-playing
@@ -86,99 +105,103 @@ sleep 3
 step 12-live-number-12
 longok
 step 13-live-options
-key KEYCODE_BACK
-key KEYCODE_BACK
+key KEYCODE_DPAD_CENTER
 sleep 2
-step 14-back-home
+step 14-live-favorited
+to_main
+sleep 1
+step 15-back-home
 
-# 3. Movies: grid -> categories -> menu -> Filmler
-key KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT
-key KEYCODE_DPAD_DOWN
-sleep 3
-step 15-movies
-key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
-step 16-movies-grid
+# 3. Movies (menu index 2)
+menu 2
+step 16-movies-categories
+key KEYCODE_DPAD_RIGHT
+sleep 1
+step 17-movies-grid
 key KEYCODE_DPAD_CENTER
 sleep 25
-step 17-movie-playing
+step 18-movie-playing
 key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
-step 18-movie-seek
+step 19-movie-seek
 key KEYCODE_DPAD_CENTER
 sleep 1
-step 19-movie-paused
-key KEYCODE_BACK
-key KEYCODE_BACK
-sleep 2
-step 20-after-movie
+step 20-movie-paused
+key KEYCODE_DPAD_CENTER
+sleep 3
+to_main
+sleep 1
+step 21-after-movie
 
-# 4. Continue watching
-key KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT
-key KEYCODE_DPAD_UP KEYCODE_DPAD_UP
-sleep 2
-step 21-continue-watching
-key KEYCODE_DPAD_RIGHT
-step 22-continue-focus
+# 4. Continue watching (menu index 0)
+menu 0
+step 22-continue-watching
 key KEYCODE_DPAD_CENTER
 sleep 8
 step 23-continue-resumed
-key KEYCODE_BACK
-key KEYCODE_BACK
-sleep 2
+to_main
 
-# 5. Series
-key KEYCODE_DPAD_LEFT
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
-sleep 3
-step 24-series
-key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_CENTER
+# 5. Series (menu index 3)
+menu 3
+step 24-series-categories
+key KEYCODE_DPAD_RIGHT
+sleep 1
+step 25-series-grid
+key KEYCODE_DPAD_CENTER
 sleep 4
-step 25-series-detail
+step 26-series-detail
 key KEYCODE_DPAD_CENTER
 sleep 22
-step 26-episode-playing
-key KEYCODE_BACK
+step 27-episode-playing
 key KEYCODE_BACK
 sleep 3
-step 27-series-detail-resume
+step 28-series-detail-resume
 key KEYCODE_DPAD_UP
-step 28-series-season-row
+step 29a-series-season-row
 key KEYCODE_DPAD_RIGHT
 sleep 2
 step 29-series-season-2
-key KEYCODE_BACK
-sleep 2
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
+step 30-series-episode-focus
+to_main
 
-# 6. Broken series (empty episodes) must not crash
-key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
-step 30-series-last
+# 6. Series with empty episode list must not crash (last tile: Dizi 8)
+menu 3
+key KEYCODE_DPAD_RIGHT
+key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
+step 31-series-last-tile
 key KEYCODE_DPAD_CENTER
 sleep 4
-step 31-series-empty
-key KEYCODE_BACK
-sleep 2
+step 32-series-empty
+to_main
 
-# 7. Favourite via long press, then search
+# 7. Favourite a movie with long press, then favourites (menu index 4)
+menu 2
+key KEYCODE_DPAD_RIGHT
 longok
-step 32-favorite-added
-key KEYCODE_BACK KEYCODE_BACK
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
-sleep 2
-step 33-search-menu
-key KEYCODE_DPAD_CENTER
-sleep 1
+step 33-movie-favorited
+menu 4
+step 34-favorites
+
+# 8. Search (menu index 5)
+menu 5
 adb shell input text "kanal%s1"
 sleep 1; hide_ime
-sleep 4
-step 34-search-results
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
+sleep 5
+step 35-search-results
+key KEYCODE_DPAD_DOWN
+step 36-search-focus
+key KEYCODE_DPAD_CENTER
 sleep 6
-step 35-search-play
-key KEYCODE_BACK KEYCODE_BACK
-sleep 2
-key KEYCODE_DPAD_UP
-sleep 3
-step 36-favorites
+step 37-search-play
+to_main
+
+# 9. Account dialog (menu index 6)
+menu 6
+step 38-account
+key KEYCODE_BACK
+sleep 1
+step 39-final
 
 adb logcat -d > "$OUT/logcat.txt"
 grep -n -A40 "FATAL EXCEPTION" "$OUT/logcat.txt" > "$OUT/crash.txt" || true
