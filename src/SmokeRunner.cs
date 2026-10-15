@@ -342,9 +342,10 @@ public sealed class SmokeRunner
         await Enter();
         await Wait(0.5);
         Shot("22-account-menu");
+        Check("account menu opens", _window.DialogOpen);
         await Escape();
         await Wait(0.5);
-        Check("account menu closes", _model.Account != null);
+        Check("account menu closes", !_window.DialogOpen && _model.Account != null);
 
         Finish();
     }

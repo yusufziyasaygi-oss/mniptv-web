@@ -77,6 +77,7 @@ public sealed class MainWindow : Window, IShell
 
     public LoginView? Login => _changeAccount ?? _login;
     public bool IsFullScreen => _fullScreen;
+    public bool DialogOpen => _dialog != null;
     /// Created on first use: an owned window needs its owner to be shown first.
     public PlayerWindow Overlay => _overlayWindow ??= new PlayerWindow(this);
 

@@ -584,6 +584,7 @@ public sealed class BrowseView : Grid
                         else _area = Area.Sidebar;
                         break;
                     case Area.Categories:
+                    case Area.Search:
                         _area = Area.Sidebar;
                         break;
                 }
