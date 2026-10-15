@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.KeyEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -140,6 +141,69 @@ class SeriesActivity : AppCompatActivity() {
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
+    }
+
+    /**
+     * Predictable remote navigation: buttons ↔ selected season ↔ episodes,
+     * and no sideways escapes out of the season row or the episode list.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN && ::seasonList.isInitialized) {
+            val f = currentFocus
+            if (f != null && handleNavigation(event.keyCode, f)) return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun handleNavigation(keyCode: Int, f: View): Boolean {
+        val inSeasons = f.isInside(seasonList)
+        val inEpisodes = f.isInside(episodeList)
+        val onButton = f === resumeButton || f === favButton
+        val hasSeasons = seasonAdapter.itemCount > 0
+        when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                if (inEpisodes && nextFocusInside(episodeList, f, View.FOCUS_UP) == null && !episodeList.canScrollVertically(-1)) {
+                    if (hasSeasons) seasonList.focusRow(selectedSeason.coerceAtLeast(0)) else focusButtons()
+                    return true
+                }
+                if (inSeasons) {
+                    focusButtons()
+                    return true
+                }
+                if (onButton) return true
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                if (onButton) {
+                    if (hasSeasons) seasonList.focusRow(selectedSeason.coerceAtLeast(0))
+                    else if (episodeAdapter.itemCount > 0) episodeList.focusFirstVisible()
+                    return true
+                }
+                if (inSeasons) {
+                    handler.removeCallbacks(seasonRunnable)
+                    if (pendingSeason >= 0 && pendingSeason != selectedSeason) selectSeason(pendingSeason)
+                    if (episodeAdapter.itemCount > 0) episodeList.post { episodeList.focusRow(0) }
+                    return true
+                }
+                if (inEpisodes && nextFocusInside(episodeList, f, View.FOCUS_DOWN) == null && !episodeList.canScrollVertically(1)) {
+                    return true
+                }
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                val dir = if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) View.FOCUS_LEFT else View.FOCUS_RIGHT
+                if (inSeasons && nextFocusInside(seasonList, f, dir) == null && !seasonList.canScrollHorizontally(if (dir == View.FOCUS_LEFT) -1 else 1)) {
+                    return true
+                }
+                if (inEpisodes) return true
+                if (f === favButton && dir == View.FOCUS_RIGHT) return true
+                if (f === resumeButton && dir == View.FOCUS_LEFT) return true
+                if (f === favButton && dir == View.FOCUS_LEFT && resumeButton.visibility != View.VISIBLE) return true
+            }
+        }
+        return false
+    }
+
+    private fun focusButtons() {
+        if (resumeButton.visibility == View.VISIBLE) resumeButton.requestFocus() else favButton.requestFocus()
     }
 
     private fun updateFavButton() {

@@ -160,8 +160,13 @@ step 29a-series-season-row
 key KEYCODE_DPAD_RIGHT
 sleep 2
 step 29-series-season-2
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
+key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
+step 29b-series-right-edge-stays
+key KEYCODE_DPAD_DOWN
+sleep 1
 step 30-series-episode-focus
+key KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+step 30b-series-buttons
 to_main
 
 # 6. Series with empty episode list must not crash (last tile: Dizi 8)
