@@ -24,6 +24,14 @@ static void requestFrame(void *context) {
         NSOpenGLPFAColorSize, 24, NSOpenGLPFAAlphaSize, 8, 0
     };
     NSOpenGLPixelFormat *format = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
+    if (!format) {
+        // No hardware renderer (virtual machines, some external displays): fall back to any 3.2 core renderer.
+        NSOpenGLPixelFormatAttribute fallback[] = {
+            NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+            NSOpenGLPFADoubleBuffer, NSOpenGLPFAColorSize, 24, NSOpenGLPFAAlphaSize, 8, 0
+        };
+        format = [[NSOpenGLPixelFormat alloc] initWithAttributes:fallback];
+    }
     if (!format) return nil;
     self = [super initWithFrame:NSMakeRect(0, 0, 800, 450) pixelFormat:format];
     if (self) self.wantsBestResolutionOpenGLSurface = YES;

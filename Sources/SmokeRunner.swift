@@ -250,6 +250,7 @@ final class SmokeRunner {
 
         // 8. Search
         model.goToSection(.search)
+        await wait(1)
         model.query = "kanal 1"
         let searched = await waitUntil(10) { self.model.tiles.count == 7 }
         check("search 'kanal 1'", searched, "tiles=\(model.tiles.count)")
