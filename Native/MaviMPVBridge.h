@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (int)setText:(NSString *)value property:(NSString *)name NS_SWIFT_NAME(set(text:property:));
 - (int)seekTo:(double)seconds absolute:(BOOL)absolute NS_SWIFT_NAME(seek(seconds:absolute:));
 - (int)reloadAudio NS_SWIFT_NAME(reloadAudio());
+- (int)stopPlayback NS_SWIFT_NAME(stopPlayback());
 - (void)shutdown NS_SWIFT_NAME(shutdown());
 @end
 NS_ASSUME_NONNULL_END

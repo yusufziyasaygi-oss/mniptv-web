@@ -35,7 +35,10 @@ struct SeriesView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             MN.black
-            RemoteImage(url: cover).opacity(0.16).clipped().allowsHitTesting(false)
+            Color.clear
+                .overlay(RemoteImage(url: cover).opacity(0.16))
+                .clipped()
+                .allowsHitTesting(false)
             HStack(alignment: .top, spacing: 36) {
                 ZStack {
                     Rectangle().fill(MN.card)

@@ -209,6 +209,11 @@ static id nodeObject(mpv_node *node) {
     const char *args[] = {"ao-reload", NULL};
     return mpv_command(_handle, args);
 }
+- (int)stopPlayback {
+    if (!_handle) return MPV_ERROR_UNINITIALIZED;
+    const char *args[] = {"stop", NULL};
+    return mpv_command_async(_handle, 0, args);
+}
 - (int)seekTo:(double)seconds absolute:(BOOL)absolute {
     if (!_handle || !isfinite(seconds)) return MPV_ERROR_INVALID_PARAMETER;
     NSString *position = [NSString stringWithFormat:@"%.6f", seconds];

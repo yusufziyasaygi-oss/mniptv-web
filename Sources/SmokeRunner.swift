@@ -105,7 +105,9 @@ final class SmokeRunner {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let server = ProcessInfo.processInfo.environment["MN_SMOKE_SERVER"] ?? "http://127.0.0.1:8080"
         await wait(2)
-        window?.setFrame(NSRect(x: 0, y: 0, width: 1440, height: 880), display: true)
+        if let screen = NSScreen.main?.visibleFrame {
+            window?.setFrame(NSRect(x: screen.minX, y: screen.minY, width: min(1440, screen.width), height: min(880, screen.height)), display: true)
+        }
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         await wait(1)

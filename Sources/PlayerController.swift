@@ -7,7 +7,28 @@ struct TrackOption: Hashable {
     let selected: Bool
 }
 
-/// Drives one MaviMPVBridge (libmpv) for live channels, movies and series.
+/// One libmpv instance and video surface for the whole app. Re-creating the OpenGL
+/// surface per screen left later screens black, and reusing it makes channel changes faster.
+@MainActor
+enum PlaybackEngine {
+    private static var instance: MaviMPVBridge?
+    private(set) static var failure: String?
+
+    static var shared: MaviMPVBridge? {
+        if let i = instance { return i }
+        if failure != nil { return nil }
+        let created = MaviMPVBridge()
+        if created.ready {
+            instance = created
+        } else {
+            failure = "Oynatıcı başlatılamadı (\(created.initializationStage) \(created.initializationError))"
+            created.shutdown()
+        }
+        return instance
+    }
+}
+
+/// Drives the shared MaviMPVBridge (libmpv) for live channels, movies and series.
 @MainActor
 final class PlayerController: ObservableObject {
     enum Status: Equatable { case loading, playing, paused, failed(String) }
@@ -76,13 +97,15 @@ final class PlayerController: ObservableObject {
         self.request = request
         self.model = model
         self.volume = model.store.volume
-        let instance = MaviMPVBridge()
-        if instance.ready {
-            bridge = instance
-            _ = instance.set(number: volume, property: "volume")
+        if let engine = PlaybackEngine.shared {
+            bridge = engine
+            _ = engine.stopPlayback()
+            _ = engine.drainEvents()
+            _ = engine.set(number: volume, property: "volume")
+            _ = engine.set(text: "no", property: "mute")
+            _ = engine.set(number: 0, property: "panscan")
         } else {
-            instance.shutdown()
-            status = .failed("Oynatıcı başlatılamadı (\(instance.initializationStage) \(instance.initializationError))")
+            status = .failed(PlaybackEngine.failure ?? "Oynatıcı başlatılamadı")
         }
     }
 
@@ -110,7 +133,8 @@ final class PlayerController: ObservableObject {
         tuneTask?.cancel()
         retryTask?.cancel()
         epgTask?.cancel()
-        bridge?.shutdown()
+        _ = bridge?.stopPlayback()
+        _ = bridge?.set(text: "no", property: "pause")
         bridge = nil
     }
 
@@ -123,6 +147,8 @@ final class PlayerController: ObservableObject {
         duration = 0
         pendingStart = start
         _ = bridge.set(text: start > 1 ? String(format: "%.1f", start) : "none", property: "start")
+        _ = bridge.set(text: "auto", property: "aid")
+        _ = bridge.set(text: "auto", property: "sid")
         _ = bridge.load(address: url)
         _ = bridge.set(text: "no", property: "pause")
     }
