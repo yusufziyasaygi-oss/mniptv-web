@@ -42,12 +42,18 @@ struct MNIPTVApp: App {
 
 struct RootView: View {
     @EnvironmentObject var model: AppModel
+
     @StateObject private var loginForm = LoginForm()
     @State private var accountDialog = false
     @State private var changingAccount = false
 
     var body: some View {
         ZStack {
+            // The video surface never leaves the window; player screens are transparent overlays on top of it.
+            if model.account != nil, let engine = PlaybackEngine.shared {
+                MPVSurfaceView(surface: engine.surface)
+                    .allowsHitTesting(false)
+            }
             if model.account == nil {
                 LoginView(form: loginForm)
             } else {

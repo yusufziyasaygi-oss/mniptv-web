@@ -56,9 +56,7 @@ struct PlayerScreen: View {
 
     var body: some View {
         ZStack {
-            Color.black
-            MPVSurfaceView(surface: player.surface)
-                .allowsHitTesting(false)
+            // Video is drawn by the shared surface underneath (see RootView).
             Color.clear
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) { toggleFullScreen() }
@@ -102,7 +100,6 @@ struct PlayerScreen: View {
                 vodControls
             }
         }
-        .background(Color.black)
         .focusable()
         .focused($keyFocus)
         .focusEffectDisabled()
