@@ -1,0 +1,78 @@
+name: Build MN IPTV TV
+
+on:
+  push:
+    branches: [ mn-iptv-tv ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mn-iptv-tv
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Android SDK
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Build release APK
+        id: build
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle :app:assembleRelease --no-daemon --stacktrace --console=plain 2>&1 | tee build.log
+
+      - name: Collect outputs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out
+          cp build.log out/ 2>/dev/null || true
+          grep -nE '^e: |error:|FAILURE|What went wrong|Could not|AAPT' -A4 build.log > out/errors.txt 2>/dev/null || true
+          echo "${{ steps.build.outcome }}" > out/status.txt
+          echo "${GITHUB_SHA}" > out/source_sha.txt
+          APK=app/build/outputs/apk/release/app-release-unsigned.apk
+          if [ -f "$APK" ]; then
+            BT="$ANDROID_HOME/build-tools/35.0.0"
+            cp "$APK" out/MN-IPTV-TV-unsigned.apk
+            "$BT/aapt" dump badging out/MN-IPTV-TV-unsigned.apk > out/badging.txt 2>&1 || true
+            "$BT/zipalign" -c -P 16 -v 4 out/MN-IPTV-TV-unsigned.apk > out/zipalign.txt 2>&1 && echo OK >> out/zipalign.txt || echo FAILED >> out/zipalign.txt
+            mkdir -p out/tools
+            cp "$BT/lib/apksigner.jar" out/tools/apksigner.jar
+            sha256sum out/MN-IPTV-TV-unsigned.apk > out/SHA256.txt
+          fi
+
+      - name: Publish outputs to branch
+        if: always()
+        shell: bash
+        run: |
+          cd out
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b mn-iptv-tv-out
+          git add -A
+          git commit -q -m "Build output for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mn-iptv-tv-out

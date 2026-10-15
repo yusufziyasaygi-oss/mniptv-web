@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MN Player 2.2.2 Signature Theme -->
+    <color name="mn_black">#000000</color>
+    <color name="mn_black_90">#E6000000</color>
+    <color name="mn_black_75">#BF000000</color>
+    <color name="mn_black_40">#66000000</color>
+    <color name="mn_surface">#0F1115</color>
+    <color name="mn_surface_card">#161920</color>
+
+    <!-- Accent Color: Mavi Nokta Blue -->
+    <color name="mn_blue">#3B8BFF</color>
+    <color name="mn_blue_glow">#4D3B8BFF</color>
+    <color name="mn_blue_dark">#246AD6</color>
+
+    <!-- Text and Indicators -->
+    <color name="mn_text_primary">#FFFFFF</color>
+    <color name="mn_text_secondary">#9DA4B0</color>
+    <color name="mn_text_muted">#5A606E</color>
+    <color name="mn_divider">#20242D</color>
+
+    <!-- Badges & Status -->
+    <color name="mn_badge_bg">#252A36</color>
+    <color name="mn_live_red">#FF3B30</color>
+    <color name="mn_focus_outline">#3B8BFF</color>
+</resources>
