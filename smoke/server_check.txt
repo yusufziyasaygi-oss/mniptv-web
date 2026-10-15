@@ -1,0 +1,1 @@
+{"user_info": {"auth": 1, "status": "Active", "username": "u"}, "server_info": {"url": "10.0.2.2", "port": "8080"}}

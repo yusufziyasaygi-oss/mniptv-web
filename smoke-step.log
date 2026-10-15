@@ -1,0 +1,9 @@
+ffmpeg=/c/ProgramData/Chocolatey/bin/ffmpeg
+total 31841
+drwxr-xr-x 1 runneradmin 197121        0 Oct 15 22:40 .
+drwxr-xr-x 1 runneradmin 197121        0 Oct 15 22:39 ..
+-rw-r--r-- 1 runneradmin 197121 13742988 Oct 15 22:40 live.ts
+-rw-r--r-- 1 runneradmin 197121      382 Oct 15 22:40 logo.png
+-rw-r--r-- 1 runneradmin 197121 18852093 Oct 15 22:40 movie.mp4
+-rw-r--r-- 1 runneradmin 197121     1349 Oct 15 22:40 poster.png
+checks=27 failed=0checks=27 failed=0

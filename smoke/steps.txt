@@ -1,0 +1,49 @@
+﻿22:40:16.8 SHOT 01-login center-nonblack=0.07 | section=Canlı TV route=0 tiles=0 | - | engine=nil 
+22:40:17.3 SHOT 02-login-filled center-nonblack=0.07 | section=Canlı TV route=0 tiles=0 | - | engine=nil 
+22:40:18.0 CHECK OK   login  | section=Canlı TV route=0 tiles=15 | - | engine=nil 
+22:40:19.5 SHOT 03-home-live center-nonblack=0.15 | section=Canlı TV route=0 tiles=15 | - | engine=nil 
+22:40:19.5 CHECK OK   live categories loaded categories=3 | section=Canlı TV route=0 tiles=15 | - | engine=nil 
+22:40:19.5 CHECK OK   live channels loaded tiles=15 | section=Canlı TV route=0 tiles=15 | - | engine=nil 
+22:40:21.9 SHOT 04-grid-focus center-nonblack=0.24 | section=Canlı TV route=0 tiles=15 | - | engine=nil 
+22:40:22.8 CHECK OK   live player opened  | section=Canlı TV route=1 tiles=15 | pos=0.1 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=2 container=mpegts
+22:40:23.8 CHECK OK   live stream plays pos=1.0 h=720 | section=Canlı TV route=1 tiles=15 | pos=1.0 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=15 container=mpegts
+22:40:23.8 CHECK OK   opened the focused tile (not the first) current=1 | section=Canlı TV route=1 tiles=15 | pos=1.0 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=15 container=mpegts
+22:40:24.9 SHOT 05-live-playing center-nonblack=1.00 | section=Canlı TV route=1 tiles=15 | pos=2.1 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=30 container=mpegts
+22:40:30.6 CHECK OK   zap down -> next channel current=2 | section=Canlı TV route=1 tiles=15 | pos=5.4 dur=40.0 h=720 status=Playing cur=2 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=70 container=mpegts
+22:40:30.7 SHOT 06-live-zap center-nonblack=1.00 | section=Canlı TV route=1 tiles=15 | pos=5.4 dur=40.0 h=720 status=Playing cur=2 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=73 container=mpegts
+22:40:35.3 CHECK OK   left -> previous channel current=1 | section=Canlı TV route=1 tiles=15 | pos=4.3 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=58 container=mpegts
+22:40:37.0 SHOT 07-live-list center-nonblack=0.75 | section=Canlı TV route=1 tiles=15 | pos=5.9 dur=40.0 h=720 status=Playing cur=1 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=79 container=mpegts
+22:40:42.8 CHECK OK   channel list pick current=3 | section=Canlı TV route=1 tiles=15 | pos=4.2 dur=40.0 h=720 status=Playing cur=3 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=56 container=mpegts
+22:40:47.1 CHECK OK   number keys 1-2 -> channel 12 number=12 | section=Canlı TV route=1 tiles=15 | pos=1.9 dur=40.0 h=720 status=Playing cur=11 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=24 container=mpegts
+22:40:47.2 SHOT 08-live-number center-nonblack=1.00 | section=Canlı TV route=1 tiles=15 | pos=1.9 dur=40.0 h=720 status=Playing cur=11 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=25 container=mpegts
+22:40:49.3 CHECK OK   esc leaves live player  | section=Canlı TV route=0 tiles=15 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:40:49.4 SHOT 09-back-home center-nonblack=0.24 | section=Canlı TV route=0 tiles=15 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:40:52.4 CHECK OK   movies section tiles=10 | section=Filmler route=0 tiles=10 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:40:54.6 SHOT 10-movies-grid center-nonblack=0.44 | section=Filmler route=0 tiles=10 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:13.0 CHECK OK   movie plays past 18s pos=18.1 | section=Filmler route=1 tiles=10 | pos=18.1 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=238 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:13.1 SHOT 11-movie-playing center-nonblack=1.00 | section=Filmler route=1 tiles=10 | pos=18.1 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=239 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:16.3 CHECK OK   right arrow seeks +20s before=18.1 after=40.5 | section=Filmler route=1 tiles=10 | pos=40.5 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=28 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:16.4 SHOT 12-movie-seek center-nonblack=1.00 | section=Filmler route=1 tiles=10 | pos=40.5 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=29 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:18.0 CHECK OK   space pauses status=Paused | section=Filmler route=1 tiles=10 | pos=40.6 dur=60.0 h=720 status=Paused cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=29 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:18.1 SHOT 13-movie-paused center-nonblack=1.00 | section=Filmler route=1 tiles=10 | pos=40.6 dur=60.0 h=720 status=Paused cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=29 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:21.8 CHECK OK   movie progress saved pos=42.1 | section=Filmler route=0 tiles=10 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:26.4 CHECK OK   continue watching shows movie tiles=1 | section=İzlemeye Devam route=0 tiles=1 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:26.5 SHOT 14-continue center-nonblack=0.11 | section=İzlemeye Devam route=0 tiles=1 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:27.7 CHECK OK   resume from saved position pos=42.4 saved=42.1 | section=İzlemeye Devam route=1 tiles=1 | pos=42.4 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=3 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:34.1 CHECK OK   series section tiles=8 | section=Diziler route=0 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:40.0 SHOT 15-series-detail center-nonblack=0.36 | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:40.0 CHECK OK   series screen open  | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:41:58.6 CHECK OK   episode plays pos=18.1 | section=Diziler route=2 tiles=8 | pos=18.1 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=239 container=mov,mp4,m4a,3gp,3g2,mj2
+22:41:58.7 SHOT 16-episode-playing center-nonblack=1.00 | section=Diziler route=2 tiles=8 | pos=18.1 dur=60.0 h=720 status=Playing cur=0 msg= fail= | hwdec=no vo=gpu-next gpu=/ pixfmt=yuv420p out=1280x720 drops=239 container=mov,mp4,m4a,3gp,3g2,mj2
+22:42:01.4 CHECK OK   series progress saved (one card) ep=4101 pos=18.1 | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:01.4 SHOT 17-series-resume center-nonblack=0.25 | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:03.7 SHOT 18-series-season-2 center-nonblack=0.25 | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:08.3 SHOT 19-series-empty center-nonblack=0.02 | section=Diziler route=1 tiles=8 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:15.6 CHECK OK   F adds favourite  | section=Filmler route=0 tiles=10 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:16.7 SHOT 20-favorites center-nonblack=0.18 | section=Favoriler route=0 tiles=1 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:16.7 CHECK OK   favourites list tiles=1 | section=Favoriler route=0 tiles=1 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:18.4 CHECK OK   search 'kanal 1' tiles=7 | section=Ara route=0 tiles=7 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:19.5 SHOT 21-search center-nonblack=0.23 | section=Ara route=0 tiles=7 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:26.0 SHOT 22-account-menu center-nonblack=0.16 | section=Ara route=0 tiles=7 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:26.0 CHECK OK   account menu opens  | section=Ara route=0 tiles=7 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
+22:42:27.1 CHECK OK   account menu closes  | section=Ara route=0 tiles=7 | - | hwdec= vo= gpu=/ pixfmt= out=x drops= container=
