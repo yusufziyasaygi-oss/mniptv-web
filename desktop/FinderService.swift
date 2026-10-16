@@ -9,7 +9,13 @@ final class FinderService:NSObject,NSApplicationDelegate {
         if urls.isEmpty,let paths=pasteboard.propertyList(forType:NSPasteboard.PasteboardType("NSFilenamesPboardType")) as? [String]{urls=paths.map{URL(fileURLWithPath:$0)}}
         guard let url=urls.first else{error.pointee="Bir medya dosyası seç.";return}
         for player in NSRunningApplication.runningApplications(withBundleIdentifier:"com.mavinokta.player"){player.hide()}
-        if let child,child.isRunning{NSRunningApplication(processIdentifier:child.processIdentifier)?.terminate()}
+        // Main player pauses itself when it receives this.
+        DistributedNotificationCenter.default().postNotificationName(Notification.Name("com.mavinokta.player.preview.started"),object:nil,userInfo:nil,deliverImmediately:true)
+        // Reuse a preview that is already running (hidden after Esc): it opens the new file at once.
+        if NSRunningApplication.runningApplications(withBundleIdentifier:"com.mavinokta.player.preview").contains(where:{!$0.isTerminated}) {
+            DistributedNotificationCenter.default().postNotificationName(Notification.Name("com.mavinokta.player.preview.open"),object:nil,userInfo:["path":url.path],deliverImmediately:true)
+            return
+        }
         let process=Process()
         process.executableURL=Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent("MN Preview.app/Contents/MacOS/MNPreview")
         process.arguments=["--quick-look",url.path]

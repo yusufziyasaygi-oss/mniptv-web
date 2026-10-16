@@ -65,23 +65,7 @@ jobs:
           ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=640x480:rate=25 -f lavfi -i sine=f=880 -t 20 -c:v mpeg4 -c:a libmp3lame media/f-xvid.avi
           "$APP/Contents/MacOS/MNPlayer" --verify-media "$PWD"/media/* 2>&1 | tee out/test/verify-media.txt
           echo "exit=$?" >> out/test/verify-media.txt
-          # Finder preview helper opened the way the Finder service opens it
-          "$APP/Contents/Helpers/MN Preview.app/Contents/MacOS/MNPreview" --quick-look "$PWD/media/b-dikey.mov" > out/test/preview.log 2>&1 &
-          PID=$!
-          sleep 6
-          screencapture -x out/test/preview-dikey.png
-          osascript -e 'tell application "System Events" to get {name, size, position} of every window of (every process whose unix id is '"$PID"')' > out/test/preview-windows.txt 2>&1
-          kill $PID
-          "$APP/Contents/Helpers/MN Preview.app/Contents/MacOS/MNPreview" --quick-look "$PWD/media/a-yatay.mp4" > out/test/preview2.log 2>&1 &
-          PID=$!
-          sleep 6
-          screencapture -x out/test/preview-yatay.png
-          kill $PID
-          "$APP/Contents/MacOS/MNPlayer" "$PWD/media/c-hevc.mkv" > out/test/main.log 2>&1 &
-          PID=$!
-          sleep 7
-          screencapture -x out/test/main-hevc.png
-          kill $PID
+          bash tests/preview-test.sh
           codesign --verify --deep --strict "$APP" > out/test/codesign.txt 2>&1; echo "codesign=$?" >> out/test/codesign.txt
           lipo -archs "$APP/Contents/MacOS/MNPlayer" > out/test/archs.txt
           plutil -lint "$APP/Contents/Info.plist" "$APP/Contents/Helpers/MN Finder.app/Contents/Info.plist" "$APP/Contents/Helpers/MN Preview.app/Contents/Info.plist" > out/test/plist-lint.txt 2>&1

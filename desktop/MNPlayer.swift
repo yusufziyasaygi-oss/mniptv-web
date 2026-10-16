@@ -4,13 +4,19 @@ import UniformTypeIdentifiers
 let accent = NSColor(red: 59/255, green: 139/255, blue: 1, alpha: 1)
 let videoExtensions = "mp4 m4v mov mkv avi webm wmv flv f4v mpg mpeg mpe m1v m2v mpv ts mts m2ts m2t vob ogv ogm 3gp 3g2 asf divx rm rmvb dv mxf nut nsv hevc h264 h265 y4m av1 amv mpegts".split(separator:" ").map(String.init)
 let audioExtensions = "mp3 m4a aac wav flac ogg opus aiff aif wma ac3 dts ape caf au mka alac".split(separator:" ").map(String.init)
-func makeEngine(headless: Bool = false) -> OpaquePointer? {
+let previewOpenNote=Notification.Name("com.mavinokta.player.preview.open")
+let previewStartedNote=Notification.Name("com.mavinokta.player.preview.started")
+func mnLog(_ text:String){if ProcessInfo.processInfo.environment["MN_LOG"] != nil{FileHandle.standardError.write((text+"\n").data(using:.utf8)!)}}
+func makeEngine(headless: Bool = false, extra: [String] = []) -> OpaquePointer? {
     let bundle=Bundle.main.bundleURL
     let base=Bundle.main.bundleIdentifier=="com.mavinokta.player.preview" ? bundle.deletingLastPathComponent().deletingLastPathComponent():bundle.appendingPathComponent("Contents")
     let root = base.appendingPathComponent("MacOS/plugins").path
     setenv("VLC_PLUGIN_PATH", root, 1)
-    var args = ["--no-video-title-show", "--no-osd", "--no-stats", "--no-snapshot-preview", "--no-video-on-top", "--no-media-library", "--no-plugins-cache", "--quiet"]
+    // The bundle ships a plugin cache built at packaging time, so VLC does not rescan ~300 plugins on every start.
+    var args = ["--no-video-title-show", "--no-osd", "--no-stats", "--no-snapshot-preview", "--no-video-on-top", "--no-media-library", "--quiet"]
+    if ProcessInfo.processInfo.environment["MN_NO_PLUGIN_CACHE"] != nil { args.append("--no-plugins-cache") }
     if headless { args += ["--vout=dummy", "--aout=dummy"] }
+    args += extra
     let strings = args.map { strdup($0)! }
     defer { strings.forEach { free($0) } }
     let pointers = strings.map { UnsafePointer<CChar>($0) as UnsafePointer<CChar>? }
@@ -46,9 +52,16 @@ func displayAspect(_ mp: OpaquePointer) -> CGFloat? {
     return ratio.isFinite && ratio>0 ? ratio:nil
 }
 
+// Packaging step: write the VLC plugin cache next to the bundled plugins.
+if CommandLine.arguments.contains("--build-plugin-cache") {
+    guard let engine = makeEngine(headless:true, extra:["--reset-plugins-cache"]) else { print("ENGINE_ERROR"); exit(2) }
+    libvlc_release(engine); print("PLUGIN_CACHE_OK"); exit(0)
+}
 // Command-line codec verification uses the same bundled engine, with no GUI or audio output.
 if CommandLine.arguments.contains("--verify-media") {
+    let started = Date()
     guard let engine = makeEngine(headless:true), let mp = libvlc_media_player_new(engine) else { print("ENGINE_ERROR"); exit(2) }
+    print("ENGINE_START \(Int(Date().timeIntervalSince(started)*1000))ms")
     var failed = false
     for path in CommandLine.arguments.dropFirst(2) {
         let media = path.withCString { libvlc_media_new_path(engine,$0) }!
@@ -149,6 +162,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     var regularFrame:NSRect?
     let previewMode=CommandLine.arguments.contains("--quick-look") || Bundle.main.bundleIdentifier=="com.mavinokta.player.preview"
     var previousApp:NSRunningApplication?
+    var idleTimer:Timer?
+    var hideAfterFullScreen=false
     var activeMedia:URL? { queue.indices.contains(index) ? queue[index] : nil }
 
     func applicationDidFinishLaunching(_ notification:Notification) {
@@ -180,17 +195,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         }
         timer=Timer.scheduledTimer(withTimeInterval:0.2,repeats:true) { [weak self] _ in self?.tick() }
         window.makeFirstResponder(surface);NSApp.activate(ignoringOtherApps:true)
+        let center=DistributedNotificationCenter.default()
+        if previewMode {
+            // A running preview is reused for the next Control+M, so it opens without starting VLC again.
+            center.addObserver(forName:previewOpenNote,object:nil,queue:.main){[weak self] note in
+                guard let path=note.userInfo?["path"] as? String else{return}
+                self?.openPreview(URL(fileURLWithPath:path))
+            }
+        } else {
+            // Do not keep playing (and talking) behind a Finder preview.
+            center.addObserver(forName:previewStartedNote,object:nil,queue:.main){[weak self] _ in self?.pauseForPreview()}
+        }
         if !pending.isEmpty { let items=pending;pending=[];add(items) }
         let args=CommandLine.arguments.dropFirst().filter { !$0.hasPrefix("-") }
         if !args.isEmpty {
             let urls=args.map { URL(fileURLWithPath:$0) }
-            if previewMode,let selected=urls.first {
-                let siblings=(try? FileManager.default.contentsOfDirectory(at:selected.deletingLastPathComponent(),includingPropertiesForKeys:[.isRegularFileKey],options:[.skipsHiddenFiles])) ?? []
-                queue=siblings.filter{videoExtensions.contains($0.pathExtension.lowercased()) && (try? $0.resourceValues(forKeys:[.isRegularFileKey]).isRegularFile)==true}.sorted{$0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending}
-                if let position=queue.firstIndex(where: { $0.path.precomposedStringWithCanonicalMapping == selected.path.precomposedStringWithCanonicalMapping }){play(position)}else{add([selected])}
-            }else{add(urls)}
+            if previewMode,let selected=urls.first {openPreview(selected,launching:true)}else{add(urls)}
         }
     }
+    func openPreview(_ selected:URL,launching:Bool=false) {
+        idleTimer?.invalidate();idleTimer=nil;hideAfterFullScreen=false
+        if !launching,let front=NSWorkspace.shared.frontmostApplication,front.processIdentifier != ProcessInfo.processInfo.processIdentifier{previousApp=front}
+        DistributedNotificationCenter.default().postNotificationName(previewStartedNote,object:nil,userInfo:nil,deliverImmediately:true)
+        let siblings=(try? FileManager.default.contentsOfDirectory(at:selected.deletingLastPathComponent(),includingPropertiesForKeys:[.isRegularFileKey],options:[.skipsHiddenFiles])) ?? []
+        queue=siblings.filter{videoExtensions.contains($0.pathExtension.lowercased()) && (try? $0.resourceValues(forKeys:[.isRegularFileKey]).isRegularFile)==true}.sorted{$0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending}
+        index = -1
+        if let position=queue.firstIndex(where: { $0.path.precomposedStringWithCanonicalMapping == selected.path.precomposedStringWithCanonicalMapping }){play(position)}else{add([selected])}
+        window.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)
+        mnLog("PREVIEW_OPEN \(selected.lastPathComponent)")
+    }
+    func pauseForPreview() {
+        guard activeMedia != nil else{return}
+        engineQueue.async {[self] in if libvlc_media_player_is_playing(mp)==1{libvlc_media_player_set_pause(mp,1);mnLog("MAIN_PAUSED_FOR_PREVIEW")}}
+    }
+    /// Esc / close in preview: stop and hide, but keep the process warm for the next Control+M.
+    func hidePreview() {
+        if window.styleMask.contains(.fullScreen){hideAfterFullScreen=true;window.toggleFullScreen(nil);return}
+        savePosition()
+        engineQueue.async {[self] in libvlc_media_player_stop(mp)}
+        generation += 1;queue=[];index = -1;lastState=libvlc_NothingSpecial
+        window.orderOut(nil)
+        previousApp?.activate(options:[])
+        mnLog("PREVIEW_HIDDEN")
+        idleTimer?.invalidate()
+        idleTimer=Timer.scheduledTimer(withTimeInterval:600,repeats:false){_ in NSApp.terminate(nil)}
+    }
+    func windowShouldClose(_ sender:NSWindow)->Bool{if previewMode{hidePreview();return false};return true}
     func makeButton(_ symbol:String,_ label:String,_ action:Selector) -> NSButton {
         let button=NSButton(image:NSImage(systemSymbolName:symbol,accessibilityDescription:label) ?? NSImage(),target:self,action:action)
         button.isBordered=false;button.contentTintColor = .white;button.toolTip=label;button.setAccessibilityLabel(label);button.imageScaling = .scaleProportionallyDown
@@ -317,7 +367,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         window.setFrame(frame,display:true)
         layout()
     }
-    func windowDidExitFullScreen(_ notification:Notification){fitVideoWindow();wake()}
+    func windowDidExitFullScreen(_ notification:Notification){if hideAfterFullScreen{hideAfterFullScreen=false;hidePreview();return};fitVideoWindow();wake()}
     @objc func mini(){
         if window.styleMask.contains(.fullScreen){return}
         if window.level == .floating {
@@ -365,14 +415,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     @objc func info(){guard let url=activeMedia else{return};var w:UInt32=0,h:UInt32=0;_ = libvlc_video_get_size(mp,0,&w,&h);let alert=NSAlert();alert.messageText=url.lastPathComponent;alert.informativeText="\(w) × \(h)\n\(clockText(libvlc_media_player_get_length(mp)))\nVLC \(String(cString:libvlc_get_version()))";alert.beginSheetModal(for:window)}
     @objc func shortcuts(){let alert=NSAlert();alert.messageText="Klavye kısayolları";alert.informativeText="Space / K: Oynat / duraklat\nJ / L: 10 saniye • ← / →: 5 saniye\n↑ / ↓: Ses • M: Sessiz\nF: Tam ekran • I: Mini oynatıcı\nC: Altyazı aç / kapat\n0–9: Sürenin %0–90 noktasına git\n.: Duraklatılmış videoda sonraki kare\n⌘O: Dosya • ⌘L: Bağlantı • ⌘S: Altyazı";alert.beginSheetModal(for:window)}
     func key(_ event:NSEvent){if previewMode {
-            if event.keyCode==53{window.performClose(nil);return}
+            if event.keyCode==53{hidePreview();return}
             if event.keyCode==126{previous();wake();return}
             if event.keyCode==125{next();wake();return}
         };if event.modifierFlags.contains(.command){return};switch event.charactersIgnoringModifiers?.lowercased() ?? ""{case " ","k":togglePlay();case "j":seek(-10000);case "l":seek(10000);case "m":mute();case "f":fullScreen();case "i":mini();case "c":engineQueue.async {[self] in let n=libvlc_video_get_spu(mp);let head=libvlc_video_get_spu_description(mp);var p=head;var id:Int32 = -1;while let t=p{if t.pointee.i_id>=0{id=t.pointee.i_id;break};p=t.pointee.p_next};_ = libvlc_video_set_spu(mp,n>=0 ? -1:id);if head != nil{libvlc_track_description_list_release(head)}};case ".":engineQueue.async {[self] in libvlc_media_player_next_frame(mp)};case "?":shortcuts();default:if event.keyCode==53 && window.styleMask.contains(.fullScreen){fullScreen()}else if event.keyCode==123{seek(-5000)}else if event.keyCode==124{seek(5000)}else if event.keyCode==126 || event.keyCode==125{volume.doubleValue=max(0,min(100,volume.doubleValue+(event.keyCode==126 ? 5:-5)));volumeChanged(volume)}else if let s=event.charactersIgnoringModifiers,let n=Int(s),n>=0,n<=9{let pos=lastLength*Int64(n)/10;engineQueue.async {[self] in libvlc_media_player_set_time(mp,pos)}}};wake()}
     func wake(){controls?.isHidden=false;tools?.isHidden=previewMode;hideTimer?.invalidate();hideTimer=Timer.scheduledTimer(withTimeInterval:3,repeats:false){[weak self] _ in guard let self,self.lastState==libvlc_Playing,self.window.attachedSheet==nil else{return};self.controls.isHidden=true;self.tools.isHidden=true}}
     func notify(_ text:String){status.stringValue=text;status.isHidden=false;DispatchQueue.main.asyncAfter(deadline:.now()+2.5){[weak self] in self?.status.isHidden=true}}
     func showError(){let alert=NSAlert();alert.messageText="Medya açılamadı";alert.informativeText="Dosya bozuk, şifreli, erişilemez veya bu motorun desteklemediği bir biçimde olabilir.";alert.addButton(withTitle:"Tamam");alert.addButton(withTitle:"Başka dosya aç");alert.beginSheetModal(for:window){[weak self] result in if result == .alertSecondButtonReturn{self?.openMedia()}}}
-    func savePosition(){guard !previewMode else{return};guard let url=activeMedia,mp != nil else{return};let t=lastTime,l=lastLength;guard l>0,t>5000 else{return};var positions=UserDefaults.standard.dictionary(forKey:"positions") as? [String:Int64] ?? [:];if t<l-5000{positions[url.absoluteString]=t}else{positions.removeValue(forKey:url.absoluteString)};if positions.count>200{positions=Dictionary(uniqueKeysWithValues:positions.prefix(200).map{($0.key,$0.value)})};UserDefaults.standard.set(positions,forKey:"positions")}
+    func savePosition(){guard !previewMode else{return};guard let url=activeMedia,mp != nil else{return};let t=lastTime,l=lastLength;guard l>0,t>5000 else{return};var positions=UserDefaults.standard.dictionary(forKey:"positions") as? [String:Int64] ?? [:];let key=url.absoluteString;var order=(UserDefaults.standard.array(forKey:"positionOrder") as? [String] ?? []).filter{$0 != key};if t<l-5000{positions[key]=t;order.insert(key,at:0)}else{positions.removeValue(forKey:key)};for old in order.dropFirst(200){positions.removeValue(forKey:old)};order=Array(order.prefix(200));UserDefaults.standard.set(positions,forKey:"positions");UserDefaults.standard.set(order,forKey:"positionOrder")}
     func clearPosition(){guard !previewMode else{return};guard let url=activeMedia else{return};var positions=UserDefaults.standard.dictionary(forKey:"positions") as? [String:Int64] ?? [:];positions.removeValue(forKey:url.absoluteString);UserDefaults.standard.set(positions,forKey:"positions")}
     @objc func showQueue(){if let panel=queuePanel{panel.makeKeyAndOrderFront(nil);return};let panel=NSPanel(contentRect:NSRect(x:0,y:0,width:440,height:400),styleMask:[.titled,.closable,.resizable],backing:.buffered,defer:false);panel.title="Oynatma listesi";panel.isReleasedWhenClosed=false
         let scroll=NSScrollView(frame:NSRect(x:0,y:0,width:440,height:400));scroll.autoresizingMask=[.width,.height];scroll.hasVerticalScroller=true
@@ -424,7 +474,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         NSUpdateDynamicServices()
         let defaults=await changeDefaults(restore:false,silent:true)
         let success=synced && verified && registration.values.allSatisfy{$0==0} && !defaults.isEmpty && defaults.allSatisfy{$0["result"]=="OK"}
-        let report:[String:Any]=["version":"2.2.0","shortcut":"Control + M","shortcutOK":synced && verified,"registration":registration,"videoDefaults":defaults,"success":success]
+        let report:[String:Any]=["version":Bundle.main.object(forInfoDictionaryKey:"CFBundleShortVersionString") as? String ?? "","shortcut":"Control + M","shortcutOK":synced && verified,"registration":registration,"videoDefaults":defaults,"success":success]
         let directory=FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0].appendingPathComponent("MNPlayer")
         try? FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         if let data=try? JSONSerialization.data(withJSONObject:report,options:[.prettyPrinted,.sortedKeys]){try? data.write(to:directory.appendingPathComponent("installation.json"))}
