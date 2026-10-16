@@ -272,7 +272,9 @@ final class SmokeRunner {
         let handed = await waitUntil(10) { !self.model.lastExternalResult.isEmpty }
         await wait(4)
         let mnPlayerRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: "com.mavinokta.player").isEmpty
-        check("MN Player option hands the movie to MN Player", handed && model.route.isEmpty && model.lastExternalResult != "failed",
+        let installed = FileManager.default.fileExists(atPath: "/Applications/MN Player.app")
+        let expected = installed ? (model.lastExternalResult == "opened" && mnPlayerRunning) : model.lastExternalResult == "missing"
+        check("MN Player option hands the movie to MN Player", handed && model.route.isEmpty && expected,
               "result=\(model.lastExternalResult) route=\(model.route.count) mnplayer=\(mnPlayerRunning)")
         shot("22-mn-player")
         NSRunningApplication.runningApplications(withBundleIdentifier: "com.mavinokta.player").forEach { $0.terminate() }
