@@ -36,6 +36,10 @@ struct MNIPTVApp: App {
                 Button("Listeyi yenile") { model.reloadSection() }.keyboardShortcut("r", modifiers: .command)
                 Button("Geri") { model.back() }.keyboardShortcut("[", modifiers: .command)
             }
+            CommandMenu("Oynatıcı") {
+                Button((model.usesMNPlayer ? "" : "✓ ") + "MN IPTV") { model.setPlaybackApp(mnPlayer: false) }
+                Button((model.usesMNPlayer ? "✓ " : "") + "MN Player") { model.setPlaybackApp(mnPlayer: true) }
+            }
         }
     }
 }
@@ -89,6 +93,9 @@ struct RootView: View {
         }
         .confirmationDialog("Hesap", isPresented: $accountDialog, titleVisibility: .visible) {
             Button("Listeyi yenile") { model.reloadSection() }
+            Button(model.usesMNPlayer ? "Oynatıcıyı MN IPTV yap" : "Oynatıcıyı MN Player yap") {
+                model.setPlaybackApp(mnPlayer: !model.usesMNPlayer)
+            }
             Button("Hesabı değiştir") {
                 loginForm.error = nil
                 changingAccount = true
@@ -96,7 +103,7 @@ struct RootView: View {
             Button("Çıkış yap", role: .destructive) { model.signOut() }
             Button("Vazgeç", role: .cancel) {}
         } message: {
-            Text("\(model.account?.username ?? "")\n\(model.account?.server ?? "")")
+            Text("\(model.account?.username ?? "")\n\(model.account?.server ?? "")\nOynatıcı: \(model.usesMNPlayer ? "MN Player" : "MN IPTV")")
         }
     }
 }

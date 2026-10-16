@@ -83,6 +83,12 @@ final class Store {
         defaults.set(0.0, forKey: "epos_\(id)")
     }
 
+    /// "builtin" (MN IPTV's own player) or "mnplayer" (open in the MN Player app).
+    var playbackApp: String {
+        get { defaults.string(forKey: "playbackApplication") == "mnplayer" ? "mnplayer" : "builtin" }
+        set { defaults.set(newValue, forKey: "playbackApplication") }
+    }
+
     var volume: Double {
         get { defaults.object(forKey: "volume") == nil ? 80 : defaults.double(forKey: "volume") }
         set { defaults.set(newValue, forKey: "volume") }

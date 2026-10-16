@@ -47,7 +47,10 @@ jobs:
           "$FF" -loglevel error -y -f lavfi -i color=c=0x3B8BFF:s=128x128 -frames:v 1 ci/media/logo.png
           "$FF" -loglevel error -y -f lavfi -i color=c=0x246AD6:s=300x450 -frames:v 1 ci/media/poster.png
           ls -la ci/media
-          MOCK_HOST=http://127.0.0.1:8080 python3 ci/mock_xtream.py > out/smoke/server.log 2>&1 &
+          # MN Player (built on the mn-player-mac branch) for the "play in MN Player" check
+          git clone -q --depth 1 -b mn-player-mac-out "https://github.com/${{ github.repository }}.git" mnp 2>/dev/null && \
+            ditto -x -k mnp/MN-Player-*-macOS.zip /Applications/ && ls -d "/Applications/MN Player.app"
+                    MOCK_HOST=http://127.0.0.1:8080 python3 ci/mock_xtream.py > out/smoke/server.log 2>&1 &
           sleep 2
           curl -s "http://127.0.0.1:8080/player_api.php?username=u&password=p" > out/smoke/server_check.txt
           MN_SMOKE_DIR="$PWD/out/smoke" MN_SMOKE_SERVER="http://127.0.0.1:8080" \

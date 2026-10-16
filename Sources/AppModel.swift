@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import SwiftUI
 
@@ -399,7 +400,71 @@ final class AppModel: ObservableObject {
         refreshAfterReturn()
     }
 
-    func push(_ r: Route) { route.append(r) }
+    func push(_ r: Route) {
+        if case .player(let request) = r, store.playbackApp == "mnplayer" {
+            openInMNPlayer(request)
+            return
+        }
+        route.append(r)
+    }
+
+    var usesMNPlayer: Bool { store.playbackApp == "mnplayer" }
+
+    func setPlaybackApp(mnPlayer: Bool) {
+        store.playbackApp = mnPlayer ? "mnplayer" : "builtin"
+        revision += 1
+        showToast(mnPlayer ? "Oynatıcı: MN Player" : "Oynatıcı: MN IPTV")
+    }
+
+    /// Address of the item a play request would start, for an external player.
+    func streamAddress(_ r: PlayRequest) -> String? {
+        guard let api = api else { return nil }
+        switch r.mode {
+        case .live:
+            guard r.channels.indices.contains(r.index) else { return nil }
+            return api.liveURL(r.channels[r.index].id, ext: "ts")
+        case .movie:
+            guard let m = r.movie else { return nil }
+            return api.movieURL(m.id, ext: m.ext ?? "mp4")
+        case .series:
+            guard r.episodes.indices.contains(r.index) else { return nil }
+            let ep = r.episodes[r.index]
+            store.saveProgress(Progress(key: "SERIES:\(r.seriesId)", kind: .series, id: r.seriesId, title: r.seriesName,
+                                        subtitle: "S\(ep.season) B\(ep.number) · \(ep.title)", image: r.seriesCover, ext: ep.ext,
+                                        episodeId: ep.id, season: ep.season, episode: ep.number, position: 0,
+                                        duration: Double(ep.durationSec), updatedAt: Date().timeIntervalSince1970))
+            return api.episodeURL(ep.id, ext: ep.ext)
+        }
+    }
+
+    /// Last message shown for an MN Player hand-off (used by the self test).
+    private(set) var lastExternalResult = ""
+
+    func openInMNPlayer(_ r: PlayRequest) {
+        let installed = URL(fileURLWithPath: "/Applications/MN Player.app")
+        let appURL = FileManager.default.fileExists(atPath: installed.path)
+            ? installed : NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.mavinokta.player")
+        guard let appURL = appURL else {
+            lastExternalResult = "missing"
+            showToast("MN Player bulunamadı. Hesap menüsünden oynatıcıyı MN IPTV yapabilirsin.")
+            return
+        }
+        guard let address = streamAddress(r) else { return }
+        var link = URLComponents()
+        link.scheme = "mnplayer"
+        link.host = "play"
+        link.queryItems = [URLQueryItem(name: "url", value: address)]
+        guard let url = link.url else { return }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: configuration) { [weak self] _, error in
+            Task { @MainActor in
+                self?.lastExternalResult = error == nil ? "opened" : "failed"
+                self?.showToast(error == nil ? "MN Player'da açıldı" : "MN Player açılamadı")
+                self?.refreshAfterReturn()
+            }
+        }
+    }
 
     func back() {
         guard !route.isEmpty else { return }

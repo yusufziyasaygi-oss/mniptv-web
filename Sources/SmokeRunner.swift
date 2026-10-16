@@ -264,6 +264,21 @@ final class SmokeRunner {
         await wait(1)
         shot("21-search")
 
+        // 9. Player choice: MN Player hand-off instead of the built-in player
+        model.setPlaybackApp(mnPlayer: true)
+        model.goToSection(.movies)
+        _ = await waitUntil(10) { !self.model.tiles.isEmpty }
+        if let first = model.tiles.first { model.open(first) }
+        let handed = await waitUntil(10) { !self.model.lastExternalResult.isEmpty }
+        await wait(4)
+        let mnPlayerRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: "com.mavinokta.player").isEmpty
+        check("MN Player option hands the movie to MN Player", handed && model.route.isEmpty && model.lastExternalResult != "failed",
+              "result=\(model.lastExternalResult) route=\(model.route.count) mnplayer=\(mnPlayerRunning)")
+        shot("22-mn-player")
+        NSRunningApplication.runningApplications(withBundleIdentifier: "com.mavinokta.player").forEach { $0.terminate() }
+        model.setPlaybackApp(mnPlayer: false)
+        await wait(1)
+
         finish()
         await wait(1)
         NSApp.terminate(nil)
