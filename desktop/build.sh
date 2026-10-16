@@ -13,8 +13,6 @@ cp "$BASE/desktop/Info.plist" "$APP/Contents/Info.plist"
 cp -R "$BASE/web" "$APP/Contents/Resources/"
 cp -R "$BASE/desktop/Licenses/" "$APP/Contents/Resources/Licenses/"
 find "$APP/Contents/MacOS" -type f \( -name '*.dylib' -o -name '*.jar' \) -exec sh -c 'codesign --force --sign - "$1" 2>/dev/null' sh {} \;
-# Plugin cache: built after the plugins are signed, so file sizes and dates match at run time.
-"$APP/Contents/MacOS/MNPlayer" --build-plugin-cache
 PREVIEW="$APP/Contents/Helpers/MN Preview.app"
 mkdir -p "$PREVIEW/Contents/MacOS"
 cp "$BASE/desktop/Preview-Info.plist" "$PREVIEW/Contents/Info.plist"

@@ -7,6 +7,6 @@ Yerel macOS oynatıcı (LibVLC). Kaynak: Drive hafıza modülü 01 (MN Player 2.
 - Finder önizleme: `MN Finder.app` bir Servis ("MN Player Önizleme") sağlar; kurulum Finder'da bu servise Control+M atar.
 - CI: `.github/workflows/build-player.yml`, çıktılar `mn-player-mac-out` dalında.
 
-2.2.3: Finder önizlemesi açıkken ana oynatıcı duraklar, Esc sonrası önizleme süreci 10 dk hazır bekler (sonraki Control+M anında açılır), VLC eklenti önbelleği pakete eklenir.
+2.2.3: Finder önizlemesi açıkken ana oynatıcı duraklar, Esc sonrası önizleme süreci 10 dk hazır bekler (sonraki Control+M anında açılır).
 
 Not: Asıl `MNPlayer.icns` kayıtta yoktu; `assets/icon-1024.png` geçici ikondur.

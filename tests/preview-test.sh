@@ -15,9 +15,7 @@ check() { if [ "$2" = 0 ]; then echo "OK   $1" | tee -a "$O/checks.txt"; else ec
 swiftc -O tests/notify.swift -o notify && swiftc -O tests/service.swift -o service
 
 # Engine start time with and without the plugin cache
-"$APP/Contents/MacOS/MNPlayer" --verify-media "$M/a-yatay.mp4" | grep ENGINE_START | sed 's/^/cache: /' > "$O/engine-start.txt"
-MN_NO_PLUGIN_CACHE=1 "$APP/Contents/MacOS/MNPlayer" --verify-media "$M/a-yatay.mp4" | grep ENGINE_START | sed 's/^/no-cache: /' >> "$O/engine-start.txt"
-ls -la "$APP/Contents/MacOS/plugins/" | grep -i "\.dat" >> "$O/engine-start.txt"
+"$APP/Contents/MacOS/MNPlayer" --verify-media "$M/a-yatay.mp4" | grep ENGINE_START > "$O/engine-start.txt"
 
 # 1. Main player plays a video
 MN_LOG=1 "$APP/Contents/MacOS/MNPlayer" "$M/a-yatay.mp4" 2> "$O/main-stderr.txt" &

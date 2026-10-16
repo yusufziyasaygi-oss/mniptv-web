@@ -12,9 +12,7 @@ func makeEngine(headless: Bool = false, extra: [String] = []) -> OpaquePointer? 
     let base=Bundle.main.bundleIdentifier=="com.mavinokta.player.preview" ? bundle.deletingLastPathComponent().deletingLastPathComponent():bundle.appendingPathComponent("Contents")
     let root = base.appendingPathComponent("MacOS/plugins").path
     setenv("VLC_PLUGIN_PATH", root, 1)
-    // The bundle ships a plugin cache built at packaging time, so VLC does not rescan ~300 plugins on every start.
-    var args = ["--no-video-title-show", "--no-osd", "--no-stats", "--no-snapshot-preview", "--no-video-on-top", "--no-media-library", "--quiet"]
-    if ProcessInfo.processInfo.environment["MN_NO_PLUGIN_CACHE"] != nil { args.append("--no-plugins-cache") }
+    var args = ["--no-video-title-show", "--no-osd", "--no-stats", "--no-snapshot-preview", "--no-video-on-top", "--no-media-library", "--no-plugins-cache", "--quiet"]
     if headless { args += ["--vout=dummy", "--aout=dummy"] }
     args += extra
     let strings = args.map { strdup($0)! }
@@ -52,11 +50,6 @@ func displayAspect(_ mp: OpaquePointer) -> CGFloat? {
     return ratio.isFinite && ratio>0 ? ratio:nil
 }
 
-// Packaging step: write the VLC plugin cache next to the bundled plugins.
-if CommandLine.arguments.contains("--build-plugin-cache") {
-    guard let engine = makeEngine(headless:true, extra:["--reset-plugins-cache"]) else { print("ENGINE_ERROR"); exit(2) }
-    libvlc_release(engine); print("PLUGIN_CACHE_OK"); exit(0)
-}
 // Command-line codec verification uses the same bundled engine, with no GUI or audio output.
 if CommandLine.arguments.contains("--verify-media") {
     let started = Date()
