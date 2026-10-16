@@ -45,7 +45,9 @@ osascript -e 'tell application "System Events" to key code 53'
 sleep 1.5
 W=$(title $P); echo "after esc windows: [$W]" >> "$O/timing.txt"
 [ -z "$(echo "$W" | tr -d ' ,')" ]; check "esc closes the preview window" $?
-kill -0 $P; check "preview process kept for the next Control+M" $?
+kill -0 $P; ALIVE=$?; check "preview process kept for the next Control+M" $ALIVE
+if [ $ALIVE != 0 ]; then wait $P; echo "preview exit status: $?" >> "$O/timing.txt"; fi
+cp ~/Library/Logs/DiagnosticReports/*MNPreview* "$O/" 2>/dev/null
 
 # 5. Next Control+M reuses it (MN Finder posts this message)
 T0=$(now)

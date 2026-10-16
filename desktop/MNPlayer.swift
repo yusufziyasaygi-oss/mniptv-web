@@ -434,7 +434,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     func application(_ sender:NSApplication,open urls:[URL]){if mp==nil{pending += urls}else{add(urls);window.makeKeyAndOrderFront(nil)}}
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows flag:Bool)->Bool{window?.makeKeyAndOrderFront(nil);return true}
     func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{true}
+    func applicationWillTerminate(_ notification:Notification){mnLog("WILL_TERMINATE\n"+Thread.callStackSymbols.joined(separator:"\n"))}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {
+        mnLog("SHOULD_TERMINATE\n"+Thread.callStackSymbols.prefix(25).joined(separator:"\n"))
         terminating=true;savePosition();timer?.invalidate();hideTimer?.invalidate();sleepTimer?.invalidate()
         guard mp != nil else{return .terminateNow}
         engineQueue.async {[self] in libvlc_media_player_stop(mp);libvlc_media_player_release(mp);libvlc_release(engine);DispatchQueue.main.async{NSApp.reply(toApplicationShouldTerminate:true)}}
