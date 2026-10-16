@@ -1,0 +1,7 @@
+MN Player.app/
+.build/
+work/
+out/
+media/
+icon.iconset/
+desktop/MNPlayer.icns

@@ -1,0 +1,25 @@
+PASS 3gp-h263.3gp 176x144 404ms
+PASS aiff-audio.aiff 0x0 405ms
+PASS asf-msmpeg4.asf 320x180 305ms
+PASS avi-mpeg4.avi 320x180 280ms
+PASS flac-audio.flac 0x0 507ms
+PASS flv-flv1.flv 320x180 522ms
+PASS mkv-av1.mkv 320x180 252ms
+PASS mkv-h264.mkv 320x180 251ms
+PASS mkv-hevc.mkv 320x180 252ms
+PASS mov-prores.mov 320x180 402ms
+PASS mp3-audio.mp3 0x0 262ms
+PASS mp4-h264.mp4 320x180 405ms
+PASS mpg-mpeg1.mpg 320x180 475ms
+PASS opus-audio.opus 0x0 825ms
+PASS ts-mpeg2.ts 320x180 505ms
+PASS vob-mpeg2.vob 320x180 505ms
+PASS wav-audio.wav 0x0 305ms
+PASS webm-vp8.webm 320x180 502ms
+PASS wma-audio.wma 0x0 301ms
+PASS wmv-wmv2.wmv 320x180 302ms
+
+Son derleme kontrolü:
+PASS mp4-h264.mp4 320x180 405ms
+PASS mkv-hevc.mkv 320x180 251ms
+PASS mov-prores.mov 320x180 406ms

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+  <title>MN Player</title>
+  <options customize="never" hostArchitectures="arm64" require-scripts="false"/>
+  <allowed-os-versions><os-version min="13.0"/></allowed-os-versions>
+  <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
+  <welcome file="Welcome.html" mime-type="text/html"/>
+  <choices-outline><line choice="default"><line choice="player"/></line></choices-outline>
+  <choice id="default"/>
+  <choice id="player" visible="false" title="MN Player"><pkg-ref id="com.mavinokta.player.installer"/></choice>
+  <pkg-ref id="com.mavinokta.player.installer" version="2.2.2" onConclusion="none">MNPlayer-component.pkg</pkg-ref>
+</installer-gui-script>

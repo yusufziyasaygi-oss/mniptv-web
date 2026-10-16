@@ -1,0 +1,7 @@
+MN Player desktop engine: VideoLAN VLC/libVLC 3.0.24.
+Binary libraries and plugins originate from the installed official VLC macOS application.
+libVLC/libvlccore: LGPL 2.1 or later. Plugins may be GPL 2 or later; this desktop source and bundled distribution are provided under GPL 2 or later.
+Corresponding upstream source: https://download.videolan.org/pub/videolan/vlc/3.0.24/vlc-3.0.24.tar.xz
+Build scripts and third party dependency recipes: https://code.videolan.org/videolan/vlc/-/tree/3.0.24/contrib
+The Swift application source and build script are included in the desktop folder. Dynamic libraries are replaceable in Contents/MacOS/lib and Contents/MacOS/plugins.
+No VLC trademark or endorsement is claimed.

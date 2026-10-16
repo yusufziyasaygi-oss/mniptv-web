@@ -1,0 +1,121 @@
+name: Build MN Player macOS
+
+on:
+  push:
+    branches: [ mn-player-mac ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mn-player-mac
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install VLC (engine source)
+        shell: bash
+        run: |
+          mkdir -p out
+          brew install --cask vlc > out/vlc-install.log 2>&1 || true
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" /Applications/VLC.app/Contents/Info.plist | tee out/vlc-version.txt
+          ls /Applications/VLC.app/Contents/MacOS | tee -a out/vlc-version.txt
+          lipo -archs /Applications/VLC.app/Contents/MacOS/lib/libvlc.dylib | tee -a out/vlc-version.txt
+
+      - name: Icon
+        shell: bash
+        run: |
+          mkdir -p icon.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s assets/icon-1024.png --out icon.iconset/icon_${s}x${s}.png >/dev/null
+            d=$((s*2)); sips -z $d $d assets/icon-1024.png --out icon.iconset/icon_${s}x${s}@2x.png >/dev/null
+          done
+          iconutil -c icns icon.iconset -o desktop/MNPlayer.icns
+
+      - name: Build app
+        id: build
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          sh desktop/build.sh 2>&1 | tee out/build.log
+          test -x "MN Player.app/Contents/MacOS/MNPlayer"
+
+      - name: Test
+        id: test
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          APP="MN Player.app"
+          brew install ffmpeg > /dev/null 2>&1
+          mkdir -p media out/test
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=f=440 -t 20 -c:v libx264 -pix_fmt yuv420p -c:a aac media/a-yatay.mp4
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=1080x1920:rate=30 -f lavfi -i sine=f=330 -t 20 -c:v libx264 -pix_fmt yuv420p -c:a aac media/b-dikey.mov
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=1920x1080:rate=25 -f lavfi -i sine=f=550 -t 20 -c:v libx265 -pix_fmt yuv420p -c:a libopus media/c-hevc.mkv
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=25 -f lavfi -i sine=f=660 -t 20 -c:v libvpx-vp9 -c:a libopus media/d-vp9.webm
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=720x576:rate=25 -f lavfi -i sine=f=770 -t 20 -c:v mpeg2video -c:a mp2 media/e-mpeg2.ts
+          ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=640x480:rate=25 -f lavfi -i sine=f=880 -t 20 -c:v mpeg4 -c:a libmp3lame media/f-xvid.avi
+          "$APP/Contents/MacOS/MNPlayer" --verify-media "$PWD"/media/* 2>&1 | tee out/test/verify-media.txt
+          echo "exit=$?" >> out/test/verify-media.txt
+          # Finder preview helper opened the way the Finder service opens it
+          "$APP/Contents/Helpers/MN Preview.app/Contents/MacOS/MNPreview" --quick-look "$PWD/media/b-dikey.mov" > out/test/preview.log 2>&1 &
+          PID=$!
+          sleep 6
+          screencapture -x out/test/preview-dikey.png
+          osascript -e 'tell application "System Events" to get {name, size, position} of every window of (every process whose unix id is '"$PID"')' > out/test/preview-windows.txt 2>&1
+          kill $PID
+          "$APP/Contents/Helpers/MN Preview.app/Contents/MacOS/MNPreview" --quick-look "$PWD/media/a-yatay.mp4" > out/test/preview2.log 2>&1 &
+          PID=$!
+          sleep 6
+          screencapture -x out/test/preview-yatay.png
+          kill $PID
+          "$APP/Contents/MacOS/MNPlayer" "$PWD/media/c-hevc.mkv" > out/test/main.log 2>&1 &
+          PID=$!
+          sleep 7
+          screencapture -x out/test/main-hevc.png
+          kill $PID
+          codesign --verify --deep --strict "$APP" > out/test/codesign.txt 2>&1; echo "codesign=$?" >> out/test/codesign.txt
+          lipo -archs "$APP/Contents/MacOS/MNPlayer" > out/test/archs.txt
+          plutil -lint "$APP/Contents/Info.plist" "$APP/Contents/Helpers/MN Finder.app/Contents/Info.plist" "$APP/Contents/Helpers/MN Preview.app/Contents/Info.plist" > out/test/plist-lint.txt 2>&1
+          exit 0
+
+      - name: Package
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -e
+          V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" desktop/Info.plist)
+          W=work/installer
+          mkdir -p "$W/payload/Applications" "$W/scripts"
+          ditto "MN Player.app" "$W/payload/Applications/MN Player.app"
+          cp desktop/postinstall "$W/scripts/postinstall"; chmod 755 "$W/scripts/postinstall"
+          pkgbuild --analyze --root "$W/payload" "$W/components.plist"
+          i=0; while /usr/libexec/PlistBuddy -c "Print :$i:RootRelativeBundlePath" "$W/components.plist" >/dev/null 2>&1; do /usr/libexec/PlistBuddy -c "Set :$i:BundleIsRelocatable false" "$W/components.plist"; i=$((i+1)); done
+          pkgbuild --root "$W/payload" --component-plist "$W/components.plist" --scripts "$W/scripts" --identifier com.mavinokta.player.installer --version "$V" --install-location / "$W/MNPlayer-component.pkg"
+          productbuild --distribution desktop/Distribution.xml --package-path "$W" --resources desktop/installer-resources "out/MNPlayer-$V-AppleSilicon.pkg"
+          ditto -c -k --keepParent "MN Player.app" "out/MN-Player-$V-macOS.zip"
+          shasum -a 256 out/*.pkg out/*.zip > out/SHA256.txt
+
+      - name: Publish outputs
+        if: always()
+        shell: bash
+        run: |
+          echo "build=${{ steps.build.outcome }} test=${{ steps.test.outcome }}" > out/status.txt
+          echo "${GITHUB_SHA}" > out/source_sha.txt
+          cd out
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b mn-player-mac-out
+          git add -A
+          git commit -q -m "Build output for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mn-player-mac-out
