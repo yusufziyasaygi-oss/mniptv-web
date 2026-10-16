@@ -433,7 +433,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     }
     func application(_ sender:NSApplication,open urls:[URL]){if mp==nil{pending += urls}else{add(urls);window.makeKeyAndOrderFront(nil)}}
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows flag:Bool)->Bool{window?.makeKeyAndOrderFront(nil);return true}
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{true}
+    // The preview only hides its window on Esc and stays ready for the next Control+M (it quits after 10 idle minutes).
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{!previewMode}
     func applicationWillTerminate(_ notification:Notification){mnLog("WILL_TERMINATE\n"+Thread.callStackSymbols.joined(separator:"\n"))}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {
         mnLog("SHOULD_TERMINATE\n"+Thread.callStackSymbols.prefix(25).joined(separator:"\n"))
