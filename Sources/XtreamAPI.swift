@@ -1,6 +1,6 @@
 import Foundation
 
-let userAgent = "MN-IPTV-Mac/2.1.2"
+let userAgent = "MN-IPTV-Mac/2.1.3"
 
 enum APIError: LocalizedError {
     case badAddress

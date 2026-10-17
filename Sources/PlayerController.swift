@@ -29,12 +29,34 @@ enum PlaybackEngine {
     }
 }
 
+/// Keeps the Mac (display and system) awake while video plays. libmpv only does this for its own
+/// windows; MN IPTV draws through its own layer, so the app has to ask macOS itself.
+@MainActor
+enum SleepGuard {
+    static let reason = "MN IPTV video oynatıyor"
+    private static var activity: NSObjectProtocol?
+    static var active: Bool { activity != nil }
+
+    static func set(_ on: Bool) {
+        if on, activity == nil {
+            activity = ProcessInfo.processInfo.beginActivity(
+                options: [.idleDisplaySleepDisabled, .idleSystemSleepDisabled, .userInitiated], reason: reason)
+        } else if !on, let a = activity {
+            ProcessInfo.processInfo.endActivity(a)
+            activity = nil
+        }
+    }
+}
+
 /// Drives the shared MaviMPVBridge (libmpv) for live channels, movies and series.
 @MainActor
 final class PlayerController: ObservableObject {
     enum Status: Equatable { case loading, playing, paused, failed(String) }
 
-    @Published private(set) var status: Status = .loading
+    @Published private(set) var status: Status = .loading {
+        // Awake while playing or buffering; paused or failed lets the Mac sleep as usual.
+        didSet { SleepGuard.set(bridge != nil && (status == .playing || status == .loading)) }
+    }
     @Published private(set) var position: Double = 0
     @Published private(set) var duration: Double = 0
     @Published private(set) var videoHeight: Int = 0
@@ -137,6 +159,7 @@ final class PlayerController: ObservableObject {
         _ = bridge?.stopPlayback()
         _ = bridge?.set(text: "no", property: "pause")
         bridge = nil
+        SleepGuard.set(false)
     }
 
     private func load(_ url: String, start: Double) {

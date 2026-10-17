@@ -99,6 +99,21 @@ final class SmokeRunner {
         for _ in 0..<4 { await left() }
     }
 
+    /// What macOS itself reports: `pmset -g assertions` lists the app's no-sleep request by reason.
+    private func sleepAssertionHeld() -> Bool {
+        let task = Process()
+        let pipe = Pipe()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+        task.arguments = ["-g", "assertions"]
+        task.standardOutput = pipe
+        guard (try? task.run()) != nil else { return false }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        task.waitUntilExit()
+        let text = String(data: data, encoding: .utf8) ?? ""
+        try? text.write(to: dir.appendingPathComponent("pmset-\(Int(Date().timeIntervalSince1970)).txt"), atomically: true, encoding: .utf8)
+        return text.contains(SleepGuard.reason)
+    }
+
     private func httpGet(_ url: String) async {
         guard let u = URL(string: url) else { return }
         _ = try? await URLSession.shared.data(from: u)
@@ -184,6 +199,7 @@ final class SmokeRunner {
         await enter()
         let movieStarted = await waitUntil(25) { (self.model.activePlayer?.position ?? 0) > 18 }
         check("movie plays past 18s", movieStarted, "pos=\(model.activePlayer?.position ?? 0)")
+        check("Mac kept awake while playing", SleepGuard.active && sleepAssertionHeld(), "guard=\(SleepGuard.active)")
         shot("11-movie-playing")
         let before = model.activePlayer?.position ?? 0
         await right(); await right()
@@ -194,6 +210,7 @@ final class SmokeRunner {
         await space()
         await wait(1)
         check("space pauses", model.activePlayer?.status == .paused, "status=\(String(describing: model.activePlayer?.status))")
+        check("paused: Mac may sleep again", !SleepGuard.active && !sleepAssertionHeld(), "guard=\(SleepGuard.active)")
         shot("13-movie-paused")
         await space()
         await wait(1)
