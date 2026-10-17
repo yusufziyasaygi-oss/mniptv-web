@@ -173,7 +173,8 @@ class Handler(BaseHTTPRequestHandler):
                 print(f"SLOW start {action} cat={cat} waited={time.time() - t0:.1f}s", flush=True)
                 try:
                     if action == "get_live_streams" and str(cat) == "2":
-                        for _ in range(100):
+                        t_slow = time.time()
+                        while time.time() - t_slow < 10:  # wall clock: macOS stretches short sleeps
                             time.sleep(0.1)
                             if client_gone(self.connection):
                                 print(f"SLOW aborted-by-client {action} cat={cat}", flush=True)
