@@ -111,7 +111,7 @@ final class SmokeRunner {
         task.waitUntilExit()
         let text = String(data: data, encoding: .utf8) ?? ""
         try? text.write(to: dir.appendingPathComponent("pmset-\(Int(Date().timeIntervalSince1970)).txt"), atomically: true, encoding: .utf8)
-        return text.contains(SleepGuard.reason)
+        return text.contains("MN IPTV video oynat")  // pmset prints non-ASCII letters mangled
     }
 
     private func httpGet(_ url: String) async {
