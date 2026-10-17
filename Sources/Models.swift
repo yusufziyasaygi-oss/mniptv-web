@@ -114,9 +114,9 @@ func formatTime(_ seconds: Double) -> String {
     return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
 }
 
+private let searchLocale = Locale(identifier: "tr_TR")
+private let searchFold: [Character: Character] = ["ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c", "â": "a", "î": "i"]
+
 func normalizeForSearch(_ s: String) -> String {
-    var t = s.lowercased(with: Locale(identifier: "tr_TR"))
-    let map: [Character: Character] = ["ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c", "â": "a", "î": "i"]
-    t = String(t.map { map[$0] ?? $0 })
-    return t
+    String(s.lowercased(with: searchLocale).map { searchFold[$0] ?? $0 })
 }

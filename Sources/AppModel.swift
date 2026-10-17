@@ -86,7 +86,12 @@ final class AppModel: ObservableObject {
     @Published private(set) var selectedCategory: Int = -1
     @Published private(set) var tiles: [Tile] = []
     @Published private(set) var contentTitle = ""
-    @Published private(set) var loading = false
+    @Published private(set) var loading = false {
+        didSet { if loading != oldValue { loadingChanged() } }
+    }
+    /// Shown under the spinner when the server takes long, so a slow panel does not look like a hang.
+    @Published private(set) var slowLoading = false
+    private var slowTask: Task<Void, Never>?
     @Published private(set) var emptyMessage: String?
     @Published var query = ""
     @Published private(set) var route: [Route] = []
@@ -102,6 +107,15 @@ final class AppModel: ObservableObject {
     private var categoryTask: Task<Void, Never>?
     private var contentTask: Task<Void, Never>?
     private var toastTask: Task<Void, Never>?
+    /// One download per list: "Tümü" and search, or a category picked twice, share a request. It is
+    /// cancelled as soon as nobody waits for it (panels allow few connections per account).
+    private final class Flight {
+        let task: Task<Any, Error>
+        var waiters = Set<UUID>()
+        init(_ task: Task<Any, Error>) { self.task = task }
+    }
+    private var flights: [String: Flight] = [:]
+    private var searchNames: [Kind: (count: Int, names: [String])] = [:]
 
     init() {
         if let acc = store.account {
@@ -173,6 +187,47 @@ final class AppModel: ObservableObject {
         categoryCache.removeAll()
         streamCache.removeAll()
         seriesCache.removeAll()
+        searchNames.removeAll()
+        flights.values.forEach { $0.task.cancel() }
+        flights.removeAll()
+    }
+
+    private func loadingChanged() {
+        slowTask?.cancel()
+        slowLoading = false
+        guard loading else { return }
+        slowTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 7_000_000_000)
+            guard let self = self, !Task.isCancelled, self.loading else { return }
+            self.slowLoading = true
+        }
+    }
+
+    private func shared<T>(_ key: String, _ load: @escaping () async throws -> T) async throws -> T {
+        let flight: Flight
+        if let f = flights[key] {
+            flight = f
+        } else {
+            flight = Flight(Task { try await load() as Any })
+            flights[key] = flight
+        }
+        let id = UUID()
+        flight.waiters.insert(id)
+        defer { leave(key, flight, id) }
+        let value = try await withTaskCancellationHandler {
+            try await flight.task.value
+        } onCancel: {
+            Task { @MainActor [weak self] in self?.leave(key, flight, id) }
+        }
+        guard let typed = value as? T else { throw APIError.badResponse("Beklenmeyen yanıt") }
+        return typed
+    }
+
+    private func leave(_ key: String, _ flight: Flight, _ id: UUID) {
+        flight.waiters.remove(id)
+        guard flight.waiters.isEmpty else { return }
+        if flights[key] === flight { flights[key] = nil }
+        flight.task.cancel()
     }
 
     func reloadSection() {
@@ -190,23 +245,34 @@ final class AppModel: ObservableObject {
 
     func categories(_ kind: Kind) async throws -> [Category] {
         if let c = categoryCache[kind] { return c }
-        let list = try await requireAPI().categories(kind)
-        categoryCache[kind] = list
+        let api = try requireAPI()
+        let list: [Category] = try await shared("cat|\(kind.rawValue)") { try await api.categories(kind) }
+        if self.api === api { categoryCache[kind] = list }
         return list
     }
 
     func streams(_ kind: Kind, _ categoryId: String?) async throws -> [MediaEntry] {
         let key = "\(kind.rawValue)|\(categoryId ?? "*")"
         if let c = streamCache[key] { return c }
-        let list = try await requireAPI().streams(kind, categoryId: categoryId)
-        streamCache[key] = list
+        let api = try requireAPI()
+        let list: [MediaEntry] = try await shared("streams|\(key)") { try await api.streams(kind, categoryId: categoryId) }
+        if self.api === api { streamCache[key] = list }
         return list
+    }
+
+    /// Search-normalised names of a whole catalogue, computed once off the main thread.
+    private func searchIndex(_ kind: Kind, _ all: [MediaEntry]) async -> [String] {
+        if let c = searchNames[kind], c.count == all.count { return c.names }
+        let names = await Task.detached(priority: .userInitiated) { all.map { normalizeForSearch($0.name) } }.value
+        searchNames[kind] = (all.count, names)
+        return names
     }
 
     func seriesInfo(_ id: String) async throws -> SeriesInfo {
         if let c = seriesCache[id] { return c }
-        let info = try await requireAPI().seriesInfo(id)
-        seriesCache[id] = info
+        let api = try requireAPI()
+        let info: SeriesInfo = try await shared("series|\(id)") { try await api.seriesInfo(id) }
+        if self.api === api { seriesCache[id] = info }
         return info
     }
 
@@ -303,20 +369,30 @@ final class AppModel: ObservableObject {
             let needle = normalizeForSearch(q)
             var results: [MediaEntry] = []
             var failures = 0
-            for kind in Kind.allCases {
+            let kinds = Kind.allCases
+            for (n, kind) in kinds.enumerated() {
                 do {
                     let all = try await self.streams(kind, nil)
                     if Task.isCancelled { return }
-                    var added = 0
-                    for e in all where added < 300 {
-                        if normalizeForSearch(e.name).contains(needle) {
-                            results.append(e)
-                            added += 1
+                    let names = await self.searchIndex(kind, all)
+                    let found = await Task.detached(priority: .userInitiated) { () -> [MediaEntry] in
+                        var hits: [MediaEntry] = []
+                        for i in names.indices where hits.count < 300 {
+                            if names[i].contains(needle) { hits.append(all[i]) }
                         }
-                    }
+                        return hits
+                    }.value
+                    if Task.isCancelled { return }
+                    results.append(contentsOf: found)
                 } catch {
                     if Task.isCancelled { return }
                     failures += 1
+                }
+                // Show what is found so far instead of waiting for the slowest catalogue.
+                if n < kinds.count - 1 && !results.isEmpty {
+                    let favs = self.store.favoriteKeys
+                    self.contentTitle = "\"\(q)\" · \(results.count) sonuç · aranıyor…"
+                    self.setTiles(results.map { .media($0, favorite: favs.contains($0.key), showKind: $0.kind != .live) }, empty: "")
                 }
             }
             if Task.isCancelled { return }

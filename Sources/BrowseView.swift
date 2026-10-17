@@ -153,7 +153,13 @@ struct BrowseView: View {
                 ZStack {
                     grid(width: geo.size.width)
                     if model.loading {
-                        ProgressView().controlSize(.large)
+                        VStack(spacing: 14) {
+                            ProgressView().controlSize(.large)
+                            if model.slowLoading {
+                                Text("Sunucu yavaş yanıt veriyor, bekleniyor…")
+                                    .font(.system(size: 14)).foregroundColor(MN.text2)
+                            }
+                        }
                     } else if let empty = model.emptyMessage {
                         Text(empty).font(.system(size: 15)).foregroundColor(MN.text2)
                             .multilineTextAlignment(.center).frame(maxWidth: 520)

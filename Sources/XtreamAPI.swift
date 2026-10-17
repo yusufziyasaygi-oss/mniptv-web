@@ -1,6 +1,6 @@
 import Foundation
 
-let userAgent = "MN-IPTV-Mac/2.1.1"
+let userAgent = "MN-IPTV-Mac/2.1.2"
 
 enum APIError: LocalizedError {
     case badAddress
@@ -18,15 +18,23 @@ enum APIError: LocalizedError {
 
 final class XtreamAPI {
     let account: Account
+    /// Small answers (login, categories, series info, EPG), one category, the whole catalogue.
     private let session: URLSession
+    private let categorySession: URLSession
+    private let bulkSession: URLSession
 
     init(account: Account) {
         self.account = account
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 20
-        config.timeoutIntervalForResource = 90
-        config.httpAdditionalHeaders = ["User-Agent": userAgent]
-        session = URLSession(configuration: config)
+        func make(_ total: TimeInterval) -> URLSession {
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = 20
+            config.timeoutIntervalForResource = total
+            config.httpAdditionalHeaders = ["User-Agent": userAgent]
+            return URLSession(configuration: config)
+        }
+        session = make(25)
+        categorySession = make(40)
+        bulkSession = make(120)  // search and "Tümü" fetch the whole catalogue: tens of MB on large panels
     }
 
     private static let unreserved = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
@@ -46,14 +54,27 @@ final class XtreamAPI {
         return url
     }
 
-    private func get(_ action: String?, _ extra: [(String, String)] = []) async throws -> Any {
+    /// Connection errors are retried once; a timeout is reported as such instead of a spinner forever.
+    private func get(_ action: String?, _ extra: [(String, String)] = [], using: URLSession? = nil) async throws -> Any {
         let url = try apiURL(action, extra)
-        let (data, response) = try await session.data(from: url)
-        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-            throw APIError.http(http.statusCode)
+        let s = using ?? session
+        var attempt = 0
+        while true {
+            do {
+                let (data, response) = try await s.data(from: url)
+                if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                    throw APIError.http(http.statusCode)
+                }
+                if data.isEmpty { return [Any]() }
+                return (try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])) ?? NSNull()
+            } catch let e as URLError where e.code == .timedOut {
+                throw APIError.badResponse("Sunucu \(Int(s.configuration.timeoutIntervalForResource)) saniyede yanıt vermedi")
+            } catch let e as URLError where e.code != .cancelled && !Task.isCancelled && attempt == 0 {
+                _ = e
+                attempt += 1
+                try await Task.sleep(nanoseconds: 800_000_000)
+            }
         }
-        if data.isEmpty { return [Any]() }
-        return (try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed])) ?? NSNull()
     }
 
     /// nil when login is OK, otherwise a user-facing message.
@@ -93,7 +114,7 @@ final class XtreamAPI {
         }
         var extra: [(String, String)] = []
         if let c = categoryId, !c.isEmpty { extra.append(("category_id", c)) }
-        let list = (try await get(action, extra) as? [Any]) ?? []
+        let list = (try await get(action, extra, using: extra.isEmpty ? bulkSession : categorySession) as? [Any]) ?? []
         var out: [MediaEntry] = []
         out.reserveCapacity(list.count)
         for item in list {

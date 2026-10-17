@@ -99,6 +99,11 @@ final class SmokeRunner {
         for _ in 0..<4 { await left() }
     }
 
+    private func httpGet(_ url: String) async {
+        guard let u = URL(string: url) else { return }
+        _ = try? await URLSession.shared.data(from: u)
+    }
+
     private func finish() {
         let data = try? JSONSerialization.data(withJSONObject: checks, options: [.prettyPrinted])
         try? data?.write(to: dir.appendingPathComponent("results.json"))
@@ -263,6 +268,27 @@ final class SmokeRunner {
         check("search 'kanal 1'", searched, "tiles=\(model.tiles.count)")
         await wait(1)
         shot("21-search")
+
+        // 8b. Slow panel: one list download at a time, "Spor" answers in 10 s. Leaving "Spor" for
+        // "Tümü" must abort the Spor download, so "Tümü" appears within a few seconds.
+        await httpGet(server + "/__slow?on=1")
+        model.clearCache()
+        model.goToSection(.live)
+        _ = await waitUntil(10) { self.model.tiles.count == 15 && !self.model.loading }
+        model.selectCategory(1)
+        await wait(1.5)
+        model.selectCategory(2)
+        let switched = await waitUntil(4) { self.model.tiles.count == 30 && !self.model.loading }
+        check("slow panel: leaving a slow category does not block the next one", switched,
+              "tiles=\(model.tiles.count) loading=\(model.loading)")
+        shot("21b-slow-switch")
+        model.selectCategory(1)
+        await wait(8.5)
+        check("slow panel: waiting hint shown", model.loading && model.slowLoading, "loading=\(model.loading) slow=\(model.slowLoading)")
+        shot("21c-slow-hint")
+        let slowLoaded = await waitUntil(6) { self.model.tiles.count == 15 && !self.model.loading }
+        check("slow panel: slow category arrives", slowLoaded, "tiles=\(model.tiles.count)")
+        await httpGet(server + "/__slow?on=0")
 
         // 9. Player choice: MN Player hand-off instead of the built-in player
         model.setPlaybackApp(mnPlayer: true)

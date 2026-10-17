@@ -7,6 +7,9 @@ import base64
 import json
 import os
 import re
+import select
+import socket
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -14,6 +17,20 @@ from urllib.parse import parse_qs, urlparse
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MEDIA = os.path.join(ROOT, "media")
 HOST = os.environ.get("MOCK_HOST", "http://10.0.2.2:8080")
+
+
+# Slow-panel mode (switched on by the smoke test): like many real panels, only one list download
+# per account at a time, and the "Spor" live category takes 10 s to answer.
+SLOW = {"on": False}
+LIST_LOCK = threading.Lock()
+
+
+def client_gone(conn):
+    try:
+        r, _, _ = select.select([conn], [], [], 0)
+        return bool(r) and conn.recv(1, socket.MSG_PEEK) == b""
+    except OSError:
+        return True
 
 
 def b64(s):
@@ -139,11 +156,32 @@ class Handler(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         q = {k: v[0] for k, v in parse_qs(url.query).items()}
         path = url.path
+        if path == "/__slow":
+            SLOW["on"] = q.get("on") == "1"
+            return self.send_json({"slow": SLOW["on"]})
         if path == "/player_api.php":
             if q.get("username") != "u" or q.get("password") != "p":
                 return self.send_json({"user_info": {"auth": 0}})
             action = q.get("action")
             cat = q.get("category_id")
+            if SLOW["on"] and action in ("get_live_streams", "get_vod_streams", "get_series"):
+                t0 = time.time()
+                while not LIST_LOCK.acquire(timeout=0.1):
+                    if client_gone(self.connection):
+                        print(f"SLOW gave-up-waiting {action} cat={cat}", flush=True)
+                        return
+                print(f"SLOW start {action} cat={cat} waited={time.time() - t0:.1f}s", flush=True)
+                try:
+                    if action == "get_live_streams" and str(cat) == "2":
+                        for _ in range(100):
+                            time.sleep(0.1)
+                            if client_gone(self.connection):
+                                print(f"SLOW aborted-by-client {action} cat={cat}", flush=True)
+                                return
+                    return self.send_json(live_streams(cat) if action == "get_live_streams"
+                                          else vod_streams(cat) if action == "get_vod_streams" else series_list(cat))
+                finally:
+                    LIST_LOCK.release()
             if action is None:
                 return self.send_json({"user_info": {"auth": 1, "status": "Active", "username": "u"},
                                        "server_info": {"url": "10.0.2.2", "port": "8080"}})
