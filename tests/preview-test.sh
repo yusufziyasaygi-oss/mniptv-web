@@ -21,6 +21,8 @@ swiftc -O tests/notify.swift -o notify && swiftc -O tests/service.swift -o servi
 MN_LOG=1 "$APP/Contents/MacOS/MNPlayer" "$M/a-yatay.mp4" 2> "$O/main-stderr.txt" &
 MAIN=$!
 sleep 6
+pmset -g assertions > "$O/pmset-playing.txt"
+grep -q "MN Player video oynatıyor" "$O/pmset-playing.txt"; check "Mac kept awake while playing" $?
 
 # 2. Cold preview start (as MN Finder launches it)
 T0=$(now)
@@ -30,6 +32,7 @@ wait_title $P "b-dikey.mov" 20; check "preview opens with file name as title" $?
 echo "cold preview: $(( $(now) - T0 )) ms" >> "$O/timing.txt"
 sleep 2
 grep -q MAIN_PAUSED_FOR_PREVIEW "$O/main-stderr.txt"; check "main player paused when preview opened" $?
+grep -q AWAKE_OFF "$O/main-stderr.txt"; check "paused main player lets the Mac sleep" $?
 screencapture -x "$O/1-preview-dikey.png"
 
 # 3. Down arrow -> next video in the same folder
@@ -43,6 +46,7 @@ screencapture -x "$O/2-preview-back.png"
 # 4. Esc hides the preview, process stays warm
 osascript -e 'tell application "System Events" to key code 53'
 sleep 1.5
+grep -q AWAKE_OFF "$O/preview-stderr.txt"; check "hidden preview lets the Mac sleep" $?
 W=$(title $P); echo "after esc windows: [$W]" >> "$O/timing.txt"
 [ -z "$(echo "$W" | tr -d ' ,')" ]; check "esc closes the preview window" $?
 kill -0 $P; ALIVE=$?; check "preview process kept for the next Control+M" $ALIVE

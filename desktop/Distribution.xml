@@ -8,5 +8,5 @@
   <choices-outline><line choice="default"><line choice="player"/></line></choices-outline>
   <choice id="default"/>
   <choice id="player" visible="false" title="MN Player"><pkg-ref id="com.mavinokta.player.installer"/></choice>
-  <pkg-ref id="com.mavinokta.player.installer" version="2.2.3" onConclusion="none">MNPlayer-component.pkg</pkg-ref>
+  <pkg-ref id="com.mavinokta.player.installer" version="2.2.4" onConclusion="none">MNPlayer-component.pkg</pkg-ref>
 </installer-gui-script>

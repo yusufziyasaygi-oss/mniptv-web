@@ -128,6 +128,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     var autoplay=true
     var savedVolume:Int32=100
     var lastState=libvlc_NothingSpecial
+    /// Keeps the Mac (display and system) awake while a video plays or buffers; paused/stopped releases it.
+    var awakeActivity:NSObjectProtocol?
+    func keepAwake(_ on:Bool) {
+        if on, awakeActivity==nil {
+            awakeActivity=ProcessInfo.processInfo.beginActivity(options:[.idleDisplaySleepDisabled,.idleSystemSleepDisabled,.userInitiated],reason:"MN Player video oynatıyor")
+            mnLog("AWAKE_ON")
+        } else if !on, let a=awakeActivity {
+            ProcessInfo.processInfo.endActivity(a);awakeActivity=nil
+            mnLog("AWAKE_OFF")
+        }
+    }
     var errorShown=false
     var playButton:NSButton!
     var nextButton:NSButton!
@@ -227,6 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         savePosition()
         engineQueue.async {[self] in libvlc_media_player_stop(mp)}
         generation += 1;queue=[];index = -1;lastState=libvlc_NothingSpecial
+        keepAwake(false)
         window.orderOut(nil)
         previousApp?.activate(options:[])
         mnLog("PREVIEW_HIDDEN")
@@ -312,6 +324,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
             let aspect=displayAspect(mp)
             DispatchQueue.main.async { [self] in
                 tickPending=false;guard !terminating,revision==generation else{return};lastTime=time;lastLength=length;seekable=canSeek
+                keepAwake(state==libvlc_Playing || state==libvlc_Opening || state==libvlc_Buffering)
                 if let aspect,videoAspect==nil || abs(aspect-(videoAspect ?? aspect))>0.005{videoAspect=aspect;fitVideoWindow()}
                 if let seek=pendingSeek,state==libvlc_Playing,length>0 {
                     pendingSeek=nil
@@ -438,7 +451,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
     func applicationWillTerminate(_ notification:Notification){mnLog("WILL_TERMINATE\n"+Thread.callStackSymbols.joined(separator:"\n"))}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply {
         mnLog("SHOULD_TERMINATE\n"+Thread.callStackSymbols.prefix(25).joined(separator:"\n"))
-        terminating=true;savePosition();timer?.invalidate();hideTimer?.invalidate();sleepTimer?.invalidate()
+        terminating=true;keepAwake(false);savePosition();timer?.invalidate();hideTimer?.invalidate();sleepTimer?.invalidate()
         guard mp != nil else{return .terminateNow}
         engineQueue.async {[self] in libvlc_media_player_stop(mp);libvlc_media_player_release(mp);libvlc_release(engine);DispatchQueue.main.async{NSApp.reply(toApplicationShouldTerminate:true)}}
         return .terminateLater
