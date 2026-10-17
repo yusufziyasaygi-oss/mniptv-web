@@ -1,0 +1,10 @@
+OK   Mac kept awake while playing
+OK   preview opens with file name as title
+OK   main player paused when preview opened
+OK   paused main player lets the Mac sleep
+OK   down arrow -> next video in folder
+OK   up arrow -> previous video
+OK   hidden preview lets the Mac sleep
+OK   esc closes the preview window
+OK   preview process kept for the next Control+M
+OK   second preview opens in the running process

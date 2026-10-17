@@ -1,0 +1,8 @@
+[34m==>[0m [1mWould install 1 cask:[0m
+vlc
+[32m==>[0m [1mFetching downloads for: [32mvlc[39m[0m
+✔︎ Cask vlc (3.0.23)
+[32m==>[0m [1mInstalling Cask [32mvlc[39m[0m
+[34m==>[0m [1mMoving App 'VLC.app' to '/Applications/VLC.app'[0m
+[34m==>[0m [1mLinking Command Wrapper 'vlc' to '/opt/homebrew/bin/vlc'[0m
+🍺  vlc was successfully installed!

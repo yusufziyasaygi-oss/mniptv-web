@@ -1,0 +1,2 @@
+4f3611c43a81e10fa08e815214aa6c8c3d4b5a5453447751565723d3d063091f  out/MNPlayer-2.2.4-AppleSilicon.pkg
+117af81ad6b019ffe120b583c600e7f0a91d459d18ebb7390b1674ba8b424bfc  out/MN-Player-2.2.4-macOS.zip

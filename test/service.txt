@@ -1,0 +1,3 @@
+NSPerformService=true
+4493 /Users/runner/work/mniptv-web/mniptv-web/MN Player.app/Contents/Helpers/MN Finder.app/Contents/MacOS/MNFinder
+e-mpeg2.ts

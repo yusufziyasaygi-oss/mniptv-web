@@ -1,0 +1,35 @@
+2026-10-17 19:04:57 +0000 
+Assertion status system-wide:
+   BackgroundTask                 0
+   PreventDiskIdle                1
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    1
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            1
+Listed by owning process:
+   pid 234(coreaudiod): [0x000000ac0001813f] 00:00:04 PreventUserIdleSystemSleep named: "com.apple.audio.AVIODevice.context.preventuseridlesleep"  
+	Created for PID: 3993. 
+	Resources: audio-out AVIODevice 
+   pid 260(nsurlsessiond): [0x000000ae000b8149] 00:00:02 BackgroundTask named: "NSURLSessionTask 7264EEE3-9542-4ED4-80BD-89ABB433280B"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 260(nsurlsessiond): [0x000000ae000b814b] 00:00:02 BackgroundTask named: "NSURLSessionTask BA9383F6-3956-49F9-92B8-E9524E211203"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 260(nsurlsessiond): [0x000000ae000b814d] 00:00:02 BackgroundTask named: "NSURLSessionTask 0803D919-2191-4DA7-9D19-378E1ADDB76E"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 109(mds): [0x00000014000b80b3] 00:02:36 BackgroundTask named: "com.apple.metadata.mds.power"  
+   pid 166(WindowServer): [0x000000080009802b] 00:02:48 UserIsActive named: "com.apple.iohideventsystem.queue.tickle.nxevent service:IOHIDSystem pid:333 process:Dock"  
+   pid 3993(MNPlayer): [0x000000ad00018146] 00:00:04 PreventUserIdleSystemSleep named: "MN Player video oynatõyor"  
+   pid 3993(MNPlayer): [0x000000ad00058147] 00:00:04 PreventUserIdleDisplaySleep named: "MN Player video oynatõyor"  
+   pid 293(mds_stores): [0x00000018000b80dd] 00:02:32 BackgroundTask named: "com.apple.metadata.mds_stores.power"  
+   pid 94(powerd): [0x0000000500018001] 00:02:51 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 94(powerd): [0x0000000500098002] 00:02:51 UserIsActive named: "com.apple.powerd.ws.initialize"  
+   pid 307(addonsd): [0x0000000800018028] 00:02:49 PreventUserIdleSystemSleep named: "Anka sleeplessness"  
+   pid 307(addonsd): [0x0000000800058027] 00:02:49 NoDisplaySleepAssertion named: "Anka sleeplessness"  
+   pid 307(addonsd): [0x00000008000f8029] 00:02:49 PreventDiskIdle named: "Anka sleeplessness"  
+   pid 307(addonsd): [0x000000080011802a] 00:02:49 NetworkClientActive named: "Anka sleeplessness"  
+Kernel Assertions: 0x4=USB
+   id=501  level=255 0x4=USB creat= description=com.apple.usb.externaldevice.0c900000 owner=Virtual USB Keyboard
+   id=502  level=255 0x4=USB creat= description=com.apple.usb.externaldevice.0ca00000 owner=Virtual USB Digitizer
