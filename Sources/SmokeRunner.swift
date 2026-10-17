@@ -282,12 +282,13 @@ final class SmokeRunner {
         check("slow panel: leaving a slow category does not block the next one", switched,
               "tiles=\(model.tiles.count) loading=\(model.loading)")
         shot("21b-slow-switch")
+        log("slow: select Spor again t=\(Date().timeIntervalSince1970)")
         model.selectCategory(1)
         await wait(8.5)
         check("slow panel: waiting hint shown", model.loading && model.slowLoading, "loading=\(model.loading) slow=\(model.slowLoading)")
         shot("21c-slow-hint")
         let slowLoaded = await waitUntil(6) { self.model.tiles.count == 15 && !self.model.loading }
-        check("slow panel: slow category arrives", slowLoaded, "tiles=\(model.tiles.count)")
+        check("slow panel: slow category arrives", slowLoaded, "tiles=\(model.tiles.count) loading=\(model.loading) empty=\(model.emptyMessage ?? "-") t=\(Date().timeIntervalSince1970)")
         await httpGet(server + "/__slow?on=0")
 
         // 9. Player choice: MN Player hand-off instead of the built-in player

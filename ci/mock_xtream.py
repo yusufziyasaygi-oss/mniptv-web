@@ -170,13 +170,14 @@ class Handler(BaseHTTPRequestHandler):
                     if client_gone(self.connection):
                         print(f"SLOW gave-up-waiting {action} cat={cat}", flush=True)
                         return
-                print(f"SLOW start {action} cat={cat} waited={time.time() - t0:.1f}s", flush=True)
+                t1 = time.time()
+                print(f"SLOW {t1:.1f} start {action} cat={cat} waited={t1 - t0:.1f}s peer={self.client_address}", flush=True)
                 try:
                     if action == "get_live_streams" and str(cat) == "2":
                         for _ in range(100):
                             time.sleep(0.1)
                             if client_gone(self.connection):
-                                print(f"SLOW aborted-by-client {action} cat={cat}", flush=True)
+                                print(f"SLOW {time.time():.1f} aborted-by-client {action} cat={cat} after={time.time() - t1:.1f}s peer={self.client_address}", flush=True)
                                 return
                     return self.send_json(live_streams(cat) if action == "get_live_streams"
                                           else vod_streams(cat) if action == "get_vod_streams" else series_list(cat))
