@@ -188,20 +188,7 @@ step 33-movie-favorited
 menu 4
 step 34-favorites
 
-# 8. Search (menu index 5)
-menu 5
-adb shell input text "kanal%s1"
-sleep 1; hide_ime
-sleep 5
-step 35-search-results
-key KEYCODE_DPAD_DOWN
-step 36-search-focus
-key KEYCODE_DPAD_CENTER
-sleep 6
-step 37-search-play
-to_main
-
-# 9. Slow panel: one list download at a time, "Spor" answers in 10 s. Leaving "Spor" for "Tümü"
+# 7b. Slow panel (before search, which caches the whole live list): one list download at a time, "Spor" answers in 10 s. Leaving "Spor" for "Tümü"
 # must abort the Spor download, so "Tümü" shows within a few seconds.
 curl -s "http://127.0.0.1:8080/__slow?on=1" >> "$OUT/server_check.txt"
 menu 1
@@ -217,7 +204,20 @@ sleep 4
 step 42-slow-loaded
 curl -s "http://127.0.0.1:8080/__slow?on=0" >> "$OUT/server_check.txt"
 
-# 10. Account dialog (menu index 6)
+# 8. Search (menu index 5)
+menu 5
+adb shell input text "kanal%s1"
+sleep 1; hide_ime
+sleep 5
+step 35-search-results
+key KEYCODE_DPAD_DOWN
+step 36-search-focus
+key KEYCODE_DPAD_CENTER
+sleep 6
+step 37-search-play
+to_main
+
+# 9. Account dialog (menu index 6)
 menu 6
 step 38-account
 key KEYCODE_BACK
