@@ -22,7 +22,7 @@ MN_LOG=1 "$APP/Contents/MacOS/MNPlayer" "$M/a-yatay.mp4" 2> "$O/main-stderr.txt"
 MAIN=$!
 sleep 6
 pmset -g assertions > "$O/pmset-playing.txt"
-grep -q "MN Player video oynat" "$O/pmset-playing.txt"; check "Mac kept awake while playing" $?
+grep -aq "MN Player video oynat" "$O/pmset-playing.txt"; check "Mac kept awake while playing" $?
 
 # 2. Cold preview start (as MN Finder launches it)
 T0=$(now)
