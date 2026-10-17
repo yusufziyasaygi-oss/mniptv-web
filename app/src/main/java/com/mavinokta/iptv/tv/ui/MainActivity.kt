@@ -28,10 +28,12 @@ import com.mavinokta.iptv.tv.data.Kind
 import com.mavinokta.iptv.tv.data.MediaEntry
 import com.mavinokta.iptv.tv.data.PlayerSession
 import com.mavinokta.iptv.tv.data.Repo
+import com.mavinokta.iptv.tv.data.normalizeForSearch
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.util.Locale
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -332,10 +334,6 @@ class MainActivity : AppCompatActivity() {
 
     // ---------------------------------------------------------------- search
 
-    private fun normalize(s: String): String =
-        s.lowercase(Locale("tr")).replace('ı', 'i').replace('ğ', 'g').replace('ü', 'u')
-            .replace('ş', 's').replace('ö', 'o').replace('ç', 'c').replace('â', 'a').replace('î', 'i')
-
     private fun runSearch(query: String, focusResults: Boolean = false) {
         val q = query.trim()
         lastQuery = q
@@ -348,31 +346,43 @@ class MainActivity : AppCompatActivity() {
         contentJob = lifecycleScope.launch {
             contentTitle.text = "Aranıyor: $q"
             setLoading(true)
-            val needle = normalize(q)
+            val needle = normalizeForSearch(q)
             val results = ArrayList<MediaEntry>()
             var failures = 0
-            for (kind in listOf(Kind.LIVE, Kind.MOVIE, Kind.SERIES)) {
+            var shown = false
+            val kinds = listOf(Kind.LIVE, Kind.MOVIE, Kind.SERIES)
+            for ((n, kind) in kinds.withIndex()) {
                 try {
                     val all = Repo.streams(kind, null)
-                    var added = 0
-                    for (e in all) {
-                        if (added >= 300) break
-                        if (normalize(e.name).contains(needle)) {
-                            results.add(e)
-                            added++
+                    val names = Repo.searchIndex(kind, all)
+                    val found = withContext(Dispatchers.Default) {
+                        val hits = ArrayList<MediaEntry>()
+                        for (i in names.indices) {
+                            if (hits.size >= 300) break
+                            if (names[i].contains(needle)) hits.add(all[i])
                         }
+                        hits
                     }
+                    results.addAll(found)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
                     failures++
                 }
+                // Show what is found so far instead of waiting for the slowest catalogue.
+                if (n < kinds.size - 1 && results.isNotEmpty()) {
+                    val favs = store.favoriteKeys()
+                    contentTitle.text = "\"$q\" · ${results.size} sonuç · aranıyor…"
+                    showTiles(results.map { Tile.Media(it, it.key in favs, showKind = it.kind != Kind.LIVE) }, null, keepFocus = shown)
+                    if (focusResults && !shown) contentGrid.focusFirstVisible()
+                    shown = true
+                }
             }
             val favs = store.favoriteKeys()
             contentTitle.text = "\"$q\" · ${results.size} sonuç"
             val empty = if (failures == 3) "Arama yapılamadı, bağlantıyı kontrol et." else "Sonuç bulunamadı"
-            showTiles(results.map { Tile.Media(it, it.key in favs, showKind = it.kind != Kind.LIVE) }, empty, false)
-            if (focusResults && results.isNotEmpty()) contentGrid.focusFirstVisible()
+            showTiles(results.map { Tile.Media(it, it.key in favs, showKind = it.kind != Kind.LIVE) }, empty, keepFocus = shown)
+            if (focusResults && !shown && results.isNotEmpty()) contentGrid.focusFirstVisible()
         }
     }
 
@@ -394,9 +404,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // A slow panel should not look like a frozen app.
+    private val slowRunnable = Runnable {
+        if (loading.visibility != View.VISIBLE) return@Runnable
+        emptyText.text = "Sunucu yavaş yanıt veriyor, bekleniyor…"
+        emptyText.translationY = 64 * resources.displayMetrics.density
+        emptyText.visibility = View.VISIBLE
+    }
+
     private fun setLoading(on: Boolean) {
         loading.visibility = if (on) View.VISIBLE else View.GONE
-        if (on) emptyText.visibility = View.GONE
+        handler.removeCallbacks(slowRunnable)
+        emptyText.translationY = 0f
+        if (on) {
+            emptyText.visibility = View.GONE
+            handler.postDelayed(slowRunnable, 7000)
+        }
     }
 
     private fun showTiles(tiles: List<Tile>, emptyMessage: String?, keepFocus: Boolean) {

@@ -201,7 +201,23 @@ sleep 6
 step 37-search-play
 to_main
 
-# 9. Account dialog (menu index 6)
+# 9. Slow panel: one list download at a time, "Spor" answers in 10 s. Leaving "Spor" for "Tümü"
+# must abort the Spor download, so "Tümü" shows within a few seconds.
+curl -s "http://127.0.0.1:8080/__slow?on=1" >> "$OUT/server_check.txt"
+menu 1
+key KEYCODE_DPAD_DOWN
+sleep 1.5
+key KEYCODE_DPAD_DOWN
+sleep 4
+step 40-slow-switch-all
+key KEYCODE_DPAD_UP
+sleep 8.5
+step 41-slow-hint
+sleep 4
+step 42-slow-loaded
+curl -s "http://127.0.0.1:8080/__slow?on=0" >> "$OUT/server_check.txt"
+
+# 10. Account dialog (menu index 6)
 menu 6
 step 38-account
 key KEYCODE_BACK

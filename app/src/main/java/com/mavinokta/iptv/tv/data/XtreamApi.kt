@@ -2,16 +2,26 @@ package com.mavinokta.iptv.tv.data
 
 import android.net.Uri
 import android.util.Base64
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.net.URLEncoder
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-const val USER_AGENT = "MN-IPTV-TV/2.1.0 (Android TV)"
+const val USER_AGENT = "MN-IPTV-TV/2.1.1 (Android TV)"
 
 class XtreamApi(val account: Account, private val http: OkHttpClient) {
 
@@ -26,16 +36,59 @@ class XtreamApi(val account: Account, private val http: OkHttpClient) {
         append(extra)
     }
 
-    private suspend fun get(url: String): String = withContext(Dispatchers.IO) {
+    private class HttpStatus(code: Int) : IOException("Sunucu yanıtı: HTTP $code")
+
+    /**
+     * One API request with a total time limit. Cancelling the caller aborts the HTTP call itself:
+     * IPTV panels allow few connections per account, so an abandoned download (switching category
+     * quickly) would otherwise make the next request wait behind it. Connection errors are retried once.
+     */
+    private suspend fun get(url: String, timeoutSec: Long = 30): String {
         val request = try {
             Request.Builder().url(url).header("User-Agent", USER_AGENT).build()
         } catch (e: IllegalArgumentException) {
             throw IOException("Sunucu adresi geçersiz")
         }
-        http.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Sunucu yanıtı: HTTP ${response.code}")
-            response.body?.string() ?: ""
+        val client = http.newBuilder().callTimeout(timeoutSec, TimeUnit.SECONDS).build()
+        var attempt = 0
+        while (true) {
+            try {
+                return execute(client, request)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: HttpStatus) {
+                throw e
+            } catch (e: InterruptedIOException) {
+                throw IOException("Sunucu $timeoutSec saniyede yanıt vermedi")
+            } catch (e: IOException) {
+                if (++attempt >= 2) throw e
+                delay(800)
+            }
         }
+    }
+
+    private suspend fun execute(client: OkHttpClient, request: Request): String = suspendCancellableCoroutine { cont ->
+        val call = client.newCall(request)
+        cont.invokeOnCancellation { call.cancel() }
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                if (cont.isActive) cont.resumeWithException(e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                try {
+                    response.use {
+                        if (!it.isSuccessful) throw HttpStatus(it.code)
+                        val body = it.body?.string() ?: ""
+                        if (cont.isActive) cont.resume(body)
+                    }
+                } catch (e: IOException) {
+                    if (cont.isActive) cont.resumeWithException(e)
+                } catch (e: OutOfMemoryError) {
+                    if (cont.isActive) cont.resumeWithException(IOException("Liste bu cihazın belleği için çok büyük"))
+                }
+            }
+        })
     }
 
     private fun array(body: String): JSONArray {
@@ -63,7 +116,7 @@ class XtreamApi(val account: Account, private val http: OkHttpClient) {
             Kind.MOVIE -> "get_vod_categories"
             Kind.SERIES -> "get_series_categories"
         }
-        val body = get(apiUrl(action))
+        val body = get(apiUrl(action), timeoutSec = 25)
         return withContext(Dispatchers.Default) {
             val a = array(body)
             (0 until a.length()).mapNotNull { i ->
@@ -82,7 +135,8 @@ class XtreamApi(val account: Account, private val http: OkHttpClient) {
             Kind.SERIES -> "get_series"
         }
         val extra = if (categoryId.isNullOrEmpty()) "" else "&category_id=" + q(categoryId)
-        val body = get(apiUrl(action, extra))
+        // The whole catalogue (search, "Tümü") can be tens of MB on large panels.
+        val body = get(apiUrl(action, extra), timeoutSec = if (categoryId.isNullOrEmpty()) 120 else 40)
         return withContext(Dispatchers.Default) {
             val a = array(body)
             val out = ArrayList<MediaEntry>(a.length())
