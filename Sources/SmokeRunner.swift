@@ -1,4 +1,5 @@
 import AppKit
+import IOKit.pwr_mgt
 import SwiftUI
 
 /// CI-only self test. Active only when MN_SMOKE_DIR is set; drives the real UI with
@@ -99,19 +100,15 @@ final class SmokeRunner {
         for _ in 0..<4 { await left() }
     }
 
-    /// What macOS itself reports: `pmset -g assertions` lists the app's no-sleep request by reason.
+    /// What macOS itself reports: the power-management assertions this process holds, by name.
     private func sleepAssertionHeld() -> Bool {
-        let task = Process()
-        let pipe = Pipe()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-        task.arguments = ["-g", "assertions"]
-        task.standardOutput = pipe
-        guard (try? task.run()) != nil else { return false }
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        task.waitUntilExit()
-        let text = String(data: data, encoding: .utf8) ?? ""
-        try? text.write(to: dir.appendingPathComponent("pmset-\(Int(Date().timeIntervalSince1970)).txt"), atomically: true, encoding: .utf8)
-        return text.contains("MN IPTV video oynat")  // pmset prints non-ASCII letters mangled
+        var out: Unmanaged<CFDictionary>?
+        guard IOPMCopyAssertionsByProcess(&out) == kIOReturnSuccess,
+              let all = out?.takeRetainedValue() as? [NSNumber: [[String: Any]]] else { return false }
+        let mine = all[NSNumber(value: getpid())] ?? []
+        let names = mine.map { "\($0["AssertType"] ?? "?"): \($0["AssertName"] ?? "?")" }
+        log("ASSERTIONS \(names)")
+        return mine.contains { ($0["AssertName"] as? String) == SleepGuard.reason && ($0["AssertType"] as? String) == "PreventUserIdleDisplaySleep" }
     }
 
     private func httpGet(_ url: String) async {
