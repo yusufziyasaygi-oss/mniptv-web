@@ -1,0 +1,1176 @@
+++ command -v ffmpeg
++ FF=/opt/homebrew/bin/ffmpeg
++ '[' -z /opt/homebrew/bin/ffmpeg ']'
++ '[' -z /opt/homebrew/bin/ffmpeg ']'
++ echo ffmpeg=/opt/homebrew/bin/ffmpeg
+ffmpeg=/opt/homebrew/bin/ffmpeg
++ /opt/homebrew/bin/ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 40 -c:v libx264 -preset veryfast -pix_fmt yuv420p -g 25 -c:a aac -b:a 128k -f mpegts ci/media/live.ts
++ /opt/homebrew/bin/ffmpeg -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=330:sample_rate=48000 -t 60 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart ci/media/movie.mp4
++ /opt/homebrew/bin/ffmpeg -loglevel error -y -f lavfi -i color=c=0x3B8BFF:s=128x128 -frames:v 1 ci/media/logo.png
++ /opt/homebrew/bin/ffmpeg -loglevel error -y -f lavfi -i color=c=0x246AD6:s=300x450 -frames:v 1 ci/media/poster.png
++ ls -la ci/media
+total 64024
+drwxr-xr-x  6 runner  staff       192 Oct 17 18:55 .
+drwxr-xr-x  5 runner  staff       160 Oct 17 18:55 ..
+-rw-r--r--  1 runner  staff  13749004 Oct 17 18:55 live.ts
+-rw-r--r--  1 runner  staff       381 Oct 17 18:55 logo.png
+-rw-r--r--  1 runner  staff  18852256 Oct 17 18:55 movie.mp4
+-rw-r--r--  1 runner  staff      1348 Oct 17 18:55 poster.png
++ git clone -q --depth 1 -b mn-player-mac-out https://github.com/yusufziyasaygi-oss/mniptv-web.git mnp
++ ditto -x -k mnp/MN-Player-2.2.4-macOS.zip /Applications/
++ ls -d '/Applications/MN Player.app'
+/Applications/MN Player.app
++ sleep 2
++ MOCK_HOST=http://127.0.0.1:8080
++ python3 ci/mock_xtream.py
++ curl -s 'http://127.0.0.1:8080/player_api.php?username=u&password=p'
++ APP_PID=5473
++ MN_SMOKE_DIR=/Users/runner/work/mniptv-web/mniptv-web/out/smoke
++ MN_SMOKE_SERVER=http://127.0.0.1:8080
++ 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
+++ seq 1 360
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ kill -0 5473
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke/finished.txt ']'
++ break
++ sleep 2
++ kill 5473
++ ls /Users/runner/Library/Logs/DiagnosticReports/
++ for f in '~/Library/Logs/DiagnosticReports/*MaviNokta*'
++ '[' -f '/Users/runner/Library/Logs/DiagnosticReports/*MaviNokta*' ']'
++ cat out/smoke/finished.txt
+checks=31 failed=0+ mkdir -p out/smoke2
++ APP_PID=9066
++ MN_SMOKE_DIR=/Users/runner/work/mniptv-web/mniptv-web/out/smoke2
++ MN_SMOKE_SERVER=http://127.0.0.1:8080
++ 'build/MN IPTV.app/Contents/MacOS/MaviNoktaIPTV'
+++ seq 1 360
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ kill -0 9066
++ sleep 1
++ for i in '$(seq 1 360)'
++ '[' -f out/smoke2/finished.txt ']'
++ break
++ sleep 2
++ kill 9066
++ exit 0

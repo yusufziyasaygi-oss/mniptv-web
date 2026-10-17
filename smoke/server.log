@@ -1,0 +1,102 @@
+127.0.0.1 "GET /player_api.php?username=u&password=p HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1004&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1005&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1004&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1006&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1012&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=10 HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series&category_id=20 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3001 HTTP/1.1" 200 -
+127.0.0.1 "GET /series/u/p/4101.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3008 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+SLOW 1792263549.5 start get_live_streams cat=1 waited=0.0s peer=('127.0.0.1', 49317)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=1 HTTP/1.1" 200 -
+SLOW 1792263549.7 start get_live_streams cat=2 waited=0.0s peer=('127.0.0.1', 49317)
+SLOW 1792263551.5 aborted-by-client get_live_streams cat=2 after=1.8s peer=('127.0.0.1', 49317)
+SLOW 1792263551.5 start get_live_streams cat=None waited=0.1s peer=('127.0.0.1', 49315)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams HTTP/1.1" 200 -
+SLOW 1792263551.8 start get_live_streams cat=2 waited=0.0s peer=('127.0.0.1', 49318)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=0 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=10 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1004&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1005&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1004&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1006&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1012&limit=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=10 HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series&category_id=20 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3001 HTTP/1.1" 200 -
+127.0.0.1 "GET /series/u/p/4101.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3008 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+SLOW 1792263703.8 start get_live_streams cat=1 waited=0.0s peer=('127.0.0.1', 49352)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=1 HTTP/1.1" 200 -
+SLOW 1792263704.0 start get_live_streams cat=2 waited=0.0s peer=('127.0.0.1', 49352)
+SLOW 1792263705.8 aborted-by-client get_live_streams cat=2 after=1.7s peer=('127.0.0.1', 49352)
+SLOW 1792263705.8 start get_live_streams cat=None waited=0.1s peer=('127.0.0.1', 49350)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams HTTP/1.1" 200 -
+SLOW 1792263706.2 start get_live_streams cat=2 waited=0.0s peer=('127.0.0.1', 49353)
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=0 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=10 HTTP/1.1" 200 -

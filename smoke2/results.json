@@ -1,0 +1,157 @@
+[
+  {
+    "detail" : "",
+    "name" : "login",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "name" : "live categories loaded",
+    "detail" : "categories=3"
+  },
+  {
+    "detail" : "tiles=15",
+    "name" : "live channels loaded",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "detail" : "",
+    "name" : "live player opened"
+  },
+  {
+    "name" : "live stream plays",
+    "ok" : true,
+    "detail" : "pos=1.3413333333333335 h=720"
+  },
+  {
+    "detail" : "current=3",
+    "ok" : true,
+    "name" : "opened the focused tile (not the first)"
+  },
+  {
+    "detail" : "current=4",
+    "name" : "zap down -> next channel",
+    "ok" : true
+  },
+  {
+    "name" : "left -> previous channel",
+    "detail" : "current=3",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "name" : "channel list pick",
+    "detail" : "current=5"
+  },
+  {
+    "name" : "number keys 1-2 -> channel 12",
+    "detail" : "number=12",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "detail" : "",
+    "name" : "esc leaves live player"
+  },
+  {
+    "ok" : true,
+    "detail" : "tiles=10",
+    "name" : "movies section"
+  },
+  {
+    "name" : "movie plays past 18s",
+    "detail" : "pos=18.28",
+    "ok" : true
+  },
+  {
+    "detail" : "guard=true",
+    "ok" : true,
+    "name" : "Mac kept awake while playing"
+  },
+  {
+    "name" : "right arrow seeks +20s",
+    "detail" : "before=18.28 after=40.160000000000004",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "name" : "space pauses",
+    "detail" : "status=Optional(MaviNoktaIPTV.PlayerController.Status.paused)"
+  },
+  {
+    "name" : "paused: Mac may sleep again",
+    "ok" : true,
+    "detail" : "guard=false"
+  },
+  {
+    "detail" : "pos=42.32",
+    "name" : "movie progress saved",
+    "ok" : true
+  },
+  {
+    "name" : "continue watching shows movie",
+    "detail" : "tiles=1",
+    "ok" : true
+  },
+  {
+    "detail" : "pos=42.36 saved=42.32",
+    "ok" : true,
+    "name" : "resume from saved position"
+  },
+  {
+    "name" : "series section",
+    "ok" : true,
+    "detail" : "tiles=8"
+  },
+  {
+    "detail" : "",
+    "ok" : true,
+    "name" : "series screen open"
+  },
+  {
+    "ok" : true,
+    "name" : "episode plays",
+    "detail" : "pos=18.16"
+  },
+  {
+    "name" : "series progress saved (one card)",
+    "detail" : "ep=4101 pos=18.52",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "name" : "F adds favourite",
+    "detail" : ""
+  },
+  {
+    "name" : "favourites list",
+    "ok" : true,
+    "detail" : "tiles=1"
+  },
+  {
+    "ok" : true,
+    "detail" : "tiles=7",
+    "name" : "search 'kanal 1'"
+  },
+  {
+    "detail" : "tiles=30 loading=false",
+    "name" : "slow panel: leaving a slow category does not block the next one",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "name" : "slow panel: waiting hint shown",
+    "detail" : "loading=true slow=true"
+  },
+  {
+    "name" : "slow panel: slow category arrives",
+    "detail" : "tiles=15 loading=false empty=- t=1792263716.484971",
+    "ok" : true
+  },
+  {
+    "detail" : "result=opened route=0 mnplayer=true",
+    "name" : "MN Player option hands the movie to MN Player",
+    "ok" : true
+  }
+]

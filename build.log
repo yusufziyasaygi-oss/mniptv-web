@@ -1,0 +1,607 @@
+Yerleşik oynatıcı derleme bileşenleri hazırlanıyor…
+[32m==>[0m [1mDownloading bottle manifests[0m
+✔︎ Bottle Manifest mpv (0.41.0_9)
+[34m==>[0m [1mWould install 1 formula:[0m
+mpv
+[34m==>[0m [1mWould install 37 dependencies for mpv:[0m
+dav1d
+mpg123
+lame
+libvmaf
+libvpx
+opus
+sdl3
+sdl2-compat
+svt-av1
+x264
+x265
+ffmpeg
+libb2
+libarchive
+fribidi
+libunibreak
+libass
+libudfread
+libbluray
+shaderc
+vulkan-headers
+vulkan-loader
+libplacebo
+luajit
+mujs
+libsamplerate
+libogg
+flac
+libvorbis
+libsndfile
+rubberband
+uchardet
+zimg
+vapoursynth
+deno
+yt-dlp
+molten-vk
+[32m==>[0m [1mFetching downloads for: [32mmpv[39m[0m
+✔︎ Bottle Manifest dav1d (1.5.4)
+✔︎ Bottle dav1d (1.5.4)
+✔︎ Bottle mpg123 (1.33.7)
+✔︎ Bottle Manifest lame (4.0)
+✔︎ Bottle Manifest mpg123 (1.33.7)
+✔︎ Bottle mpv (0.41.0_9)
+✔︎ Bottle lame (4.0)
+✔︎ Bottle Manifest libvmaf (3.2.0)
+✔︎ Bottle Manifest libvpx (1.17.0)
+✔︎ Bottle Manifest opus (1.6.1)
+✔︎ Bottle libvmaf (3.2.0)
+✔︎ Bottle libvpx (1.17.0)
+✔︎ Bottle opus (1.6.1)
+✔︎ Bottle Manifest sdl3 (3.4.16)
+✔︎ Bottle sdl2-compat (2.32.72)
+✔︎ Bottle Manifest svt-av1 (4.2.0)
+✔︎ Bottle Manifest sdl2-compat (2.32.72)
+✔︎ Bottle Manifest x264 (r3222)
+✔︎ Bottle sdl3 (3.4.16)
+✔︎ Bottle svt-av1 (4.2.0)
+✔︎ Bottle Manifest x265 (4.3)
+✔︎ Bottle x264 (r3222)
+✔︎ Bottle Manifest ffmpeg (9.0.1_1)
+✔︎ Bottle Manifest libb2 (0.98.1)
+✔︎ Bottle libb2 (0.98.1)
+✔︎ Bottle Manifest libarchive (3.8.9)
+✔︎ Bottle Manifest fribidi (1.0.16)
+✔︎ Bottle x265 (4.3)
+✔︎ Bottle Manifest libunibreak (7.0)
+✔︎ Bottle libarchive (3.8.9)
+✔︎ Bottle fribidi (1.0.16)
+✔︎ Bottle Manifest libass (0.17.5)
+✔︎ Bottle Manifest libudfread (1.2.0)
+✔︎ Bottle Manifest libbluray (1.5.0)
+✔︎ Bottle libunibreak (7.0)
+✔︎ Bottle libass (0.17.5)
+✔︎ Bottle Manifest shaderc (2026.3)
+✔︎ Bottle Manifest vulkan-headers (1.4.357.0)
+✔︎ Bottle libudfread (1.2.0)
+✔︎ Bottle libbluray (1.5.0)
+✔︎ Bottle Manifest vulkan-loader (1.4.357.0)
+✔︎ Bottle Manifest libplacebo (7.360.1)
+✔︎ Bottle vulkan-loader (1.4.357.0)
+✔︎ Bottle Manifest luajit (2.1.1788460057)
+✔︎ Bottle Manifest mujs (1.3.10)
+✔︎ Bottle Manifest libsamplerate (0.2.2)
+✔︎ Bottle mujs (1.3.10)
+✔︎ Bottle vulkan-headers (1.4.357.0)
+✔︎ Bottle Manifest libogg (1.3.6)
+✔︎ Bottle libplacebo (7.360.1)
+✔︎ Bottle libsamplerate (0.2.2)
+✔︎ Bottle Manifest flac (1.5.0)
+✔︎ Bottle Manifest libvorbis (1.3.7)
+✔︎ Bottle shaderc (2026.3)
+✔︎ Bottle libogg (1.3.6)
+✔︎ Bottle Manifest libsndfile (1.2.2_1)
+✔︎ Bottle luajit (2.1.1788460057)
+✔︎ Bottle flac (1.5.0)
+✔︎ Bottle Manifest rubberband (4.0.0)
+✔︎ Bottle Manifest uchardet (0.0.8)
+✔︎ Bottle Manifest zimg (3.0.6)
+✔︎ Bottle libsndfile (1.2.2_1)
+✔︎ Bottle rubberband (4.0.0)
+✔︎ Bottle Manifest vapoursynth (79)
+✔︎ Bottle Manifest deno (2.9.6)
+✔︎ Bottle Manifest yt-dlp (2026.8.19)
+✔︎ Bottle libvorbis (1.3.7)
+✔︎ Bottle ffmpeg (9.0.1_1)
+✔︎ Bottle Manifest molten-vk (1.4.2)
+✔︎ Bottle uchardet (0.0.8)
+✔︎ Bottle zimg (3.0.6)
+✔︎ Bottle vapoursynth (79)
+✔︎ Bottle molten-vk (1.4.2)
+✔︎ Bottle yt-dlp (2026.8.19)
+✔︎ Bottle deno (2.9.6)
+[32m==>[0m [1mInstalling dependencies for mpv:[0m [32mdav1d[39m, [32mmpg123[39m, [32mlame[39m, [32mlibvmaf[39m, [32mlibvpx[39m, [32mopus[39m, [32msdl3[39m, [32msdl2-compat[39m, [32msvt-av1[39m, [32mx264[39m, [32mx265[39m, [32mffmpeg[39m, [32mlibb2[39m, [32mlibarchive[39m, [32mfribidi[39m, [32mlibunibreak[39m, [32mlibass[39m, [32mlibudfread[39m, [32mlibbluray[39m, [32mshaderc[39m, [32mvulkan-headers[39m, [32mvulkan-loader[39m, [32mlibplacebo[39m, [32mluajit[39m, [32mmujs[39m, [32mlibsamplerate[39m, [32mlibogg[39m, [32mflac[39m, [32mlibvorbis[39m, [32mlibsndfile[39m, [32mrubberband[39m, [32muchardet[39m, [32mzimg[39m, [32mvapoursynth[39m, [32mdeno[39m, [32myt-dlp[39m and [32mmolten-vk[39m[0m
+[32m==>[0m [1mInstalling mpv dependency: [32mdav1d[39m[0m
+[34m==>[0m [1mPouring dav1d--1.5.4.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/dav1d/1.5.4: 16 files, 976KB
+[32m==>[0m [1mInstalling mpv dependency: [32mmpg123[39m[0m
+[34m==>[0m [1mPouring mpg123--1.33.7.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/mpg123/1.33.7: 34 files, 1.9MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlame[39m[0m
+[34m==>[0m [1mPouring lame--4.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/lame/4.0: 29 files, 1.9MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibvmaf[39m[0m
+[34m==>[0m [1mPouring libvmaf--3.2.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libvmaf/3.2.0: 243 files, 8.2MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibvpx[39m[0m
+[34m==>[0m [1mPouring libvpx--1.17.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libvpx/1.17.0: 22 files, 4.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mopus[39m[0m
+[34m==>[0m [1mPouring opus--1.6.1.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/opus/1.6.1: 16 files, 1MB
+[32m==>[0m [1mInstalling mpv dependency: [32msdl3[39m[0m
+[34m==>[0m [1mPouring sdl3--3.4.16.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/sdl3/3.4.16: 103 files, 6.3MB
+[32m==>[0m [1mInstalling mpv dependency: [32msdl2-compat[39m[0m
+[34m==>[0m [1mPouring sdl2-compat--2.32.72.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/sdl2-compat/2.32.72: 117 files, 3.3MB
+[32m==>[0m [1mInstalling mpv dependency: [32msvt-av1[39m[0m
+[34m==>[0m [1mPouring svt-av1--4.2.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/svt-av1/4.2.0: 23 files, 3.3MB
+[32m==>[0m [1mInstalling mpv dependency: [32mx264[39m[0m
+[34m==>[0m [1mPouring x264--r3222.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/x264/r3222: 12 files, 4.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mx265[39m[0m
+[34m==>[0m [1mPouring x265--4.3.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/x265/4.3: 12 files, 17.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mffmpeg[39m[0m
+[34m==>[0m [1mPouring ffmpeg--9.0.1_1.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/ffmpeg/9.0.1_1: 290 files, 54.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibb2[39m[0m
+[34m==>[0m [1mPouring libb2--0.98.1.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libb2/0.98.1: 9 files, 112.8KB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibarchive[39m[0m
+[34m==>[0m [1mPouring libarchive--3.8.9.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libarchive/3.8.9: 65 files, 4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mfribidi[39m[0m
+[34m==>[0m [1mPouring fribidi--1.0.16.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/fribidi/1.0.16: 68 files, 544.2KB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibunibreak[39m[0m
+[34m==>[0m [1mPouring libunibreak--7.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libunibreak/7.0: 19 files, 327.8KB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibass[39m[0m
+[34m==>[0m [1mPouring libass--0.17.5.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libass/0.17.5: 12 files, 595.5KB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibudfread[39m[0m
+[34m==>[0m [1mPouring libudfread--1.2.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libudfread/1.2.0: 13 files, 137.8KB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibbluray[39m[0m
+[34m==>[0m [1mPouring libbluray--1.5.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libbluray/1.5.0: 22 files, 1.2MB
+[32m==>[0m [1mInstalling mpv dependency: [32mshaderc[39m[0m
+[34m==>[0m [1mPouring shaderc--2026.3.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/shaderc/2026.3: 21 files, 32.7MB
+[32m==>[0m [1mInstalling mpv dependency: [32mvulkan-headers[39m[0m
+[34m==>[0m [1mPouring vulkan-headers--1.4.357.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/vulkan-headers/1.4.357.0: 72 files, 41.6MB
+[32m==>[0m [1mInstalling mpv dependency: [32mvulkan-loader[39m[0m
+[34m==>[0m [1mPouring vulkan-loader--1.4.357.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/vulkan-loader/1.4.357.0: 15 files, 1.3MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibplacebo[39m[0m
+[34m==>[0m [1mPouring libplacebo--7.360.1.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libplacebo/7.360.1: 42 files, 1.5MB
+[32m==>[0m [1mInstalling mpv dependency: [32mluajit[39m[0m
+[34m==>[0m [1mPouring luajit--2.1.1788460057.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/luajit/2.1.1788460057: 56 files, 2.2MB
+[32m==>[0m [1mInstalling mpv dependency: [32mmujs[39m[0m
+[34m==>[0m [1mPouring mujs--1.3.10.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/mujs/1.3.10: 12 files, 1.3MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibsamplerate[39m[0m
+[34m==>[0m [1mPouring libsamplerate--0.2.2.arm64_sequoia.bottle.1.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libsamplerate/0.2.2: 33 files, 3.2MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibogg[39m[0m
+[34m==>[0m [1mPouring libogg--1.3.6.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libogg/1.3.6: 103 files, 531.8KB
+[32m==>[0m [1mInstalling mpv dependency: [32mflac[39m[0m
+[34m==>[0m [1mPouring flac--1.5.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/flac/1.5.0: 40 files, 1.9MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibvorbis[39m[0m
+[34m==>[0m [1mPouring libvorbis--1.3.7.arm64_sequoia.bottle.1.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libvorbis/1.3.7: 158 files, 2.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mlibsndfile[39m[0m
+[34m==>[0m [1mPouring libsndfile--1.2.2_1.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/libsndfile/1.2.2_1: 55 files, 1.8MB
+[32m==>[0m [1mInstalling mpv dependency: [32mrubberband[39m[0m
+[34m==>[0m [1mPouring rubberband--4.0.0.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/rubberband/4.0.0: 15 files, 2MB
+[32m==>[0m [1mInstalling mpv dependency: [32muchardet[39m[0m
+[34m==>[0m [1mPouring uchardet--0.0.8.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/uchardet/0.0.8: 18 files, 635.7KB
+[32m==>[0m [1mInstalling mpv dependency: [32mzimg[39m[0m
+[34m==>[0m [1mPouring zimg--3.0.6.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/zimg/3.0.6: 28 files, 1.2MB
+[32m==>[0m [1mInstalling mpv dependency: [32mvapoursynth[39m[0m
+[34m==>[0m [1mPouring vapoursynth--79.arm64_sequoia.bottle.1.tar.gz[0m
+🍺  /opt/homebrew/Cellar/vapoursynth/79: 41 files, 2.4MB
+[32m==>[0m [1mInstalling mpv dependency: [32mdeno[39m[0m
+[34m==>[0m [1mPouring deno--2.9.6.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/deno/2.9.6: 12 files, 125MB
+[32m==>[0m [1mInstalling mpv dependency: [32myt-dlp[39m[0m
+[34m==>[0m [1mPouring yt-dlp--2026.8.19.arm64_sequoia.bottle.1.tar.gz[0m
+🍺  /opt/homebrew/Cellar/yt-dlp/2026.8.19: 1,698 files, 20.9MB
+[32m==>[0m [1mInstalling mpv dependency: [32mmolten-vk[39m[0m
+[34m==>[0m [1mPouring molten-vk--1.4.2.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/molten-vk/1.4.2: 84 files, 87.3MB
+[32m==>[0m [1mInstalling [32mmpv[39m[0m
+[34m==>[0m [1mPouring mpv--0.41.0_9.arm64_sequoia.bottle.tar.gz[0m
+🍺  /opt/homebrew/Cellar/mpv/0.41.0_9: 33 files, 11.5MB
+[32m==>[0m [1mCaveats[0m
+Bash completion has been installed to:
+  /opt/homebrew/etc/bash_completion.d
+[34m==>[0m [1mmpv[0m
+The global configuration directory is now /opt/homebrew/etc/mpv/
+You may need to migrate any data in previous /opt/homebrew/etc/mpv/mpv/
+1/4 Compile
+Sources/Components.swift:23:17: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 21 |     static let shared = ImageCache()
+ 22 |     private let cache = NSCache<NSString, NSImage>()
+ 23 |     private var running: [String: Task<NSImage?, Never>] = [:]
+    |                 `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 24 |     private let session: URLSession = {
+ 25 |         let c = URLSessionConfiguration.default
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:38:56: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 36 |     func load(_ url: String) async -> NSImage? {
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+    |                                                        `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:39:20: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+    |                    `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+ 41 |             return NSImage(data: result.0)
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:39:40: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+    |                                        `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+ 41 |             return NSImage(data: result.0)
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:39:13: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+    |             `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+ 41 |             return NSImage(data: result.0)
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:44:30: warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 42 |         }
+ 43 |         running[url] = task
+ 44 |         let img = await task.value
+    |                              `- warning: conformance of 'NSImage' to 'Sendable' is unavailable; this is an error in the Swift 6 language mode
+ 45 |         running[url] = nil
+ 46 |         if let img = img { cache.setObject(img, forKey: url as NSString) }
+
+:1:1: note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+1 | @_nonSendable(_assumed)
+  | `- note: conformance of 'NSImage' to 'Sendable' has been explicitly marked unavailable here
+
+Sources/Components.swift:38:51: warning: non-sendable type 'Task<NSImage?, Never>' cannot exit main actor-isolated context in call to nonisolated property 'value'; this is an error in the Swift 6 language mode
+ 36 |     func load(_ url: String) async -> NSImage? {
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+    |                                                   `- warning: non-sendable type 'Task<NSImage?, Never>' cannot exit main actor-isolated context in call to nonisolated property 'value'; this is an error in the Swift 6 language mode
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+
+_Concurrency.Task:2:23: note: generic struct 'Task' does not conform to the 'Sendable' protocol
+1 | @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+2 | @frozen public struct Task<Success, Failure> : Sendable where Success : Sendable, Failure : Error {
+  |                       `- note: generic struct 'Task' does not conform to the 'Sendable' protocol
+3 | }
+
+Sources/Components.swift:38:56: warning: non-sendable type 'NSImage?' of nonisolated property 'value' cannot be sent to main actor-isolated context; this is an error in the Swift 6 language mode
+ 36 |     func load(_ url: String) async -> NSImage? {
+ 37 |         if let img = cache.object(forKey: url as NSString) { return img }
+ 38 |         if let task = running[url] { return await task.value }
+    |                                                        `- warning: non-sendable type 'NSImage?' of nonisolated property 'value' cannot be sent to main actor-isolated context; this is an error in the Swift 6 language mode
+ 39 |         let task = Task<NSImage?, Never> { [session] in
+ 40 |             guard let u = URL(string: url), let result = try? await session.data(from: u) else { return nil }
+
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+1 | @frozen public enum Optional<Wrapped> : ~Copyable where Wrapped : ~Copyable {
+  |                     `- note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+2 |     case none
+3 |     case some(Wrapped)
+
+Sources/Components.swift:44:25: warning: non-sendable type 'Task<NSImage?, Never>' cannot exit main actor-isolated context in call to nonisolated property 'value'; this is an error in the Swift 6 language mode
+ 42 |         }
+ 43 |         running[url] = task
+ 44 |         let img = await task.value
+    |                         `- warning: non-sendable type 'Task<NSImage?, Never>' cannot exit main actor-isolated context in call to nonisolated property 'value'; this is an error in the Swift 6 language mode
+ 45 |         running[url] = nil
+ 46 |         if let img = img { cache.setObject(img, forKey: url as NSString) }
+
+_Concurrency.Task:2:23: note: generic struct 'Task' does not conform to the 'Sendable' protocol
+1 | @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+2 | @frozen public struct Task<Success, Failure> : Sendable where Success : Sendable, Failure : Error {
+  |                       `- note: generic struct 'Task' does not conform to the 'Sendable' protocol
+3 | }
+
+Sources/Components.swift:44:30: warning: non-sendable type 'NSImage?' of nonisolated property 'value' cannot be sent to main actor-isolated context; this is an error in the Swift 6 language mode
+ 42 |         }
+ 43 |         running[url] = task
+ 44 |         let img = await task.value
+    |                              `- warning: non-sendable type 'NSImage?' of nonisolated property 'value' cannot be sent to main actor-isolated context; this is an error in the Swift 6 language mode
+ 45 |         running[url] = nil
+ 46 |         if let img = img { cache.setObject(img, forKey: url as NSString) }
+
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+1 | @frozen public enum Optional<Wrapped> : ~Copyable where Wrapped : ~Copyable {
+  |                     `- note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+2 |     case none
+3 |     case some(Wrapped)
+2/4 Resources
+3/4 Embed libmpv
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libpng16.16.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfreetype.6.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfreetype.6.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfribidi.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libintl.8.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libpcre2-8.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libglib-2.0.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libgraphite2.3.3.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libharfbuzz.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libunibreak.7.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libass.9.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libcrypto.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libssl.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libssl.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavutil.61.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavutil.61.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavutil.61.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswresample.7.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswresample.7.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswresample.7.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswresample.7.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libvpx.12.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/liblzma.5.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libdav1d.7.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpg123.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmp3lame.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmp3lame.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libopus.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libSvtAv1Enc.4.2.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libSvtAv1Enc.4.2.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libx264.165.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libx265.217.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libx265.217.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswscale.10.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswscale.10.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswscale.10.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libswscale.10.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libvmaf.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libshaderc_shared.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libplacebo.360.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libvulkan.1.4.357.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libplacebo.360.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/liblcms2.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libplacebo.360.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libplacebo.360.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmujs.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libzstd.1.5.7.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libzstd.1.5.7.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/liblz4.1.10.0.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libb2.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfontconfig.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfontconfig.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libfontconfig.1.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libbluray.4.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libbluray.4.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libudfread.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libbluray.4.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libbluray.4.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libluajit-5.1.2.1.1788460057.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libluajit-5.1.2.1.1788460057.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libsamplerate.0.2.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/librubberband.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/librubberband.3.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libuchardet.0.0.8.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libzimg.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libjpeg.8.3.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libjpeg.8.3.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/install_name_tool: warning: changes being made to the file will invalidate the code signature in: /Users/runner/work/mniptv-web/mniptv-web/build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib
+Bundled 48 libraries; minimum macOS 15.0
+build/MN IPTV.app/Contents/Frameworks/libarchive.13.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libass.9.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libavcodec.63.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libavdevice.63.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libavfilter.12.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libavformat.63.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libavutil.61.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libb2.1.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libbluray.4.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libcrypto.3.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libdav1d.7.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libfontconfig.1.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libfreetype.6.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libfribidi.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libglib-2.0.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libgraphite2.3.3.1.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libharfbuzz.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libintl.8.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libjpeg.8.3.2.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/liblcms2.2.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libluajit-5.1.2.1.1788460057.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/liblz4.1.10.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/liblzma.5.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libmp3lame.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libmpg123.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libmpv.2.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libmujs.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libopus.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libpcre2-8.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libplacebo.360.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libpng16.16.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/librubberband.3.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libsamplerate.0.2.2.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libshaderc_shared.1.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libssl.3.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libSvtAv1Enc.4.2.0.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libswresample.7.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libswscale.10.1.101.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libuchardet.0.0.8.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libudfread.3.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libunibreak.7.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libvmaf.3.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libvpx.12.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libvulkan.1.4.357.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libx264.165.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libx265.217.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libzimg.2.dylib: replacing existing signature
+build/MN IPTV.app/Contents/Frameworks/libzstd.1.5.7.dylib: replacing existing signature
+build/MN IPTV.app: replacing existing signature
+4/4 DMG
+created: /Users/runner/work/mniptv-web/mniptv-web/build/MN-IPTV-Mac.dmg
+Checksumming Protective Master Boot Record (MBR : 0)…
+Protective Master Boot Record (MBR :: verified   CRC32 $3A71870C
+Checksumming GPT Header (Primary GPT Header : 1)…
+ GPT Header (Primary GPT Header : 1): verified   CRC32 $F678E93B
+Checksumming GPT Partition Data (Primary GPT Table : 2)…
+GPT Partition Data (Primary GPT Tabl: verified   CRC32 $4CCFC1F6
+Checksumming  (Apple_Free : 3)…
+                    (Apple_Free : 3): verified   CRC32 $00000000
+Checksumming disk image (Apple_APFS : 4)…
+         disk image (Apple_APFS : 4): verified   CRC32 $7190E741
+Checksumming  (Apple_Free : 5)…
+                    (Apple_Free : 5): verified   CRC32 $00000000
+Checksumming GPT Partition Data (Backup GPT Table : 6)…
+GPT Partition Data (Backup GPT Table: verified   CRC32 $4CCFC1F6
+Checksumming GPT Header (Backup GPT Header : 7)…
+  GPT Header (Backup GPT Header : 7): verified   CRC32 $7F5A2574
+verified   CRC32 $69F73CE5
+hdiutil: verify: checksum of "build/MN-IPTV-Mac.dmg" is VALID
+Ready: build/MN-IPTV-Mac.dmg (minimum macOS 15.0)
