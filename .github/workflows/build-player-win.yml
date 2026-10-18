@@ -1,0 +1,176 @@
+name: Build MN Player Windows
+
+on:
+  push:
+    branches: [ mn-player-win ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mn-player-win
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Fetch libmpv
+        id: mpv
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out native mpvdl
+          ok=0
+          for repo in shinchiro/mpv-winbuild-cmake zhongfly/mpv-winbuild; do
+            rm -f mpvdl/*
+            if gh release download --repo "$repo" --pattern 'mpv-dev-x86_64-2*.7z' --dir mpvdl 2>&1 | tee -a out/mpv.log; then
+              f=$(ls mpvdl/*.7z 2>/dev/null | head -1)
+              if [ -n "$f" ]; then
+                echo "$repo $(basename "$f")" > out/mpv-source.txt
+                7z x -y -ompvx "$f" >/dev/null && cp mpvx/libmpv-2.dll native/ && ok=1 && break
+              fi
+            fi
+          done
+          ls -la native | tee -a out/mpv.log
+          [ "$ok" = 1 ]
+
+      - name: Publish app
+        id: build
+        if: steps.mpv.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet publish MNPlayer.csproj -c Release -o publish 2>&1 | tee out/build.log
+          ls -la publish | tee out/publish-files.txt
+          test -f publish/MNPlayer.exe && test -f publish/libmpv-2.dll
+
+      - name: Build installer
+        id: setup
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress | Out-File -Append out\setup.log
+          }
+          & $iscc installer\MNPlayer.iss 2>&1 | Tee-Object -FilePath out\setup.log -Append
+          if (-not (Test-Path out\MN-Player-Setup-2.2.4.exe)) { exit 1 }
+
+      - name: Generate test media
+        id: media
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          mkdir -p ci/media out/smoke
+          exec > >(tee out/media-step.log) 2>&1
+          FF="$(command -v ffmpeg)"
+          if [ -z "$FF" ]; then choco install ffmpeg -y --no-progress >/dev/null; FF="$(command -v ffmpeg)"; fi
+          [ -z "$FF" ] && FF="/c/ProgramData/chocolatey/bin/ffmpeg.exe"
+          echo "ffmpeg=$FF"
+          M=ci/media
+          # a.mp4: 16:9, 40 s, two audio tracks
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=440:sample_rate=48000 -f lavfi -i sine=frequency=660:sample_rate=48000 -t 40 -map 0:v -map 1:a -map 2:a -c:v libx264 -preset veryfast -pix_fmt yuv420p -g 25 -c:a aac -b:a 96k -metadata:s:a:0 language=tur -metadata:s:a:1 language=eng -movflags +faststart $M/a.mp4
+          # b.mkv: 4:3, 12 s
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=640x480:rate=25 -f lavfi -i sine=frequency=330:sample_rate=48000 -t 12 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac $M/b.mkv
+          # c.mp4: portrait, 10 s
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=720x1280:rate=25 -f lavfi -i sine=frequency=550:sample_rate=48000 -t 10 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac $M/c.mp4
+          # d.mkv: HEVC, 6 s (codec check)
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=770:sample_rate=48000 -t 6 -c:v libx265 -preset ultrafast -pix_fmt yuv420p -c:a aac $M/d.mkv
+          # e.webm: VP9 + opus
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=25 -f lavfi -i sine=frequency=880:sample_rate=48000 -t 5 -c:v libvpx-vp9 -deadline realtime -cpu-used 8 -c:a libopus $M/e.webm
+          # f.avi: mpeg4 + mp3
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=25 -f lavfi -i sine=frequency=990:sample_rate=48000 -t 5 -c:v mpeg4 -c:a libmp3lame $M/f.avi
+          # g.mov: ProRes-free: h264 in mov
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=25 -f lavfi -i sine=frequency=1100:sample_rate=48000 -t 5 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac $M/g.mov
+          # h.ts: MPEG-TS
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=640x360:rate=25 -f lavfi -i sine=frequency=1200:sample_rate=48000 -t 5 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -f mpegts $M/h.ts
+          # i.mp3 audio only
+          "$FF" -loglevel error -y -f lavfi -i sine=frequency=440:sample_rate=44100 -t 5 -c:a libmp3lame $M/i.mp3
+          # rot.mp4: landscape stream with 90 degree display rotation
+          "$FF" -loglevel error -y -display_rotation:v 90 -i $M/a.mp4 -t 8 -c copy $M/rot.mp4
+          printf '1\n00:00:01,000 --> 00:00:30,000\nMN Player altyazi testi\n\n' > $M/sub.srt
+          ls -la $M
+
+      - name: Codec check (headless)
+        id: codec
+        if: steps.media.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          cd ci/media
+          WIN="$(cygpath -w "$PWD/../../out/codec.txt")"
+          ../../publish/MNPlayer.exe --verify-media "$WIN" a.mp4 b.mkv c.mp4 d.mkv e.webm f.avi g.mov h.ts i.mp3
+          echo "exit=$?"
+          sleep 2
+          cat ../../out/codec.txt
+
+      - name: Smoke test player UI
+        id: smoke
+        if: steps.media.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          exec > >(tee out/smoke-step.log) 2>&1
+          run_smoke() {
+            local dir="$1"; shift
+            mkdir -p "out/$dir"
+            MN_SMOKE_DIR="$(cygpath -w "$PWD/out/$dir")" MN_SMOKE_MEDIA="$(cygpath -w "$PWD/ci/media")" ./publish/MNPlayer.exe "$@" &
+            local pid=$!
+            for i in $(seq 1 300); do
+              [ -f "out/$dir/finished.txt" ] && break
+              kill -0 $pid 2>/dev/null || { echo "APP EXITED EARLY" >> "out/$dir/app-exit.txt"; break; }
+              sleep 1
+            done
+            sleep 3
+            kill $pid 2>/dev/null
+            taskkill //F //IM MNPlayer.exe >/dev/null 2>&1
+            cat "out/$dir/finished.txt" 2>/dev/null || echo "NOT FINISHED"
+          }
+          run_smoke smoke
+          run_smoke smoke-preview --preview "$(cygpath -w "$PWD/ci/media/a.mp4")"
+          exit 0
+
+      - name: Collect outputs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out
+          echo "mpv=${{ steps.mpv.outcome }} build=${{ steps.build.outcome }} setup=${{ steps.setup.outcome }} media=${{ steps.media.outcome }} codec=${{ steps.codec.outcome }} smoke=${{ steps.smoke.outcome }}" > out/status.txt
+          echo "${GITHUB_SHA}" > out/source_sha.txt
+          grep -nE "error |error:|warning CS|Error" out/build.log 2>/dev/null | head -300 > out/errors.txt || true
+          rm -f out/smoke/settings.json out/smoke-preview/settings.json
+          if [ -f out/MN-Player-Setup-2.2.4.exe ]; then sha256sum out/MN-Player-Setup-2.2.4.exe > out/SHA256.txt; fi
+          if [ -d publish ]; then du -sh publish > out/publish-size.txt; fi
+
+      - name: Publish outputs to branch
+        if: always()
+        shell: bash
+        run: |
+          cd out
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b mn-player-win-out
+          git add -A
+          git commit -q -m "Build output for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mn-player-win-out

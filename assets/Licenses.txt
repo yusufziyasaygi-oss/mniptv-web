@@ -1,0 +1,8 @@
+MN Player — açık kaynak bileşenler
+===================================
+Medya motoru: libmpv (mpv) — GPL v2+ / LGPL v2.1+ (derlemeye göre), FFmpeg bileşenleriyle birlikte.
+  mpv:    https://mpv.io  •  kaynak: https://github.com/mpv-player/mpv
+  FFmpeg: https://ffmpeg.org  •  kaynak: https://github.com/FFmpeg/FFmpeg
+  Derleme: https://github.com/shinchiro/mpv-winbuild-cmake
+.NET 8 / WPF: MIT — https://github.com/dotnet/runtime
+Bu bileşenler kendi lisansları altında dağıtılır; MN Player'ın kendi kodu Mavi Nokta'ya aittir.

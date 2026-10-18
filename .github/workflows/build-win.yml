@@ -1,0 +1,138 @@
+name: Build MN IPTV Windows
+
+on:
+  push:
+    branches: [ mn-iptv-win ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mn-iptv-win
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Fetch libmpv
+        id: mpv
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p out native mpvdl
+          ok=0
+          for repo in shinchiro/mpv-winbuild-cmake zhongfly/mpv-winbuild; do
+            rm -f mpvdl/*
+            if gh release download --repo "$repo" --pattern 'mpv-dev-x86_64-2*.7z' --dir mpvdl 2>&1 | tee -a out/mpv.log; then
+              f=$(ls mpvdl/*.7z 2>/dev/null | head -1)
+              if [ -n "$f" ]; then
+                echo "$repo $(basename "$f")" > out/mpv-source.txt
+                7z x -y -omvpx "$f" >/dev/null && cp mvpx/libmpv-2.dll native/ && ok=1 && break
+              fi
+            fi
+          done
+          ls -la native | tee -a out/mpv.log
+          [ "$ok" = 1 ]
+
+      - name: Publish app
+        id: build
+        if: steps.mpv.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet publish MNIPTV.csproj -c Release -o publish 2>&1 | tee out/build.log
+          ls -la publish | tee out/publish-files.txt
+          test -f publish/MNIPTV.exe && test -f publish/libmpv-2.dll
+
+      - name: Build installer
+        id: setup
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress | Out-File -Append out\setup.log
+          }
+          & $iscc installer\MNIPTV.iss 2>&1 | Tee-Object -FilePath out\setup.log -Append
+          if (-not (Test-Path out\MN-IPTV-Setup-2.1.0.exe)) { exit 1 }
+
+      - name: Smoke test against mock Xtream server
+        id: smoke
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          mkdir -p ci/media out/smoke
+          exec > >(tee out/smoke-step.log) 2>&1
+          FF="$(command -v ffmpeg)"
+          if [ -z "$FF" ]; then choco install ffmpeg -y --no-progress >/dev/null; FF="$(command -v ffmpeg)"; fi
+          [ -z "$FF" ] && FF="/c/ProgramData/chocolatey/bin/ffmpeg.exe"
+          echo "ffmpeg=$FF"
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=440:sample_rate=48000 -t 40 -c:v libx264 -preset veryfast -pix_fmt yuv420p -g 25 -c:a aac -b:a 128k -f mpegts ci/media/live.ts
+          "$FF" -loglevel error -y -f lavfi -i testsrc2=size=1280x720:rate=25 -f lavfi -i sine=frequency=330:sample_rate=48000 -t 60 -c:v libx264 -preset veryfast -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart ci/media/movie.mp4
+          "$FF" -loglevel error -y -f lavfi -i color=c=0x3B8BFF:s=128x128 -frames:v 1 ci/media/logo.png
+          "$FF" -loglevel error -y -f lavfi -i color=c=0x246AD6:s=300x450 -frames:v 1 ci/media/poster.png
+          ls -la ci/media
+          MOCK_HOST=http://127.0.0.1:8080 python ci/mock_xtream.py > out/smoke/server.log 2>&1 &
+          sleep 3
+          curl -s "http://127.0.0.1:8080/player_api.php?username=u&password=p" > out/smoke/server_check.txt
+          run_smoke() {
+            local dir="$1"
+            mkdir -p "out/$dir"
+            MN_SMOKE_DIR="$(cygpath -w "$PWD/out/$dir")" MN_SMOKE_SERVER="http://127.0.0.1:8080" ./publish/MNIPTV.exe &
+            local pid=$!
+            for i in $(seq 1 420); do
+              [ -f "out/$dir/finished.txt" ] && break
+              kill -0 $pid 2>/dev/null || { echo "APP EXITED EARLY" >> "out/$dir/app-exit.txt"; break; }
+              sleep 1
+            done
+            sleep 3
+            kill $pid 2>/dev/null
+            taskkill //F //IM MNIPTV.exe >/dev/null 2>&1
+            cat "out/$dir/finished.txt" 2>/dev/null || echo "NOT FINISHED"
+          }
+          run_smoke smoke
+          run_smoke smoke2
+          exit 0
+
+      - name: Collect outputs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out
+          echo "mpv=${{ steps.mpv.outcome }} build=${{ steps.build.outcome }} setup=${{ steps.setup.outcome }} smoke=${{ steps.smoke.outcome }}" > out/status.txt
+          echo "${GITHUB_SHA}" > out/source_sha.txt
+          grep -nE "error |error:|warning CS|Error" out/build.log 2>/dev/null | head -300 > out/errors.txt || true
+          rm -f out/smoke/data.json out/smoke2/data.json
+          if [ -f out/MN-IPTV-Setup-2.1.0.exe ]; then sha256sum out/MN-IPTV-Setup-2.1.0.exe > out/SHA256.txt; fi
+          if [ -d publish ]; then du -sh publish > out/publish-size.txt; fi
+
+      - name: Publish outputs to branch
+        if: always()
+        shell: bash
+        run: |
+          cd out
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b mn-iptv-win-out
+          git add -A
+          git commit -q -m "Build output for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mn-iptv-win-out
