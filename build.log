@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  Restored D:\a\mniptv-web\mniptv-web\MNIPTV.csproj (in 6.85 sec).
+D:\a\mniptv-web\mniptv-web\src\Core\Sync.cs(124,51): warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern 'not null' is not covered. [D:\a\mniptv-web\mniptv-web\MNIPTV.csproj]
+  MNIPTV -> D:\a\mniptv-web\mniptv-web\bin\Release\net8.0-windows\win-x64\MNIPTV.dll
+  MNIPTV -> D:\a\mniptv-web\mniptv-web\publish\

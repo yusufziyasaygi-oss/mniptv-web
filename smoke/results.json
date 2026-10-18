@@ -1,0 +1,167 @@
+[
+  {
+    "name": "login",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "live categories loaded",
+    "ok": true,
+    "detail": "categories=3"
+  },
+  {
+    "name": "live channels loaded",
+    "ok": true,
+    "detail": "tiles=15"
+  },
+  {
+    "name": "live player opened",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "live stream plays",
+    "ok": true,
+    "detail": "pos=1.1 h=720"
+  },
+  {
+    "name": "opened the focused tile (not the first)",
+    "ok": true,
+    "detail": "current=1"
+  },
+  {
+    "name": "zap down -\u003E next channel",
+    "ok": true,
+    "detail": "current=2"
+  },
+  {
+    "name": "left -\u003E previous channel",
+    "ok": true,
+    "detail": "current=1"
+  },
+  {
+    "name": "channel list pick",
+    "ok": true,
+    "detail": "current=3"
+  },
+  {
+    "name": "number keys 1-2 -\u003E channel 12",
+    "ok": true,
+    "detail": "number=12"
+  },
+  {
+    "name": "esc leaves live player",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "movies section",
+    "ok": true,
+    "detail": "tiles=10"
+  },
+  {
+    "name": "movie plays past 18s",
+    "ok": true,
+    "detail": "pos=18.2"
+  },
+  {
+    "name": "right arrow seeks \u002B20s",
+    "ok": true,
+    "detail": "before=18.2 after=40.7"
+  },
+  {
+    "name": "space pauses",
+    "ok": true,
+    "detail": "status=Paused"
+  },
+  {
+    "name": "movie progress saved",
+    "ok": true,
+    "detail": "pos=42.4"
+  },
+  {
+    "name": "continue watching shows movie",
+    "ok": true,
+    "detail": "tiles=1"
+  },
+  {
+    "name": "resume from saved position",
+    "ok": true,
+    "detail": "pos=42.4 saved=42.4"
+  },
+  {
+    "name": "series section",
+    "ok": true,
+    "detail": "tiles=8"
+  },
+  {
+    "name": "series screen open",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "episode plays",
+    "ok": true,
+    "detail": "pos=18.2"
+  },
+  {
+    "name": "series progress saved (one card)",
+    "ok": true,
+    "detail": "ep=4101 pos=18.2"
+  },
+  {
+    "name": "F adds favourite",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "favourites list",
+    "ok": true,
+    "detail": "tiles=1"
+  },
+  {
+    "name": "search \u0027kanal 1\u0027",
+    "ok": true,
+    "detail": "tiles=7"
+  },
+  {
+    "name": "account menu opens",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "account menu closes",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "sync: this PC\u0027s favourites and progress are on the server (reference decrypts them)",
+    "ok": true,
+    "detail": "{\u0022found\u0022:true,\u0022fav\u0022:[\u0022MOVIE:2001\u0022],\u0022prog\u0022:{\u0022MOVIE:2001\u0022:42440,\u0022SERIES:3001\u0022:18240},\u0022ep\u0022:{\u00224101\u0022:{\u0022at\u0022:1792343474920,\u0022pos\u0022:18240,\u0022w\u0022:false}}}"
+  },
+  {
+    "name": "sync: movie position from another device arrives",
+    "ok": true,
+    "detail": "pos=42"
+  },
+  {
+    "name": "sync: favourite from another device arrives",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "sync: watched episode from another device arrives",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "sync: \u0130zlemeye Devam shows the other device\u0027s movie",
+    "ok": true,
+    "detail": "tiles=3"
+  },
+  {
+    "name": "sync: status",
+    "ok": true,
+    "detail": "G\u00FCncel"
+  }
+]

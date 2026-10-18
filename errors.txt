@@ -1,0 +1,1 @@
+3:D:\a\mniptv-web\mniptv-web\src\Core\Sync.cs(124,51): warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern 'not null' is not covered. [D:\a\mniptv-web\mniptv-web\MNIPTV.csproj]
