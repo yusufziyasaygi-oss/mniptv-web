@@ -1,4 +1,6 @@
-# MN IPTV Mac 2.1.0
+# MN IPTV Mac 2.3.0
+
+2.3.0: cihazlar arası senkron (TV, Mac, Windows). Favoriler, İzlemeye Devam ve bölüm konumları aynı Xtream hesabındaki tüm cihazlarda eşitlenir; veri AES-256-GCM şifreli (`Sources/Sync.swift`, referans `ci/mnsync.py`).
 
 TV sürümüyle aynı işleyiş; mouse ve klavye ile kullanılır. Oynatma libmpv ile (TS, HLS, MKV, MP4).
 

@@ -116,6 +116,24 @@ final class SmokeRunner {
         _ = try? await URLSession.shared.data(from: u)
     }
 
+    /// Runs ci/sync_tool.py (the reference implementation) like another device would.
+    private func syncTool(_ cmd: String, _ srv: String) -> [String: Any] {
+        let out = dir.appendingPathComponent("sync_\(cmd).json")
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+        let base = ProcessInfo.processInfo.environment["MN_SMOKE_SERVER"] ?? "http://127.0.0.1:8080"
+        p.arguments = ["python3", "ci/sync_tool.py", base, srv, "u", "p", cmd, out.path]
+        p.standardOutput = FileHandle.nullDevice
+        let err = Pipe()
+        p.standardError = err
+        do { try p.run() } catch { log("sync_tool failed to start: \(error)"); return [:] }
+        p.waitUntilExit()
+        let e = String(decoding: err.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        if !e.isEmpty { log("sync_tool \(cmd) stderr: \(e.prefix(400))") }
+        guard let d = try? Data(contentsOf: out), let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] else { return [:] }
+        return o
+    }
+
     private func finish() {
         let data = try? JSONSerialization.data(withJSONObject: checks, options: [.prettyPrinted])
         try? data?.write(to: dir.appendingPathComponent("results.json"))
@@ -321,6 +339,27 @@ final class SmokeRunner {
         NSRunningApplication.runningApplications(withBundleIdentifier: "com.mavinokta.player").forEach { $0.terminate() }
         model.setPlaybackApp(mnPlayer: false)
         await wait(1)
+
+        // 10. Cross-device sync (mock GitHub API): this Mac's favourites/progress must be on the
+        // server in the reference format; then "another device" adds data that must show up here.
+        let sync = SyncService.shared
+        await sync.syncNow()
+        let srv = model.account?.server ?? server
+        let read = syncTool("read", srv)
+        let readOK = (read["found"] as? Bool) == true && ((read["fav"] as? [String]) ?? []).contains { $0.hasPrefix("MOVIE:") || $0.hasPrefix("LIVE:") }
+            && !((read["prog"] as? [String: Any]) ?? [:]).isEmpty
+        check("sync: this Mac's favourites and progress are on the server (reference decrypts them)", readOK, "\(read)")
+        _ = syncTool("inject", srv)
+        await sync.syncNow()
+        let p5 = model.store.progress("MOVIE:2005")
+        check("sync: movie position from another device arrives", abs((p5?.position ?? 0) - 42) < 0.01, "pos=\(p5?.position ?? -1)")
+        check("sync: favourite from another device arrives", model.store.isFavorite("SERIES:3002"))
+        check("sync: watched episode from another device arrives", model.store.isWatched("4103"))
+        model.goToSection(.continueWatching)
+        let shown = await waitUntil(5) { self.model.tiles.contains { if case .resume(let p) = $0 { return p.key == "MOVIE:2005" }; return false } }
+        check("sync: İzlemeye Devam shows the other device's movie", shown, "tiles=\(model.tiles.count)")
+        shot("23-sync-continue")
+        check("sync: status", sync.status == "Güncel", sync.status)
 
         finish()
         await wait(1)

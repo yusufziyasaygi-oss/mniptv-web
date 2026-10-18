@@ -122,6 +122,18 @@ final class AppModel: ObservableObject {
             account = acc
             api = XtreamAPI(account: acc)
         }
+        let sync = SyncService.shared
+        if SmokeRunner.directory != nil { sync.testBase = ProcessInfo.processInfo.environment["MN_SMOKE_SERVER"] }
+        sync.onChange = { [weak self] in self?.refreshAfterReturn() }
+        let nc = NotificationCenter.default
+        nc.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in SyncService.shared.pull() }
+        }
+        for name in [NSApplication.willResignActiveNotification, NSApplication.willTerminateNotification] {
+            nc.addObserver(forName: name, object: nil, queue: .main) { _ in
+                Task { @MainActor in SyncService.shared.flush() }
+            }
+        }
     }
 
     /// The player currently on screen (used by the smoke test and menu commands).
@@ -148,6 +160,7 @@ final class AppModel: ObservableObject {
         didStart = true
         guard account != nil else { return }
         select(store.progressList.isEmpty ? .live : .continueWatching, force: true)
+        SyncService.shared.pull(minGap: 0)
     }
 
     // MARK: account
@@ -412,6 +425,7 @@ final class AppModel: ObservableObject {
     /// Called when coming back to the catalogue: progress and favourites may have changed.
     func refreshAfterReturn() {
         revision += 1
+        SyncService.shared.flush()
         switch section {
         case .continueWatching: showContinue()
         case .favorites: showFavorites()

@@ -103,7 +103,7 @@ struct RootView: View {
             Button("Çıkış yap", role: .destructive) { model.signOut() }
             Button("Vazgeç", role: .cancel) {}
         } message: {
-            Text("\(model.account?.username ?? "")\n\(model.account?.server ?? "")\nOynatıcı: \(model.usesMNPlayer ? "MN Player" : "MN IPTV")")
+            Text("\(model.account?.username ?? "")\n\(model.account?.server ?? "")\nOynatıcı: \(model.usesMNPlayer ? "MN Player" : "MN IPTV")\nCihazlar arası senkron: \(SyncService.shared.enabled ? SyncService.shared.status : "Kapalı")")
         }
     }
 }
