@@ -114,6 +114,8 @@ public sealed class AppModel
             Account = acc;
             Api = new XtreamApi(acc);
         }
+        if (Program.SmokeDir != null) SyncService.Shared.TestBase = Environment.GetEnvironmentVariable("MN_SMOKE_SERVER");
+        SyncService.Shared.Changed += RefreshAfterReturn;
     }
 
     private void Raise(string what) => Changed?.Invoke(what);
@@ -129,6 +131,7 @@ public sealed class AppModel
         _didStart = true;
         if (Account == null) return;
         Select(Store.ProgressList.Count == 0 ? Section.Live : Section.ContinueWatching, force: true);
+        SyncService.Shared.Pull(0);
     }
 
     /// Menu command: leave player/series screens and open a section.
@@ -396,6 +399,7 @@ public sealed class AppModel
     /// Called when coming back to the catalogue: progress and favourites may have changed.
     public void RefreshAfterReturn()
     {
+        SyncService.Shared.Flush();
         Revision++;
         Raise("revision");
         switch (Section)

@@ -17,7 +17,7 @@ public sealed class ApiException : Exception
 
 public sealed class XtreamApi
 {
-    public const string UserAgent = "MN-IPTV-Windows/2.1.0";
+    public const string UserAgent = "MN-IPTV-Windows/2.3.0";
 
     private static readonly HttpClient Http = CreateClient();
 

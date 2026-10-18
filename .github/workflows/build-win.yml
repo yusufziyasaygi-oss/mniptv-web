@@ -70,7 +70,7 @@ jobs:
             choco install innosetup -y --no-progress | Out-File -Append out\setup.log
           }
           & $iscc installer\MNIPTV.iss 2>&1 | Tee-Object -FilePath out\setup.log -Append
-          if (-not (Test-Path out\MN-IPTV-Setup-2.1.0.exe)) { exit 1 }
+          if (-not (Test-Path out\MN-IPTV-Setup-2.3.0.exe)) { exit 1 }
 
       - name: Smoke test against mock Xtream server
         id: smoke
@@ -90,6 +90,7 @@ jobs:
           "$FF" -loglevel error -y -f lavfi -i color=c=0x3B8BFF:s=128x128 -frames:v 1 ci/media/logo.png
           "$FF" -loglevel error -y -f lavfi -i color=c=0x246AD6:s=300x450 -frames:v 1 ci/media/poster.png
           ls -la ci/media
+          python -m pip install -q cryptography
           MOCK_HOST=http://127.0.0.1:8080 python ci/mock_xtream.py > out/smoke/server.log 2>&1 &
           sleep 3
           curl -s "http://127.0.0.1:8080/player_api.php?username=u&password=p" > out/smoke/server_check.txt
@@ -110,6 +111,7 @@ jobs:
           }
           run_smoke smoke
           run_smoke smoke2
+          curl -s http://127.0.0.1:8080/__synclog > out/smoke/sync_log.json
           exit 0
 
       - name: Collect outputs
@@ -121,7 +123,7 @@ jobs:
           echo "${GITHUB_SHA}" > out/source_sha.txt
           grep -nE "error |error:|warning CS|Error" out/build.log 2>/dev/null | head -300 > out/errors.txt || true
           rm -f out/smoke/data.json out/smoke2/data.json
-          if [ -f out/MN-IPTV-Setup-2.1.0.exe ]; then sha256sum out/MN-IPTV-Setup-2.1.0.exe > out/SHA256.txt; fi
+          if [ -f out/MN-IPTV-Setup-2.3.0.exe ]; then sha256sum out/MN-IPTV-Setup-2.3.0.exe > out/SHA256.txt; fi
           if [ -d publish ]; then du -sh publish > out/publish-size.txt; fi
 
       - name: Publish outputs to branch

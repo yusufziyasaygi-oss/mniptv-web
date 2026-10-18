@@ -1,5 +1,7 @@
 # MN IPTV — Windows
 
+2.3.0: cihazlar arası senkron (TV, Mac, Windows). Favoriler, İzlemeye Devam ve bölüm konumları aynı Xtream hesabındaki tüm cihazlarda eşitlenir; veri AES-256-GCM şifreli (`src/Core/Sync.cs`, referans `ci/mnsync.py`).
+
 Windows 10/11 (x64) sürümü. Android TV ve Mac sürümleriyle aynı işleyiş; fare ve klavyeyle kullanılır.
 
 - .NET 8 WPF, oynatıcı libmpv (mpv-winbuild).

@@ -1,5 +1,5 @@
 ﻿#define AppName "MN IPTV"
-#define AppVersion "2.1.0"
+#define AppVersion "2.3.0"
 #define AppExe "MNIPTV.exe"
 
 [Setup]

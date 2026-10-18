@@ -347,7 +347,57 @@ public sealed class SmokeRunner
         await Wait(0.5);
         Check("account menu closes", !_window.DialogOpen && _model.Account != null);
 
+        // 10. Cross-device sync (mock GitHub API): this PC's favourites/progress must be on the
+        // server in the reference format; then "another device" adds data that must show up here.
+        var sync = SyncService.Shared;
+        await sync.SyncNow();
+        var srv = _model.Account?.Server ?? server;
+        var read = await SyncTool("read", server, srv);
+        var readOk = read?["found"]?.GetValue<bool>() == true
+            && (read["fav"] as System.Text.Json.Nodes.JsonArray)?.Count > 0
+            && (read["prog"] as System.Text.Json.Nodes.JsonObject)?.Count > 0;
+        Check("sync: this PC's favourites and progress are on the server (reference decrypts them)", readOk, read?.ToJsonString() ?? "-");
+        await SyncTool("inject", server, srv);
+        await sync.SyncNow();
+        var p5 = _model.Store.GetProgress("MOVIE:2005");
+        Check("sync: movie position from another device arrives", p5 != null && Math.Abs(p5.Position - 42) < 0.01, $"pos={p5?.Position}");
+        Check("sync: favourite from another device arrives", _model.Store.IsFavorite("SERIES:3002"));
+        Check("sync: watched episode from another device arrives", _model.Store.IsWatched("4103"));
+        _model.GoToSection(Section.ContinueWatching);
+        var shown = await WaitUntil(5, () => _model.Tiles.Any(t => t.Resume?.Key == "MOVIE:2005"));
+        Check("sync: İzlemeye Devam shows the other device's movie", shown, $"tiles={_model.Tiles.Count}");
+        await Wait(1);
+        Shot("23-sync-continue");
+        Check("sync: status", sync.Status == "Güncel", sync.Status);
+
         Finish();
+    }
+
+    /// Runs ci/sync_tool.py (the reference implementation) like another device would.
+    private async Task<System.Text.Json.Nodes.JsonNode?> SyncTool(string cmd, string baseUrl, string srv)
+    {
+        var outFile = Path.Combine(_dir, $"sync_{cmd}.json");
+        try
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo("python")
+            {
+                UseShellExecute = false, CreateNoWindow = true,
+                RedirectStandardError = true, RedirectStandardOutput = true,
+            };
+            foreach (var a in new[] { "ci/sync_tool.py", baseUrl, srv, "u", "p", cmd, outFile }) psi.ArgumentList.Add(a);
+            using var p = System.Diagnostics.Process.Start(psi)!;
+            var errTask = p.StandardError.ReadToEndAsync();
+            await p.StandardOutput.ReadToEndAsync();
+            var err = await errTask;
+            await p.WaitForExitAsync();
+            if (err.Length > 0) Log($"sync_tool {cmd} stderr: {err[..Math.Min(400, err.Length)]}");
+            return System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(outFile));
+        }
+        catch (Exception e)
+        {
+            Log($"sync_tool {cmd} failed: {e.Message}");
+            return null;
+        }
     }
 
     private static BrowseView? FindBrowse(DependencyObject root)

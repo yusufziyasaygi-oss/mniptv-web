@@ -11,6 +11,8 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+import mock_github
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MEDIA = os.path.join(ROOT, "media")
 HOST = os.environ.get("MOCK_HOST", "http://10.0.2.2:8080")
@@ -135,10 +137,20 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 remaining -= len(chunk)
 
+    def do_PUT(self):
+        if not mock_github.handle(self, "PUT"):
+            self.send_response(404)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
     def do_GET(self):
+        if mock_github.handle(self, "GET"):
+            return
         url = urlparse(self.path)
         q = {k: v[0] for k, v in parse_qs(url.query).items()}
         path = url.path
+        if path == "/__synclog":
+            return self.send_json(mock_github.LOG)
         if path == "/player_api.php":
             if q.get("username") != "u" or q.get("password") != "p":
                 return self.send_json({"user_info": {"auth": 0}})

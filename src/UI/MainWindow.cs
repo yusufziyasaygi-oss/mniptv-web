@@ -128,6 +128,8 @@ public sealed class MainWindow : Window, IShell
             if (_login == null) ParkFocus();
         };
         Closing += OnClosing;
+        Activated += (_, _) => SyncService.Shared.Pull();
+        Deactivated += (_, _) => SyncService.Shared.Flush();
 
         _model.Changed += OnModelChanged;
         RebuildScreens();
@@ -308,7 +310,8 @@ public sealed class MainWindow : Window, IShell
     private void ShowAccountMenu()
     {
         var acc = _model.Account;
-        Present(new ChoiceDialog("Hesap", acc == null ? null : $"{acc.Username}\n{acc.Server}")
+        var sync = SyncService.Shared.Enabled ? SyncService.Shared.Status : "Kapalı";
+        Present(new ChoiceDialog("Hesap", acc == null ? null : $"{acc.Username}\n{acc.Server}\nCihazlar arası senkron: {sync}")
             .Add("Listeyi yenile", () => _model.ReloadSection())
             .Add("Hesabı değiştir", ShowChangeAccount)
             .Add("Çıkış yap", () => _model.SignOut(), destructive: true)
@@ -403,6 +406,7 @@ public sealed class MainWindow : Window, IShell
     private void OnClosing(object? sender, CancelEventArgs e)
     {
         _player?.Player.SaveProgress();
+        SyncService.Shared.Flush();
         TearDownPlayer();
         if (_overlayWindow != null)
         {
