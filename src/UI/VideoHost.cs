@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace MNIPTV.UI;
+namespace MNPlayer.UI;
 
 /// Native child window that mpv renders into. It never takes keyboard focus.
 public sealed class VideoHost : HwndHost
@@ -43,7 +43,7 @@ public sealed class VideoHost : HwndHost
     [DllImport("user32.dll")] private static extern IntPtr LoadCursor(IntPtr instance, IntPtr name);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] private static extern IntPtr GetModuleHandle(string? name);
 
-    private const string ClassName = "MNIPTVVideo";
+    private const string ClassName = "MNPlayerVideo";
     private static bool _registered;
     private static readonly WndProcDelegate Proc = WndProc;
 
