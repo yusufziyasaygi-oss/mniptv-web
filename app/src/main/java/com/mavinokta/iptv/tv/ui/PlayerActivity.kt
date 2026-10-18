@@ -49,6 +49,7 @@ import com.mavinokta.iptv.tv.data.MediaEntry
 import com.mavinokta.iptv.tv.data.PlayerSession
 import com.mavinokta.iptv.tv.data.Progress
 import com.mavinokta.iptv.tv.data.Repo
+import com.mavinokta.iptv.tv.data.Sync
 import com.mavinokta.iptv.tv.data.USER_AGENT
 import com.mavinokta.iptv.tv.data.XtreamApi
 import kotlinx.coroutines.CancellationException
@@ -1031,6 +1032,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onStop()
         if (!::player.isInitialized) return
         saveProgress()
+        Sync.flush()
         handler.removeCallbacks(saveRunnable)
         if (mode == MODE_LIVE) player.stop() else player.pause()
         stoppedInBackground = true

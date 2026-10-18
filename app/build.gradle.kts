@@ -11,8 +11,8 @@ android {
         applicationId = "com.mavinokta.iptv.tv"
         minSdk = 23
         targetSdk = 35
-        versionCode = 2200
-        versionName = "2.2.0"
+        versionCode = 2300
+        versionName = "2.3.0"
     }
 
     buildTypes {

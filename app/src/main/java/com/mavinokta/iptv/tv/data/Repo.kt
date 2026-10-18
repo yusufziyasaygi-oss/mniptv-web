@@ -76,7 +76,10 @@ object Repo {
     private const val PRUNE_MS = 14 * 24 * 3_600_000L
 
     fun init(context: Context) {
-        if (!::store.isInitialized) store = Store(context)
+        if (!::store.isInitialized) {
+            store = Store(context)
+            Sync.testBase = store.syncTestBase
+        }
         if (cacheDir == null) {
             val dir = File(context.applicationContext.cacheDir, "xtream").also { it.mkdirs() }
             cacheDir = dir

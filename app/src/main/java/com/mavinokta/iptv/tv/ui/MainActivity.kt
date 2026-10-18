@@ -28,6 +28,7 @@ import com.mavinokta.iptv.tv.data.Kind
 import com.mavinokta.iptv.tv.data.MediaEntry
 import com.mavinokta.iptv.tv.data.PlayerSession
 import com.mavinokta.iptv.tv.data.Repo
+import com.mavinokta.iptv.tv.data.Sync
 import com.mavinokta.iptv.tv.data.normalizeForSearch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -91,6 +92,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Repo.init(this)
+        intent?.getStringExtra("sync_test_base")?.let { b ->
+            if (b.startsWith("http://10.0.2.2:") || b.startsWith("http://127.0.0.1:")) {
+                store.syncTestBase = b
+                Sync.testBase = b
+            }
+        }
         if (store.account == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -170,6 +177,7 @@ class MainActivity : AppCompatActivity() {
             override fun handleOnBackPressed() = handleBack()
         })
 
+        Sync.addListener(syncListener)
         menuAdapter.submit(Section.entries.map { it.title }, -1)
         for (k in Kind.entries) restoreCategory[k] = store.lastCategory(k)
         val saved = store.lastSection?.let { n -> Section.entries.firstOrNull { it.name == n } }
@@ -183,9 +191,26 @@ class MainActivity : AppCompatActivity() {
         menuList.post { menuList.focusRow(first.ordinal) }
     }
 
+    // Another device changed favourites or progress: redraw what depends on them.
+    private val syncListener: () -> Unit = {
+        if (::contentAdapter.isInitialized && !isDestroyed) {
+            when (section) {
+                Section.CONTINUE -> showContinue(keepFocus = true)
+                Section.FAVORITES -> showFavorites(keepFocus = true)
+                else -> refreshFavoriteMarks()
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Sync.flush()
+    }
+
     override fun onResume() {
         super.onResume()
         if (!::contentAdapter.isInitialized) return
+        Sync.pull()
         when (section) {
             Section.CONTINUE -> showContinue(keepFocus = true)
             Section.FAVORITES -> showFavorites(keepFocus = true)
@@ -209,6 +234,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        Sync.removeListener(syncListener)
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -589,7 +615,7 @@ class MainActivity : AppCompatActivity() {
         val acc = store.account ?: return
         val dialog = AlertDialog.Builder(this)
             .setTitle("Hesap")
-            .setMessage("${acc.username}\n${acc.server}")
+            .setMessage("${acc.username}\n${acc.server}\n\nCihazlar arası senkron: ${if (Sync.enabled()) Sync.lastStatus else "Kapalı"}")
             .setPositiveButton("Hesabı değiştir") { _, _ ->
                 startActivity(Intent(this, LoginActivity::class.java))
             }

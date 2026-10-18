@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-const val USER_AGENT = "MN-IPTV-TV/2.2.0 (Android TV)"
+const val USER_AGENT = "MN-IPTV-TV/2.3.0 (Android TV)"
 
 class XtreamApi(val account: Account, private val http: OkHttpClient) {
 

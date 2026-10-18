@@ -23,6 +23,7 @@ import com.mavinokta.iptv.tv.data.MediaEntry
 import com.mavinokta.iptv.tv.data.PlayerSession
 import com.mavinokta.iptv.tv.data.Repo
 import com.mavinokta.iptv.tv.data.SeriesInfo
+import com.mavinokta.iptv.tv.data.Sync
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -127,11 +128,21 @@ class SeriesActivity : AppCompatActivity() {
         updateFavButton()
         favButton.requestFocus()
 
+        Sync.addListener(syncListener)
         load()
+    }
+
+    private val syncListener: () -> Unit = {
+        if (info != null && !isDestroyed) {
+            updateResume()
+            updateFavButton()
+            episodeAdapter.notifyItemRangeChanged(0, episodeAdapter.itemCount)
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        Sync.pull(minGapMs = 8_000L)
         if (info != null) {
             updateResume()
             episodeAdapter.notifyItemRangeChanged(0, episodeAdapter.itemCount)
@@ -139,6 +150,7 @@ class SeriesActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        Sync.removeListener(syncListener)
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }

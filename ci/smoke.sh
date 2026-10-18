@@ -53,6 +53,7 @@ hide_ime() {
   fi
 }
 
+python3 -m pip install -q cryptography >/dev/null 2>&1 || pip3 install -q --break-system-packages cryptography >/dev/null 2>&1
 python3 ci/mock_xtream.py > "$OUT/server.log" 2>&1 &
 sleep 2
 curl -s "http://127.0.0.1:8080/player_api.php?username=u&password=p" > "$OUT/server_check.txt"
@@ -69,7 +70,7 @@ adb install -r "$OUT/test.apk" > "$OUT/install.txt" 2>&1
 adb logcat -c
 
 # 1. Login
-adb shell am start -n "$PKG/.ui.MainActivity"
+adb shell am start -n "$PKG/.ui.MainActivity" --es sync_test_base http://10.0.2.2:8080
 sleep 5
 step 01-login
 adb shell input text "10.0.2.2:8080"; sleep 1; hide_ime
@@ -256,6 +257,26 @@ step 38-account
 key KEYCODE_BACK
 sleep 1
 step 39-final
+
+# 11. Cross-device sync: this device's changes must be on the (mock) GitHub API, encrypted the
+# way the reference implementation expects; then "another device" adds a movie position and a
+# favourite, and the app has to show them after coming back to the front.
+sleep 50
+python3 ci/sync_tool.py http://127.0.0.1:8080 http://10.0.2.2:8080 u p read "$OUT/sync_read.json" > /dev/null 2>&1
+python3 ci/sync_tool.py http://127.0.0.1:8080 http://10.0.2.2:8080 u p inject "$OUT/sync_inject.json" > /dev/null 2>&1
+adb shell input keyevent KEYCODE_HOME
+sleep 3
+adb shell am start -n "$PKG/.ui.MainActivity"
+sleep 6
+menu 0
+sleep 1
+step 47-sync-continue
+check sync-continue "Film 5"
+menu 4
+sleep 1
+step 48-sync-favorites
+check sync-favorite "Dizi 2"
+curl -s http://127.0.0.1:8080/__synclog > "$OUT/sync_log.json"
 
 # 10. Starts where it was left (Filmler / Komedi), then again with the panel switched off:
 # the lists must come from the disk cache.

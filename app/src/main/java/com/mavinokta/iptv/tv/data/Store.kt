@@ -17,6 +17,7 @@ class Store(context: Context) {
             return Account(server, user, pass)
         }
         set(value) {
+            if (value != account) resetSyncDoc()
             val e = prefs.edit()
             if (value == null) {
                 e.remove("server").remove("user").remove("pass")
@@ -56,6 +57,7 @@ class Store(context: Context) {
         favCache = list
         favKeyCache = null
         writeList(KEY_FAV, list.map { it.toJson() })
+        record(SyncDoc.FAV, entry.key, JSONObject().put("e", entry.toJson()), deleted = !added)
         return added
     }
 
@@ -75,6 +77,7 @@ class Store(context: Context) {
         val kept = list.take(80)
         progressCache = kept
         writeList(KEY_PROGRESS, kept.map { it.toJson() })
+        record(SyncDoc.PROG, p.key, JSONObject().put("p", progressToSync(p)), deleted = false, at = p.updatedAt)
     }
 
     fun removeProgress(key: String) {
@@ -82,6 +85,7 @@ class Store(context: Context) {
         if (kept.size == progressList().size) return
         progressCache = kept
         writeList(KEY_PROGRESS, kept.map { it.toJson() })
+        record(SyncDoc.PROG, key, JSONObject(), deleted = true)
     }
 
     // ---- recently watched live channels ----
@@ -104,6 +108,11 @@ class Store(context: Context) {
         prefs.edit().remove(KEY_RECENT).apply()
     }
 
+    /** CI only: sync goes to the mock server on the emulator host. */
+    var syncTestBase: String?
+        get() = prefs.getString("sync_test_base", null)
+        set(value) { prefs.edit().putString("sync_test_base", value).apply() }
+
     // ---- where the user left off ----
 
     var lastSection: String?
@@ -122,12 +131,129 @@ class Store(context: Context) {
 
     fun setEpisodePosition(episodeId: String, positionMs: Long) {
         prefs.edit().putLong("epos_$episodeId", positionMs).apply()
+        recordEpisode(episodeId, positionMs, isWatched(episodeId))
     }
 
     fun isWatched(episodeId: String): Boolean = prefs.getBoolean("ew_$episodeId", false)
 
     fun setWatched(episodeId: String) {
         prefs.edit().putBoolean("ew_$episodeId", true).putLong("epos_$episodeId", 0L).apply()
+        recordEpisode(episodeId, 0L, true)
+    }
+
+    // ---- sync document ----
+    // Every local change is also written to this document (with a time stamp, deletions as
+    // tombstones); Sync merges it with the other devices' copy and hands the result back here.
+
+    private var syncCache: JSONObject? = null
+
+    fun syncDoc(): JSONObject {
+        syncCache?.let { return it }
+        val raw = prefs.getString(KEY_SYNC, null)
+        val doc = raw?.let { runCatching { JSONObject(it) }.getOrNull() } ?: seedSyncDoc()
+        syncCache = doc
+        return doc
+    }
+
+    /** First run with sync: what this device already has goes in as very old entries. */
+    private fun seedSyncDoc(): JSONObject {
+        val doc = SyncDoc.empty()
+        val favs = favorites()
+        favs.forEachIndexed { i, e ->
+            SyncDoc.section(doc, SyncDoc.FAV).put(e.key, JSONObject().put("at", (favs.size - i).toLong()).put("del", false).put("e", e.toJson()))
+        }
+        progressList().forEach { p ->
+            SyncDoc.section(doc, SyncDoc.PROG).put(p.key, JSONObject().put("at", p.updatedAt).put("del", false).put("p", progressToSync(p)))
+        }
+        val eps = SyncDoc.section(doc, SyncDoc.EP)
+        for (k in prefs.all.keys) {
+            val id = when {
+                k.startsWith("epos_") -> k.removePrefix("epos_")
+                k.startsWith("ew_") -> k.removePrefix("ew_")
+                else -> continue
+            }
+            if (eps.has(id)) continue
+            val pos = prefs.getLong("epos_$id", 0L)
+            val w = prefs.getBoolean("ew_$id", false)
+            if (pos > 0 || w) eps.put(id, JSONObject().put("at", 1L).put("pos", pos).put("w", w))
+        }
+        prefs.edit().putString(KEY_SYNC, doc.toString()).apply()
+        return doc
+    }
+
+    private fun saveSyncDoc(doc: JSONObject) {
+        syncCache = doc
+        prefs.edit().putString(KEY_SYNC, doc.toString()).apply()
+    }
+
+    private fun record(section: String, key: String, body: JSONObject, deleted: Boolean, at: Long = System.currentTimeMillis()) {
+        val doc = syncDoc()
+        body.put("at", at).put("del", deleted)
+        SyncDoc.section(doc, section).put(key, body)
+        saveSyncDoc(doc)
+        Sync.localChanged()
+    }
+
+    private fun recordEpisode(id: String, pos: Long, watched: Boolean) {
+        val doc = syncDoc()
+        SyncDoc.section(doc, SyncDoc.EP).put(id, JSONObject().put("at", System.currentTimeMillis()).put("pos", pos).put("w", watched))
+        saveSyncDoc(doc)
+        Sync.localChanged()
+    }
+
+    /** Replace local favourites, progress and episode marks with the merged document. */
+    fun applySyncDoc(doc: JSONObject) {
+        saveSyncDoc(doc)
+        val fav = SyncDoc.section(doc, SyncDoc.FAV)
+        val favList = fav.keys().asSequence().mapNotNull { k ->
+            val o = fav.optJSONObject(k) ?: return@mapNotNull null
+            if (o.optBoolean("del")) return@mapNotNull null
+            val e = o.optJSONObject("e")?.let { MediaEntry.fromJson(it) } ?: return@mapNotNull null
+            o.optLong("at") to e
+        }.sortedByDescending { it.first }.map { it.second }.toList()
+        favCache = favList
+        favKeyCache = null
+        writeList(KEY_FAV, favList.map { it.toJson() })
+
+        val prog = SyncDoc.section(doc, SyncDoc.PROG)
+        val progList = prog.keys().asSequence().mapNotNull { k ->
+            val o = prog.optJSONObject(k) ?: return@mapNotNull null
+            if (o.optBoolean("del")) return@mapNotNull null
+            o.optJSONObject("p")?.let { progressFromSync(it, o.optLong("at")) }
+        }.sortedByDescending { it.updatedAt }.take(80).toList()
+        progressCache = progList
+        writeList(KEY_PROGRESS, progList.map { it.toJson() })
+
+        val eps = SyncDoc.section(doc, SyncDoc.EP)
+        val e = prefs.edit()
+        eps.keys().forEach { id ->
+            val o = eps.optJSONObject(id) ?: return@forEach
+            val w = o.optBoolean("w")
+            val pos = o.optLong("pos")
+            if (prefs.getBoolean("ew_$id", false) != w) e.putBoolean("ew_$id", w)
+            if (prefs.getLong("epos_$id", 0L) != pos) e.putLong("epos_$id", pos)
+        }
+        e.apply()
+    }
+
+    private fun progressToSync(p: Progress): JSONObject = JSONObject()
+        .put("key", p.key).put("kind", p.kind.name).put("id", p.id).put("title", p.title)
+        .put("subtitle", p.subtitle ?: "").put("image", p.image ?: "").put("ext", p.ext ?: "")
+        .put("episodeId", p.episodeId ?: "").put("season", p.season).put("episode", p.episode)
+        .put("pos", p.positionMs).put("dur", p.durationMs)
+
+    private fun progressFromSync(o: JSONObject, at: Long): Progress? {
+        val kind = runCatching { Kind.valueOf(o.optString("kind")) }.getOrNull() ?: return null
+        val key = o.str("key") ?: return null
+        val id = o.str("id") ?: return null
+        return Progress(key, kind, id, o.str("title") ?: "", o.str("subtitle"), o.str("image"), o.str("ext"),
+            o.str("episodeId"), o.int("season"), o.int("episode"), o.long("pos"), o.long("dur"), at)
+    }
+
+    /** A different account gets its own sync space: start it from what this device has. */
+    fun resetSyncDoc() {
+        syncCache = null
+        prefs.edit().remove(KEY_SYNC).apply()
     }
 
     private fun readList(key: String): List<JSONObject> {
@@ -150,5 +276,6 @@ class Store(context: Context) {
         private const val KEY_FAV = "favorites"
         private const val KEY_PROGRESS = "progress"
         private const val KEY_RECENT = "recent_live"
+        private const val KEY_SYNC = "sync_doc"
     }
 }

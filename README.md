@@ -1,4 +1,4 @@
-# MN IPTV TV 2.2.0 (Android TV / Google TV)
+# MN IPTV TV 2.3.0 (Android TV / Google TV)
 
 Xtream Codes tabanlı Android TV uygulaması. Media3 ExoPlayer ile oynatır.
 
@@ -8,6 +8,11 @@ Xtream Codes tabanlı Android TV uygulaması. Media3 ExoPlayer ile oynatır.
 - Dizi ekranı: sezon/bölüm seçimi, kaldığı yerden devam, otomatik sonraki bölüm
 - Kumanda: canlıda ▲▼ kanal, ◀ önceki kanal, OK kanal listesi, ▶ bilgi, rakamlar kanal numarası, uzun OK seçenekler
 - Film/dizide ◀▶ 10 sn (basılı tutunca hızlanır), OK oynat/duraklat, uzun OK seçenekler (ses, altyazı, görüntü oranı)
+
+2.3.0: cihazlar arası senkron (TV, Mac, Windows)
+- Favoriler, İzlemeye Devam ve bölüm konumları aynı Xtream hesabıyla giriş yapılan tüm cihazlarda eşitlenir
+- Veri özel `mn-sync` reposunda, Xtream bilgilerinden türetilen anahtarla AES-256-GCM şifreli durur; şifre/giriş bilgisi gönderilmez
+- Biçim: `ci/mnsync.py` (referans), birleştirme öğe başına en yeni zaman damgası
 
 2.2.0 yenilikleri:
 - Hızlı açılış: kategori/içerik listeleri diske (gzip) kaydedilir; uygulama son listeyle anında açılır, eskiyse arkada yenilenir, sunucu yanıt vermezse eski liste gösterilir
