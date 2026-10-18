@@ -1,0 +1,227 @@
+[
+  {
+    "name": "engine ready",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "mpv version",
+    "ok": true,
+    "detail": "mpv v0.41.0-1205-g01e2533f3"
+  },
+  {
+    "name": "queue filled",
+    "ok": true,
+    "detail": "3"
+  },
+  {
+    "name": "playing",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "time advances",
+    "ok": true,
+    "detail": "2680"
+  },
+  {
+    "name": "duration known",
+    "ok": true,
+    "detail": "40000"
+  },
+  {
+    "name": "aspect 16:9",
+    "ok": true,
+    "detail": "1.778"
+  },
+  {
+    "name": "window fits video",
+    "ok": true,
+    "detail": "client=1.778"
+  },
+  {
+    "name": "title has file name",
+    "ok": true,
+    "detail": "a.mp4 \u2013 MN Player"
+  },
+  {
+    "name": "keep-awake on",
+    "ok": true,
+    "detail": "(not observable)"
+  },
+  {
+    "name": "pause via Space",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "time frozen while paused",
+    "ok": true,
+    "detail": "2840-\u003E2840"
+  },
+  {
+    "name": "resume via Space",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "seek \u002B10s (L)",
+    "ok": true,
+    "detail": "2920-\u003E13840"
+  },
+  {
+    "name": "seek -5s (Left)",
+    "ok": true,
+    "detail": "13840-\u003E9560"
+  },
+  {
+    "name": "volume down",
+    "ok": true,
+    "detail": "80-\u003E75"
+  },
+  {
+    "name": "mute",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "unmute",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "speed 1.5",
+    "ok": true,
+    "detail": "1.5"
+  },
+  {
+    "name": "two audio tracks listed",
+    "ok": true,
+    "detail": "2"
+  },
+  {
+    "name": "subtitle added",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "subtitle selected",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "subtitle toggled off (C)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "subtitle toggled on (C)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "settings menu opens",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Esc closes menu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "dialog opens",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "next video",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "title follows file",
+    "ok": true,
+    "detail": "b.mkv \u2013 MN Player"
+  },
+  {
+    "name": "aspect follows file (mkv 4:3)",
+    "ok": true,
+    "detail": "1.333"
+  },
+  {
+    "name": "window refits",
+    "ok": true,
+    "detail": "client=1.333"
+  },
+  {
+    "name": "fullscreen on (F)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "fullscreen off (Esc)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "mini on (I)",
+    "ok": true,
+    "detail": "w=436"
+  },
+  {
+    "name": "mini off (I)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "portrait video plays",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "portrait aspect \u003C 1",
+    "ok": true,
+    "detail": "0.563"
+  },
+  {
+    "name": "window refits portrait",
+    "ok": true,
+    "detail": "client=0.562"
+  },
+  {
+    "name": "rotated video uses display aspect",
+    "ok": true,
+    "detail": "0.563"
+  },
+  {
+    "name": "position stored",
+    "ok": true,
+    "detail": "D:\\a\\mniptv-web\\mniptv-web\\ci\\media\\a.mp4,D:\\a\\mniptv-web\\mniptv-web\\ci\\media\\b.mkv"
+  },
+  {
+    "name": "resume from saved position",
+    "ok": true,
+    "detail": "saved=29200 now=31280"
+  },
+  {
+    "name": "autoplay next at EOF",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "repeat one restarts same item",
+    "ok": true,
+    "detail": "t=1880/10000"
+  },
+  {
+    "name": "queue window opens",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "missing file reports error",
+    "ok": true,
+    "detail": ""
+  }
+]

@@ -1,0 +1,21 @@
+ffmpeg=/c/ProgramData/Chocolatey/bin/ffmpeg
+total 23577
+drwxr-xr-x 1 runneradmin 197121        0 Oct 18 15:17 .
+drwxr-xr-x 1 runneradmin 197121        0 Oct 18 15:16 ..
+-rw-r--r-- 1 runneradmin 197121 13503953 Oct 18 15:17 a.mp4
+-rw-r--r-- 1 runneradmin 197121  1290213 Oct 18 15:17 b.mkv
+-rw-r--r-- 1 runneradmin 197121  3249645 Oct 18 15:17 c.mp4
+-rw-r--r-- 1 runneradmin 197121  1244073 Oct 18 15:17 d.mkv
+-rw-r--r-- 1 runneradmin 197121   810248 Oct 18 15:17 e.webm
+-rw-r--r-- 1 runneradmin 197121   336270 Oct 18 15:17 f.avi
+-rw-r--r-- 1 runneradmin 197121   483292 Oct 18 15:17 g.mov
+-rw-r--r-- 1 runneradmin 197121   523580 Oct 18 15:17 h.ts
+-rw-r--r-- 1 runneradmin 197121    40559 Oct 18 15:17 i.mp3
+-rw-r--r-- 1 runneradmin 197121  2643903 Oct 18 15:17 rot.mp4
+-rw-r--r-- 1 runneradmin 197121       57 Oct 18 15:17 sub.srt
+width=1280
+height=720
+coded_width=1280
+coded_height=720
+displaymatrix=
+rotation=90

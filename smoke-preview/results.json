@@ -1,0 +1,82 @@
+[
+  {
+    "name": "preview window created",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "preview plays",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "preview is topmost",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "siblings queued (4 videos)",
+    "ok": true,
+    "detail": "9"
+  },
+  {
+    "name": "selected item first",
+    "ok": true,
+    "detail": "D:\\a\\mniptv-web\\mniptv-web\\ci\\media\\a.mp4"
+  },
+  {
+    "name": "title is file name",
+    "ok": true,
+    "detail": "a.mp4"
+  },
+  {
+    "name": "autoplay off in preview",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Down = next",
+    "ok": true,
+    "detail": "0-\u003E1"
+  },
+  {
+    "name": "Up = previous",
+    "ok": true,
+    "detail": "-\u003E0"
+  },
+  {
+    "name": "Space pauses",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Esc hides preview",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "process still alive (warm)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "second preview reuses window",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "keyboard hook installed",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "INFO explorer selection read",
+    "ok": true,
+    "detail": "D:\\a\\mniptv-web\\mniptv-web\\ci\\media\\a.mp4"
+  },
+  {
+    "name": "INFO Ctrl\u002BM in Explorer opens preview",
+    "ok": true,
+    "detail": "D:\\a\\mniptv-web\\mniptv-web\\ci\\media\\a.mp4"
+  }
+]

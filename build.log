@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  Restored D:\a\mniptv-web\mniptv-web\MNPlayer.csproj (in 10.25 sec).
+CSC : warning WFAC010: Remove high DPI settings from D:\a\mniptv-web\mniptv-web\app.manifest and configure via Application.SetHighDpiMode API or 'ApplicationHighDpiMode' project property [D:\a\mniptv-web\mniptv-web\MNPlayer.csproj]
+  MNPlayer -> D:\a\mniptv-web\mniptv-web\bin\Release\net8.0-windows\win-x64\MNPlayer.dll
+  MNPlayer -> D:\a\mniptv-web\mniptv-web\publish\

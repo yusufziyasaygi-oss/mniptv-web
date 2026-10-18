@@ -1,0 +1,509 @@
+Inno Setup 6 Command-Line Compiler
+Copyright (C) 1997-2026 Jordan Russell. All rights reserved.
+Portions Copyright (C) 2000-2026 Martijn Laan. All rights reserved.
+Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.
+https://www.innosetup.com
+
+Compiler engine version: Inno Setup 6.7.1
+Non-commercial use only
+
+Preprocessing
+   Reading file: C:\Program Files (x86)\Inno Setup 6\ISPPBuiltins.iss
+Parsing [Setup] section, line 6
+Parsing [Setup] section, line 7
+Parsing [Setup] section, line 8
+Parsing [Setup] section, line 9
+Parsing [Setup] section, line 10
+Parsing [Setup] section, line 11
+Parsing [Setup] section, line 12
+Parsing [Setup] section, line 13
+Parsing [Setup] section, line 14
+Parsing [Setup] section, line 15
+Parsing [Setup] section, line 16
+Parsing [Setup] section, line 17
+Parsing [Setup] section, line 18
+Parsing [Setup] section, line 19
+Parsing [Setup] section, line 20
+Parsing [Setup] section, line 21
+Parsing [Setup] section, line 22
+Parsing [Setup] section, line 23
+Parsing [Setup] section, line 24
+Parsing [Setup] section, line 25
+Parsing [Setup] section, line 26
+Parsing [Setup] section, line 27
+Parsing [Setup] section, line 28
+Parsing [Setup] section, line 29
+Parsing [Setup] section, line 30
+Reading file (WizardImageFile)
+Reading file (WizardSmallImageFile)
+Preparing Setup program executable
+   Verification successful
+   Updating icons (Setup.e32)
+   Updating version info (Setup.e32)
+Determining language code pages
+Parsing [Languages] section, line 33
+   Reading file: C:\Program Files (x86)\Inno Setup 6\Languages\Turkish.isl
+   Messages in script file
+Reading default messages from Default.isl
+Parsing [Languages] section, line 33
+   Reading file: C:\Program Files (x86)\Inno Setup 6\Languages\Turkish.isl
+Parsing [LangOptions], [Messages], and [CustomMessages] sections
+   Messages in script file
+Reading [Code] section
+Parsing [Tasks] section, line 36
+Parsing [Tasks] section, line 37
+Parsing [Icons] section, line 46
+Parsing [Icons] section, line 47
+Parsing [Registry] section, line 51
+Parsing [Registry] section, line 52
+Parsing [Registry] section, line 53
+Parsing [Registry] section, line 54
+Parsing [Registry] section, line 55
+Parsing [Registry] section, line 56
+Parsing [Registry] section, line 57
+Parsing [Registry] section, line 58
+Parsing [Registry] section, line 59
+Parsing [Registry] section, line 60
+Parsing [Registry] section, line 61
+Parsing [Registry] section, line 62
+Parsing [Registry] section, line 63
+Parsing [Registry] section, line 64
+Parsing [Registry] section, line 65
+Parsing [Registry] section, line 66
+Parsing [Registry] section, line 67
+Parsing [Registry] section, line 68
+Parsing [Registry] section, line 69
+Parsing [Registry] section, line 70
+Parsing [Registry] section, line 71
+Parsing [Registry] section, line 72
+Parsing [Registry] section, line 73
+Parsing [Registry] section, line 74
+Parsing [Registry] section, line 75
+Parsing [Registry] section, line 76
+Parsing [Registry] section, line 77
+Parsing [Registry] section, line 78
+Parsing [Registry] section, line 79
+Parsing [Registry] section, line 80
+Parsing [Registry] section, line 81
+Parsing [Registry] section, line 82
+Parsing [Registry] section, line 83
+Parsing [Registry] section, line 84
+Parsing [Registry] section, line 85
+Parsing [Registry] section, line 86
+Parsing [Registry] section, line 87
+Parsing [Registry] section, line 88
+Parsing [Registry] section, line 89
+Parsing [Registry] section, line 90
+Parsing [Registry] section, line 91
+Parsing [Registry] section, line 92
+Parsing [Registry] section, line 93
+Parsing [Registry] section, line 94
+Parsing [Registry] section, line 95
+Parsing [Registry] section, line 96
+Parsing [Registry] section, line 97
+Parsing [Registry] section, line 98
+Parsing [Registry] section, line 99
+Parsing [Registry] section, line 100
+Parsing [Registry] section, line 101
+Parsing [Registry] section, line 102
+Parsing [Registry] section, line 103
+Parsing [Registry] section, line 104
+Parsing [Registry] section, line 105
+Parsing [Registry] section, line 106
+Parsing [Registry] section, line 107
+Parsing [Registry] section, line 108
+Parsing [Registry] section, line 109
+Parsing [Registry] section, line 110
+Parsing [Registry] section, line 111
+Parsing [Registry] section, line 112
+Parsing [Registry] section, line 113
+Parsing [Registry] section, line 114
+Parsing [Registry] section, line 115
+Parsing [Registry] section, line 116
+Parsing [Registry] section, line 117
+Parsing [Registry] section, line 118
+Parsing [Registry] section, line 119
+Parsing [Registry] section, line 120
+Parsing [Registry] section, line 121
+Parsing [Registry] section, line 122
+Parsing [Registry] section, line 123
+Parsing [Registry] section, line 124
+Parsing [Registry] section, line 125
+Parsing [Registry] section, line 126
+Parsing [Registry] section, line 127
+Parsing [Registry] section, line 128
+Parsing [Registry] section, line 129
+Parsing [Registry] section, line 130
+Parsing [Registry] section, line 131
+Parsing [Registry] section, line 132
+Parsing [Registry] section, line 133
+Parsing [Registry] section, line 134
+Parsing [Registry] section, line 135
+Parsing [Registry] section, line 136
+Parsing [Registry] section, line 137
+Parsing [Registry] section, line 138
+Parsing [Registry] section, line 139
+Parsing [Registry] section, line 140
+Parsing [Registry] section, line 141
+Parsing [Registry] section, line 142
+Parsing [Registry] section, line 143
+Parsing [Registry] section, line 144
+Parsing [Registry] section, line 145
+Parsing [Registry] section, line 146
+Parsing [Registry] section, line 147
+Parsing [Registry] section, line 148
+Parsing [Registry] section, line 149
+Parsing [Registry] section, line 150
+Parsing [Registry] section, line 151
+Parsing [Registry] section, line 152
+Parsing [Registry] section, line 153
+Parsing [Registry] section, line 154
+Parsing [Registry] section, line 155
+Parsing [Registry] section, line 156
+Parsing [Registry] section, line 157
+Parsing [Registry] section, line 158
+Parsing [Registry] section, line 159
+Parsing [Registry] section, line 160
+Parsing [Registry] section, line 161
+Parsing [Registry] section, line 162
+Parsing [Registry] section, line 163
+Parsing [Registry] section, line 164
+Parsing [Registry] section, line 165
+Parsing [Registry] section, line 166
+Parsing [Registry] section, line 167
+Parsing [Registry] section, line 168
+Parsing [Registry] section, line 169
+Parsing [Registry] section, line 170
+Parsing [Registry] section, line 171
+Parsing [Registry] section, line 172
+Parsing [Registry] section, line 173
+Parsing [Registry] section, line 174
+Parsing [Registry] section, line 175
+Parsing [Registry] section, line 176
+Parsing [Registry] section, line 177
+Parsing [Registry] section, line 178
+Parsing [Registry] section, line 179
+Parsing [Registry] section, line 180
+Parsing [Registry] section, line 181
+Parsing [Registry] section, line 182
+Parsing [Registry] section, line 183
+Parsing [Registry] section, line 184
+Parsing [Registry] section, line 185
+Parsing [Registry] section, line 186
+Parsing [Registry] section, line 187
+Parsing [Registry] section, line 188
+Parsing [Registry] section, line 189
+Parsing [Registry] section, line 190
+Parsing [Registry] section, line 191
+Parsing [Registry] section, line 192
+Parsing [Registry] section, line 193
+Parsing [Registry] section, line 194
+Parsing [Registry] section, line 195
+Parsing [Registry] section, line 196
+Parsing [Registry] section, line 197
+Parsing [Registry] section, line 198
+Parsing [Registry] section, line 199
+Parsing [Registry] section, line 200
+Parsing [Registry] section, line 201
+Parsing [Registry] section, line 202
+Parsing [Registry] section, line 203
+Parsing [Registry] section, line 204
+Parsing [Registry] section, line 205
+Parsing [Registry] section, line 206
+Parsing [Registry] section, line 207
+Parsing [Registry] section, line 208
+Parsing [Registry] section, line 209
+Parsing [Registry] section, line 210
+Parsing [Registry] section, line 211
+Parsing [Registry] section, line 212
+Parsing [Registry] section, line 213
+Parsing [Registry] section, line 214
+Parsing [Registry] section, line 215
+Parsing [Registry] section, line 216
+Parsing [Registry] section, line 217
+Parsing [Registry] section, line 218
+Parsing [Registry] section, line 219
+Parsing [Registry] section, line 220
+Parsing [Registry] section, line 221
+Parsing [Registry] section, line 222
+Parsing [Registry] section, line 223
+Parsing [Registry] section, line 224
+Parsing [Registry] section, line 225
+Parsing [Registry] section, line 226
+Parsing [Registry] section, line 227
+Parsing [InstallDelete] section, line 43
+Parsing [Run] section, line 230
+Parsing [Run] section, line 231
+Parsing [UninstallRun] section, line 234
+Parsing [Files] section, line 40
+Creating setup files
+   Verification successful
+   Updating icons (Setup.exe)
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Accessibility.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\clretwrc.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\clrgc.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\clrjit.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\coreclr.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\createdump.exe
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\D3DCompiler_47_cor3.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\DirectWriteForwarder.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\hostfxr.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\hostpolicy.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\libmpv-2.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.CSharp.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.DiaSymReader.Native.amd64.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.VisualBasic.Core.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.VisualBasic.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.VisualBasic.Forms.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.Win32.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.Win32.Registry.AccessControl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.Win32.Registry.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Microsoft.Win32.SystemEvents.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\MNPlayer.deps.json
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\MNPlayer.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\MNPlayer.exe
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\MNPlayer.runtimeconfig.json
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\mscordaccore.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\mscordaccore_amd64_amd64_8.0.3126.42015.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\mscordbi.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\mscorlib.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\mscorrc.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\msquic.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\netstandard.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PenImc_cor3.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationCore.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework-SystemCore.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework-SystemData.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework-SystemDrawing.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework-SystemXml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework-SystemXmlLinq.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.Aero.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.Aero2.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.AeroLite.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.Classic.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.Luna.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationFramework.Royale.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationNative_cor3.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\PresentationUI.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\ReachFramework.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.AppContext.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Buffers.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.CodeDom.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Collections.Concurrent.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Collections.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Collections.Immutable.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Collections.NonGeneric.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Collections.Specialized.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.Annotations.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.DataAnnotations.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.EventBasedAsync.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ComponentModel.TypeConverter.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Configuration.ConfigurationManager.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Configuration.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Console.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Core.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Data.Common.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Data.DataSetExtensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Data.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Design.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.Contracts.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.Debug.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.DiagnosticSource.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.EventLog.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.EventLog.Messages.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.FileVersionInfo.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.PerformanceCounter.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.Process.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.StackTrace.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.TextWriterTraceListener.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.Tools.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.TraceSource.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Diagnostics.Tracing.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.DirectoryServices.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Drawing.Common.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Drawing.Design.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Drawing.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Drawing.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Dynamic.Runtime.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Formats.Asn1.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Formats.Tar.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Globalization.Calendars.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Globalization.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Globalization.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Compression.Brotli.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Compression.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Compression.FileSystem.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Compression.Native.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Compression.ZipFile.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.FileSystem.AccessControl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.FileSystem.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.FileSystem.DriveInfo.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.FileSystem.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.FileSystem.Watcher.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.IsolatedStorage.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.MemoryMappedFiles.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Packaging.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Pipes.AccessControl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.Pipes.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.IO.UnmanagedMemoryStream.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Linq.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Linq.Expressions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Linq.Parallel.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Linq.Queryable.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Memory.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Http.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Http.Json.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.HttpListener.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Mail.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.NameResolution.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.NetworkInformation.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Ping.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Quic.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Requests.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Security.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.ServicePoint.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.Sockets.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.WebClient.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.WebHeaderCollection.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.WebProxy.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.WebSockets.Client.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Net.WebSockets.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Numerics.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Numerics.Vectors.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ObjectModel.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Printing.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Private.CoreLib.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Private.DataContractSerialization.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Private.Uri.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Private.Xml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Private.Xml.Linq.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.DispatchProxy.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Emit.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Emit.ILGeneration.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Emit.Lightweight.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Metadata.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Reflection.TypeExtensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Resources.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Resources.Reader.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Resources.ResourceManager.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Resources.Writer.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.CompilerServices.Unsafe.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.CompilerServices.VisualC.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Handles.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.InteropServices.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.InteropServices.JavaScript.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.InteropServices.RuntimeInformation.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Intrinsics.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Loader.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Numerics.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Serialization.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Serialization.Formatters.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Serialization.Json.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Serialization.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Runtime.Serialization.Xml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.AccessControl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Claims.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Algorithms.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Cng.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Csp.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Encoding.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.OpenSsl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Pkcs.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.ProtectedData.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.X509Certificates.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Cryptography.Xml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Permissions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Principal.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.Principal.Windows.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Security.SecureString.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ServiceModel.Web.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ServiceProcess.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.Encoding.CodePages.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.Encoding.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.Encoding.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.Encodings.Web.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.Json.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Text.RegularExpressions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.AccessControl.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Channels.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Overlapped.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Tasks.Dataflow.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Tasks.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Tasks.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Tasks.Parallel.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Thread.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.ThreadPool.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Threading.Timer.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Transactions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Transactions.Local.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.ValueTuple.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Web.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Web.HttpUtility.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Controls.Ribbon.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Extensions.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Forms.Design.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Forms.Design.Editors.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Forms.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Forms.Primitives.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Input.Manipulations.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Windows.Presentation.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xaml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.Linq.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.ReaderWriter.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.Serialization.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.XDocument.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.XmlDocument.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.XmlSerializer.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.XPath.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\System.Xml.XPath.XDocument.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\UIAutomationClient.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\UIAutomationClientSideProviders.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\UIAutomationProvider.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\UIAutomationTypes.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\vcruntime140_cor3.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\WindowsBase.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\WindowsFormsIntegration.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\wpfgfx_cor3.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\Licenses\Licenses.txt
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\Microsoft.VisualBasic.Forms.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\PresentationCore.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\PresentationFramework.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\PresentationUI.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\ReachFramework.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Windows.Controls.Ribbon.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Windows.Forms.Design.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Windows.Forms.Primitives.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Windows.Forms.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Windows.Input.Manipulations.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\System.Xaml.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\UIAutomationClient.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\UIAutomationClientSideProviders.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\UIAutomationProvider.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\UIAutomationTypes.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\WindowsBase.resources.dll
+   Compressing: D:\a\mniptv-web\mniptv-web\installer\..\publish\tr\WindowsFormsIntegration.resources.dll
+   Compressing Setup program executable
+   Updating version info (Setup.exe)
+   Updating manifest (Setup.exe)
+
+
+Successful compile (88.734 sec). Resulting Setup program filename is:
+D:\a\mniptv-web\mniptv-web\out\MN-Player-Setup-2.2.4.exe

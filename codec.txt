@@ -1,0 +1,11 @@
+ENGINE_OK mpv mpv v0.41.0-1205-g01e2533f3
+PASS a.mp4 1280x720 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=0 disp=1280x720
+PASS b.mkv 640x480 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=0 disp=640x480
+PASS c.mp4 720x1280 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=0 disp=720x1280
+PASS d.mkv 1280x720 codec=H.265 / HEVC (High Efficiency Video Coding) rotate=0 disp=1280x720
+PASS e.webm 640x360 codec=Google VP9 rotate=0 disp=640x360
+PASS f.avi 640x360 codec=MPEG-4 part 2 rotate=0 disp=640x360
+PASS g.mov 640x360 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=0 disp=640x360
+PASS h.ts 640x360 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=0 disp=640x360
+PASS i.mp3 x codec= rotate= disp=x
+PASS rot.mp4 1280x720 codec=H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 rotate=270 disp=720x1280

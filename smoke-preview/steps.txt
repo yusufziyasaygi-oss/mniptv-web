@@ -1,0 +1,21 @@
+﻿15:18:33.1 CHECK OK   preview window created 
+15:18:34.1 CHECK OK   preview plays 
+15:18:34.1 CHECK OK   preview is topmost 
+15:18:34.1 CHECK OK   siblings queued (4 videos) 9
+15:18:34.1 CHECK OK   selected item first D:\a\mniptv-web\mniptv-web\ci\media\a.mp4
+15:18:34.1 CHECK OK   title is file name a.mp4
+15:18:34.1 CHECK OK   autoplay off in preview 
+15:18:35.2 SHOT preview center-nonblack=1.00 size=992x588
+15:18:35.7 CHECK OK   Down = next 0->1
+15:18:36.0 CHECK OK   Up = previous ->0
+15:18:36.2 CHECK OK   Space pauses 
+15:18:37.0 CHECK OK   Esc hides preview 
+15:18:37.0 CHECK OK   process still alive (warm) 
+15:18:38.1 CHECK OK   second preview reuses window 
+15:18:38.1 CHECK OK   keyboard hook installed 
+15:18:38.4 explorer window 66080
+15:18:42.9 foreground class CabinetWClass
+15:18:45.4 SHOT explorer center-nonblack=0.99 size=800x600
+15:18:45.6 explorer debug: start; win=66080/66080; sel=1; folder=D:\a\mniptv-web\mniptv-web\ci\media items=11; focus=D:\a\mniptv-web\mniptv-web\ci\media\a.mp4;
+15:18:45.6 CHECK OK   INFO explorer selection read D:\a\mniptv-web\mniptv-web\ci\media\a.mp4
+15:18:46.8 CHECK OK   INFO Ctrl+M in Explorer opens preview D:\a\mniptv-web\mniptv-web\ci\media\a.mp4
