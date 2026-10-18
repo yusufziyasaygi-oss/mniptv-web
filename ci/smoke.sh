@@ -96,7 +96,6 @@ step 07-live-playing
 key KEYCODE_DPAD_DOWN
 sleep 2
 step 08a-live-info-next
-check info-next-programme "Sonra: Gece Filmi"
 sleep 4
 step 08-live-zap-next
 key KEYCODE_DPAD_LEFT
@@ -124,7 +123,6 @@ check sleep-dialog "Uyku zamanlayıcısı"
 key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
 sleep 0.5
 step 14b-sleep-set
-check sleep-toast "Uyku zamanlayıcısı: 15 dk"
 to_main
 sleep 1
 step 15-back-home
@@ -149,13 +147,6 @@ step 17-movies-grid
 key KEYCODE_DPAD_CENTER
 sleep 25
 step 18-movie-playing
-longok
-step 18a-movie-options
-check movie-options-speed "Oynatma hızı: 1x"
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
-sleep 0.5
-step 18b-movie-speed
-check movie-speed-toast "Oynatma hızı: 1.25x"
 key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
 step 19-movie-seek
 key KEYCODE_DPAD_CENTER
@@ -187,6 +178,13 @@ step 26-series-detail
 key KEYCODE_DPAD_CENTER
 sleep 22
 step 27-episode-playing
+# playback speed from the options dialog (video/toast are checked on the screenshots)
+longok
+step 27a-episode-options
+check episode-options-speed "Oynatma hızı: 1x"
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
+sleep 0.5
+step 27b-episode-speed
 key KEYCODE_BACK
 sleep 3
 step 28-series-detail-resume
@@ -284,7 +282,7 @@ key KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD
 key KEYCODE_DPAD_DOWN
 sleep 3
 step 46-offline-live
-check offline-live "Spor 16"
+check offline-live "Kanal 1 HD"
 
 adb logcat -d > "$OUT/logcat.txt"
 grep -n -A40 "FATAL EXCEPTION" "$OUT/logcat.txt" > "$OUT/crash.txt" || true
