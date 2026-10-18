@@ -8,7 +8,7 @@ enum SyncConfig {
     static let api = "https://api.github.com"
     static let repo = "yusufziyasaygi-oss/mn-sync"
     /// XOR-obfuscated access token (contents of the mn-sync repository only). Empty: sync off.
-    private static let tokenX = ""
+    private static let tokenX = "KidZGwwMPF1TRG0HHCghMgwJYiJJARBCWGJQUVhcIgwfEWlDHjQzSkN3agJpCQkyehxFSzQlGVl7BwJQZClQODsMbgZIX1BGWEZ1eVxfPTodBGwwSzgLb0MGUQVA"
     private static let mask = Array("MN-sync-2026-key".utf8)
 
     static var token: String {
