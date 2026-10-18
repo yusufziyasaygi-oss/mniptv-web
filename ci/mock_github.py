@@ -22,6 +22,12 @@ def _send(h, code, obj):
 def handle(h, method):
     """Returns True when the request was a GitHub API call."""
     path = urlparse(h.path).path
+    if path == "/__syncreset":
+        with LOCK:
+            FILES.clear()
+            LOG.append("RESET")
+        _send(h, 200, {"reset": True})
+        return True
     if not path.startswith("/repos/") or "/contents/" not in path:
         return False
     file_path = path.split("/contents/", 1)[1]
