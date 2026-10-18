@@ -110,6 +110,8 @@ jobs:
             cat "out/$dir/finished.txt" 2>/dev/null || echo "NOT FINISHED"
           }
           run_smoke smoke
+          curl -s http://127.0.0.1:8080/__synclog > out/smoke/sync_log_run1.json
+          curl -s http://127.0.0.1:8080/__syncreset
           run_smoke smoke2
           curl -s http://127.0.0.1:8080/__synclog > out/smoke/sync_log.json
           exit 0
