@@ -1,5 +1,6 @@
 package com.mavinokta.iptv.tv.ui
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,8 @@ internal fun ImageView.loadPoster(url: String?) {
     } else {
         load(url) {
             crossfade(false)
+            // Posters are opaque: 16-bit decoding halves their memory, which matters on 1 GB boxes.
+            bitmapConfig(Bitmap.Config.RGB_565)
             placeholder(R.drawable.ph_poster)
             error(R.drawable.ph_poster)
         }

@@ -19,6 +19,11 @@ step() {
     echo "$name | DEAD | $top" >> "$OUT/steps.txt"
   fi
 }
+# UI text assertions (uiautomator dump), results in asserts.txt
+ui_has() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb shell cat /sdcard/ui.xml | grep -qF "$1"; }
+check() {
+  if ui_has "$2"; then echo "PASS $1" >> "$OUT/asserts.txt"; else echo "FAIL $1 [$2]" >> "$OUT/asserts.txt"; fi
+}
 key() { for k in "$@"; do adb shell input keyevent "$k"; sleep 0.7; done; }
 longok() { adb shell input keyevent --longpress KEYCODE_DPAD_CENTER; sleep 1; }
 top_activity() { adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity"; }
@@ -89,7 +94,10 @@ key KEYCODE_DPAD_CENTER
 sleep 7
 step 07-live-playing
 key KEYCODE_DPAD_DOWN
-sleep 6
+sleep 2
+step 08a-live-info-next
+check info-next-programme "Sonra: Gece Filmi"
+sleep 4
 step 08-live-zap-next
 key KEYCODE_DPAD_LEFT
 sleep 5
@@ -108,9 +116,29 @@ step 13-live-options
 key KEYCODE_DPAD_CENTER
 sleep 2
 step 14-live-favorited
+longok
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
+sleep 1
+step 14a-sleep-dialog
+check sleep-dialog "Uyku zamanlayıcısı"
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
+sleep 0.5
+step 14b-sleep-set
+check sleep-toast "Uyku zamanlayıcısı: 15 dk"
 to_main
 sleep 1
 step 15-back-home
+# Recently watched channels appear as a live category
+menu 1
+sleep 1
+step 15a-live-categories-recent
+check recent-category "Son İzlenenler"
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
+sleep 2
+step 15b-live-recent-grid
+check recent-grid-count "Son İzlenenler · "
+key KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+sleep 1.5
 
 # 3. Movies (menu index 2)
 menu 2
@@ -121,6 +149,13 @@ step 17-movies-grid
 key KEYCODE_DPAD_CENTER
 sleep 25
 step 18-movie-playing
+longok
+step 18a-movie-options
+check movie-options-speed "Oynatma hızı: 1x"
+key KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER
+sleep 0.5
+step 18b-movie-speed
+check movie-speed-toast "Oynatma hızı: 1.25x"
 key KEYCODE_DPAD_RIGHT KEYCODE_DPAD_RIGHT
 step 19-movie-seek
 key KEYCODE_DPAD_CENTER
@@ -223,6 +258,33 @@ step 38-account
 key KEYCODE_BACK
 sleep 1
 step 39-final
+
+# 10. Starts where it was left (Filmler / Komedi), then again with the panel switched off:
+# the lists must come from the disk cache.
+menu 2
+key KEYCODE_DPAD_DOWN
+sleep 2
+step 43-before-restart
+check category-count "Komedi · 10"
+adb shell am force-stop "$PKG"
+sleep 1
+adb shell am start -n "$PKG/.ui.MainActivity"
+sleep 5
+step 44-restart-online
+check restart-section "Komedi · 10"
+adb shell am force-stop "$PKG"
+pkill -f mock_xtream.py
+sleep 2
+adb shell am start -n "$PKG/.ui.MainActivity"
+sleep 6
+step 45-restart-offline
+check offline-lists "Komedi · 10"
+key KEYCODE_DPAD_LEFT KEYCODE_DPAD_LEFT
+key KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+key KEYCODE_DPAD_DOWN
+sleep 3
+step 46-offline-live
+check offline-live "Spor 16"
 
 adb logcat -d > "$OUT/logcat.txt"
 grep -n -A40 "FATAL EXCEPTION" "$OUT/logcat.txt" > "$OUT/crash.txt" || true

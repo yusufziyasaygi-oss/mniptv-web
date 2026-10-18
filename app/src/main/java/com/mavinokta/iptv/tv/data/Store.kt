@@ -29,12 +29,18 @@ class Store(context: Context) {
         }
 
     // ---- favourites ----
+    // Parsed from JSON once and kept in memory; every change rewrites the stored list.
 
-    fun favorites(): List<MediaEntry> = readList(KEY_FAV).mapNotNull { MediaEntry.fromJson(it) }
+    private var favCache: List<MediaEntry>? = null
+    private var favKeyCache: Set<String>? = null
 
-    fun isFavorite(key: String): Boolean = favorites().any { it.key == key }
+    fun favorites(): List<MediaEntry> =
+        favCache ?: readList(KEY_FAV).mapNotNull { MediaEntry.fromJson(it) }.also { favCache = it }
 
-    fun favoriteKeys(): Set<String> = favorites().mapTo(HashSet()) { it.key }
+    fun favoriteKeys(): Set<String> =
+        favKeyCache ?: favorites().mapTo(HashSet()) { it.key }.also { favKeyCache = it }
+
+    fun isFavorite(key: String): Boolean = key in favoriteKeys()
 
     /** Returns true when the entry is now a favourite. */
     fun toggleFavorite(entry: MediaEntry): Boolean {
@@ -47,25 +53,67 @@ class Store(context: Context) {
             list.add(0, entry)
             true
         }
+        favCache = list
+        favKeyCache = null
         writeList(KEY_FAV, list.map { it.toJson() })
         return added
     }
 
     // ---- continue watching ----
 
+    private var progressCache: List<Progress>? = null
+
     fun progressList(): List<Progress> =
-        readList(KEY_PROGRESS).mapNotNull { Progress.fromJson(it) }.sortedByDescending { it.updatedAt }
+        progressCache ?: readList(KEY_PROGRESS).mapNotNull { Progress.fromJson(it) }
+            .sortedByDescending { it.updatedAt }.also { progressCache = it }
 
     fun progress(key: String): Progress? = progressList().firstOrNull { it.key == key }
 
     fun saveProgress(p: Progress) {
         val list = progressList().filter { it.key != p.key }.toMutableList()
         list.add(0, p)
-        writeList(KEY_PROGRESS, list.take(80).map { it.toJson() })
+        val kept = list.take(80)
+        progressCache = kept
+        writeList(KEY_PROGRESS, kept.map { it.toJson() })
     }
 
     fun removeProgress(key: String) {
-        writeList(KEY_PROGRESS, progressList().filter { it.key != key }.map { it.toJson() })
+        val kept = progressList().filter { it.key != key }
+        if (kept.size == progressList().size) return
+        progressCache = kept
+        writeList(KEY_PROGRESS, kept.map { it.toJson() })
+    }
+
+    // ---- recently watched live channels ----
+
+    private var recentCache: List<MediaEntry>? = null
+
+    fun recentChannels(): List<MediaEntry> =
+        recentCache ?: readList(KEY_RECENT).mapNotNull { MediaEntry.fromJson(it) }.also { recentCache = it }
+
+    fun addRecentChannel(entry: MediaEntry) {
+        val list = recentChannels()
+        if (list.firstOrNull()?.key == entry.key) return
+        val updated = (listOf(entry) + list.filter { it.key != entry.key }).take(30)
+        recentCache = updated
+        writeList(KEY_RECENT, updated.map { it.toJson() })
+    }
+
+    fun clearRecentChannels() {
+        recentCache = emptyList()
+        prefs.edit().remove(KEY_RECENT).apply()
+    }
+
+    // ---- where the user left off ----
+
+    var lastSection: String?
+        get() = prefs.getString("last_section", null)
+        set(value) { prefs.edit().putString("last_section", value).apply() }
+
+    fun lastCategory(kind: Kind): String? = prefs.getString("last_cat_${kind.name}", null)
+
+    fun setLastCategory(kind: Kind, id: String) {
+        prefs.edit().putString("last_cat_${kind.name}", id).apply()
     }
 
     // ---- per-episode position / watched ----
@@ -101,5 +149,6 @@ class Store(context: Context) {
     companion object {
         private const val KEY_FAV = "favorites"
         private const val KEY_PROGRESS = "progress"
+        private const val KEY_RECENT = "recent_live"
     }
 }

@@ -32,6 +32,7 @@ import com.mavinokta.iptv.tv.data.normalizeForSearch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -70,6 +71,8 @@ class MainActivity : AppCompatActivity() {
     private var pendingCategory = -1
     private var focusCategoriesWhenLoaded = false
     private var lastQuery = ""
+    // Category to reopen per kind: used once, the first time that section loads after app start.
+    private val restoreCategory = HashMap<Kind, String?>()
 
     private var categoryJob: Job? = null
     private var contentJob: Job? = null
@@ -135,6 +138,8 @@ class MainActivity : AppCompatActivity() {
         }
         contentGrid.layoutManager = gridLayout
         contentGrid.itemAnimator = null
+        contentGrid.setHasFixedSize(true)
+        contentGrid.setItemViewCacheSize(24)
         contentGrid.adapter = contentAdapter
         contentGrid.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
             if (right - left != oldRight - oldLeft) updateSpans(right - left)
@@ -166,7 +171,14 @@ class MainActivity : AppCompatActivity() {
         })
 
         menuAdapter.submit(Section.entries.map { it.title }, -1)
-        val first = if (store.progressList().isNotEmpty()) Section.CONTINUE else Section.LIVE
+        for (k in Kind.entries) restoreCategory[k] = store.lastCategory(k)
+        val saved = store.lastSection?.let { n -> Section.entries.firstOrNull { it.name == n } }
+        val first = when {
+            saved != null && saved != Section.SEARCH && saved != Section.ACCOUNT &&
+                !(saved == Section.CONTINUE && store.progressList().isEmpty()) -> saved
+            store.progressList().isNotEmpty() -> Section.CONTINUE
+            else -> Section.LIVE
+        }
         selectSection(first, fromClick = false)
         menuList.post { menuList.focusRow(first.ordinal) }
     }
@@ -177,8 +189,23 @@ class MainActivity : AppCompatActivity() {
         when (section) {
             Section.CONTINUE -> showContinue(keepFocus = true)
             Section.FAVORITES -> showFavorites(keepFocus = true)
+            Section.LIVE -> {
+                if (currentCategoryId() == RECENT_ID) selectCategory(selectedCategory, force = true)
+                else refreshFavoriteMarks()
+                ensureRecentCategory()
+            }
             else -> refreshFavoriteMarks()
         }
+    }
+
+    private fun currentCategoryId(): String? = categories.getOrNull(selectedCategory)?.id
+
+    /** "Son İzlenenler" appears in the live list as soon as a channel has been watched. */
+    private fun ensureRecentCategory() {
+        if (section != Section.LIVE || categories.isEmpty()) return
+        if (categories.any { it.id == RECENT_ID } || store.recentChannels().isEmpty()) return
+        categories = categories + Category(RECENT_ID, RECENT_TITLE)
+        categoryAdapter.submit(categories.map { it.name }, selectedCategory)
     }
 
     override fun onDestroy() {
@@ -211,6 +238,7 @@ class MainActivity : AppCompatActivity() {
         val kind = kindOf(s)
         val reload = s != section || (fromClick && kind != null && categories.isEmpty())
         section = s
+        if (s != Section.SEARCH) store.lastSection = s.name
         menuAdapter.setActivated(s.ordinal)
 
         if (reload) {
@@ -265,20 +293,42 @@ class MainActivity : AppCompatActivity() {
             setLoading(true)
             try {
                 val cats = Repo.categories(kind)
-                val all = cats + Category(ALL_ID, "Tümü")
+                var all = cats + Category(ALL_ID, "Tümü")
+                if (kind == Kind.LIVE && store.recentChannels().isNotEmpty()) all = all + Category(RECENT_ID, RECENT_TITLE)
                 categories = all
-                selectedCategory = 0
-                categoryAdapter.submit(all.map { it.name }, 0)
-                selectCategory(0, force = true)
+                val wanted = restoreCategory.remove(kind)
+                val start = if (wanted != null) all.indexOfFirst { it.id == wanted }.coerceAtLeast(0) else 0
+                selectedCategory = start
+                categoryAdapter.submit(all.map { it.name }, start)
+                selectCategory(start, force = true)
                 if (focusCategoriesWhenLoaded) {
                     focusCategoriesWhenLoaded = false
-                    categoryList.focusRow(0)
+                    categoryList.focusRow(start)
                 }
+                prefetchCategories(kind)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 setLoading(false)
                 showTiles(emptyList(), "Liste alınamadı: ${e.message ?: "bağlantı hatası"}\nMenüden bölümü tekrar seçerek yeniden dene.", false)
+            }
+        }
+    }
+
+    // Category lists are tiny; fetching the other two sections' lists while the user looks at the
+    // first makes switching sections instant.
+    private fun prefetchCategories(current: Kind) {
+        lifecycleScope.launch {
+            delay(1_500)
+            for (k in Kind.entries) {
+                if (k == current) continue
+                try {
+                    Repo.categories(k)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    // not needed yet
+                }
             }
         }
     }
@@ -295,20 +345,36 @@ class MainActivity : AppCompatActivity() {
         if (!force && index == selectedCategory && contentAdapter.itemCount > 0) return
         selectedCategory = index
         categoryAdapter.setActivated(index)
+        store.setLastCategory(kind, cat.id)
         contentJob?.cancel()
+        if (cat.id == RECENT_ID) {
+            val list = store.recentChannels()
+            showStreams(cat, list, keepFocus = !force && contentAdapter.itemCount > 0)
+            return
+        }
         contentJob = lifecycleScope.launch {
             contentTitle.text = cat.name
             setLoading(true)
             try {
-                val list = Repo.streams(kind, if (cat.id == ALL_ID) null else cat.id)
-                val favs = store.favoriteKeys()
-                showTiles(list.map { Tile.Media(it, it.key in favs, false) }, "Bu kategoride içerik yok", false)
+                val list = Repo.streams(kind, if (cat.id == ALL_ID) null else cat.id) { fresh ->
+                    // A background refresh found changes: update in place if the user is still here.
+                    if (!isDestroyed && selectedCategory == index && section?.let { kindOf(it) } == kind) {
+                        showStreams(cat, fresh, keepFocus = true)
+                    }
+                }
+                showStreams(cat, list, keepFocus = false)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 showTiles(emptyList(), "İçerik alınamadı: ${e.message ?: "bağlantı hatası"}\nKategoriyi tekrar seçerek yeniden dene.", false)
             }
         }
+    }
+
+    private fun showStreams(cat: Category, list: List<MediaEntry>, keepFocus: Boolean) {
+        val favs = store.favoriteKeys()
+        contentTitle.text = if (list.isEmpty()) cat.name else "${cat.name} · ${list.size}"
+        showTiles(list.map { Tile.Media(it, it.key in favs, false) }, "Bu kategoride içerik yok", keepFocus)
     }
 
     private fun showContinue(keepFocus: Boolean) {
@@ -528,7 +594,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, LoginActivity::class.java))
             }
             .setNeutralButton("Listeyi yenile") { _, _ ->
-                Repo.clearCache()
+                Repo.refreshAll()
                 val current = section ?: Section.LIVE
                 section = null
                 selectSection(current, fromClick = false)
@@ -637,5 +703,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val ALL_ID = "__all__"
+        private const val RECENT_ID = "__recent__"
+        private const val RECENT_TITLE = "Son İzlenenler"
     }
 }

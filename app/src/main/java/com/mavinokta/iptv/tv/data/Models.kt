@@ -81,7 +81,13 @@ data class SeriesInfo(
         get() = seasons.flatMap { s -> episodesBySeason[s].orEmpty() }
 }
 
-data class EpgNow(val title: String, val start: Long, val end: Long)
+data class EpgNow(
+    val title: String,
+    val start: Long,
+    val end: Long,
+    val nextTitle: String? = null,
+    val nextStart: Long = 0L
+)
 
 /**
  * One "continue watching" card. Movies are keyed per movie, series are keyed per

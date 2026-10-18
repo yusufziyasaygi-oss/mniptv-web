@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-const val USER_AGENT = "MN-IPTV-TV/2.1.1 (Android TV)"
+const val USER_AGENT = "MN-IPTV-TV/2.2.0 (Android TV)"
 
 class XtreamApi(val account: Account, private val http: OkHttpClient) {
 
@@ -110,63 +110,69 @@ class XtreamApi(val account: Account, private val http: OkHttpClient) {
         return null
     }
 
-    suspend fun categories(kind: Kind): List<Category> {
-        val action = when (kind) {
-            Kind.LIVE -> "get_live_categories"
-            Kind.MOVIE -> "get_vod_categories"
-            Kind.SERIES -> "get_series_categories"
+    private fun catAction(kind: Kind) = when (kind) {
+        Kind.LIVE -> "get_live_categories"
+        Kind.MOVIE -> "get_vod_categories"
+        Kind.SERIES -> "get_series_categories"
+    }
+
+    /** Raw JSON bodies are what the disk cache stores; parsing happens off the main thread. */
+    suspend fun rawCategories(kind: Kind): String = get(apiUrl(catAction(kind)), timeoutSec = 25)
+
+    suspend fun parseCategories(body: String): List<Category> = withContext(Dispatchers.Default) {
+        val a = array(body)
+        (0 until a.length()).mapNotNull { i ->
+            val o = a.optJSONObject(i) ?: return@mapNotNull null
+            val id = o.str("category_id") ?: return@mapNotNull null
+            Category(id, o.str("category_name") ?: id)
         }
-        val body = get(apiUrl(action), timeoutSec = 25)
-        return withContext(Dispatchers.Default) {
-            val a = array(body)
-            (0 until a.length()).mapNotNull { i ->
-                val o = a.optJSONObject(i) ?: return@mapNotNull null
-                val id = o.str("category_id") ?: return@mapNotNull null
-                Category(id, o.str("category_name") ?: id)
-            }
-        }
+    }
+
+    private fun streamAction(kind: Kind) = when (kind) {
+        Kind.LIVE -> "get_live_streams"
+        Kind.MOVIE -> "get_vod_streams"
+        Kind.SERIES -> "get_series"
     }
 
     /** categoryId == null loads the whole catalogue of that kind (used for search). */
-    suspend fun streams(kind: Kind, categoryId: String?): List<MediaEntry> {
-        val action = when (kind) {
-            Kind.LIVE -> "get_live_streams"
-            Kind.MOVIE -> "get_vod_streams"
-            Kind.SERIES -> "get_series"
-        }
+    suspend fun rawStreams(kind: Kind, categoryId: String?): String {
         val extra = if (categoryId.isNullOrEmpty()) "" else "&category_id=" + q(categoryId)
         // The whole catalogue (search, "Tümü") can be tens of MB on large panels.
-        val body = get(apiUrl(action, extra), timeoutSec = if (categoryId.isNullOrEmpty()) 120 else 40)
-        return withContext(Dispatchers.Default) {
-            val a = array(body)
-            val out = ArrayList<MediaEntry>(a.length())
-            for (i in 0 until a.length()) {
-                val o = a.optJSONObject(i) ?: continue
-                val entry = when (kind) {
-                    Kind.LIVE -> o.str("stream_id")?.let { id ->
-                        MediaEntry(Kind.LIVE, id, o.str("name") ?: id, o.str("stream_icon"), null,
-                            o.str("category_id"), o.int("num"))
-                    }
-                    Kind.MOVIE -> o.str("stream_id")?.let { id ->
-                        MediaEntry(Kind.MOVIE, id, o.str("name") ?: id, o.str("stream_icon"),
-                            o.str("container_extension") ?: "mp4", o.str("category_id"))
-                    }
-                    Kind.SERIES -> o.str("series_id")?.let { id ->
-                        MediaEntry(Kind.SERIES, id, o.str("name") ?: id, o.str("cover"), null,
-                            o.str("category_id"))
-                    }
-                }
-                if (entry != null) out.add(entry)
-            }
-            if (kind == Kind.LIVE && out.any { it.number > 0 }) {
-                out.sortWith(compareBy { if (it.number > 0) it.number else Int.MAX_VALUE })
-            }
-            out
-        }
+        return get(apiUrl(streamAction(kind), extra), timeoutSec = if (categoryId.isNullOrEmpty()) 120 else 40)
     }
 
-    suspend fun seriesInfo(seriesId: String): SeriesInfo {
-        val body = get(apiUrl("get_series_info", "&series_id=" + q(seriesId))).trim()
+    suspend fun parseStreams(kind: Kind, body: String): List<MediaEntry> = withContext(Dispatchers.Default) {
+        val a = array(body)
+        val out = ArrayList<MediaEntry>(a.length())
+        for (i in 0 until a.length()) {
+            val o = a.optJSONObject(i) ?: continue
+            val entry = when (kind) {
+                Kind.LIVE -> o.str("stream_id")?.let { id ->
+                    MediaEntry(Kind.LIVE, id, o.str("name") ?: id, o.str("stream_icon"), null,
+                        o.str("category_id"), o.int("num"))
+                }
+                Kind.MOVIE -> o.str("stream_id")?.let { id ->
+                    MediaEntry(Kind.MOVIE, id, o.str("name") ?: id, o.str("stream_icon"),
+                        o.str("container_extension") ?: "mp4", o.str("category_id"))
+                }
+                Kind.SERIES -> o.str("series_id")?.let { id ->
+                    MediaEntry(Kind.SERIES, id, o.str("name") ?: id, o.str("cover"), null,
+                        o.str("category_id"))
+                }
+            }
+            if (entry != null) out.add(entry)
+        }
+        if (kind == Kind.LIVE && out.any { it.number > 0 }) {
+            out.sortWith(compareBy { if (it.number > 0) it.number else Int.MAX_VALUE })
+        }
+        out
+    }
+
+    suspend fun rawSeriesInfo(seriesId: String): String =
+        get(apiUrl("get_series_info", "&series_id=" + q(seriesId)))
+
+    suspend fun parseSeriesInfo(raw: String): SeriesInfo {
+        val body = raw.trim()
         return withContext(Dispatchers.Default) {
             if (!body.startsWith("{")) throw IOException("Dizi bilgisi alınamadı")
             val root = JSONObject(body)
@@ -221,20 +227,28 @@ class XtreamApi(val account: Account, private val http: OkHttpClient) {
     }
 
     suspend fun shortEpg(streamId: String): EpgNow? {
-        val body = get(apiUrl("get_short_epg", "&stream_id=" + q(streamId) + "&limit=2")).trim()
+        val body = get(apiUrl("get_short_epg", "&stream_id=" + q(streamId) + "&limit=3")).trim()
         return withContext(Dispatchers.Default) {
             if (!body.startsWith("{")) return@withContext null
             val list = JSONObject(body).optJSONArray("epg_listings") ?: return@withContext null
             val now = System.currentTimeMillis() / 1000
+            var current: EpgNow? = null
+            var next: JSONObject? = null
+            var nextStart = Long.MAX_VALUE
             for (i in 0 until list.length()) {
                 val o = list.optJSONObject(i) ?: continue
                 val start = o.long("start_timestamp")
                 val end = o.long("stop_timestamp")
                 if (start <= now && now < end) {
-                    return@withContext EpgNow(decode(o.str("title")), start, end)
+                    current = EpgNow(decode(o.str("title")), start, end)
+                } else if (start >= now && start < nextStart) {
+                    next = o
+                    nextStart = start
                 }
             }
-            null
+            val c = current ?: return@withContext null
+            val n = next
+            if (n == null) c else c.copy(nextTitle = decode(n.str("title")), nextStart = nextStart)
         }
     }
 

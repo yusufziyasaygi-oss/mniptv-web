@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
@@ -107,6 +108,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var infoBadge: TextView
     private lateinit var infoEpg: TextView
     private lateinit var infoEpgProgress: ProgressBar
+    private lateinit var infoNext: TextView
     private lateinit var channelPanel: View
     private lateinit var panelTitle: TextView
     private lateinit var channelList: RecyclerView
@@ -132,6 +134,15 @@ class PlayerActivity : AppCompatActivity() {
     private var epg: EpgNow? = null
     private var epgJob: Job? = null
     private val numberBuffer = StringBuilder()
+
+    // sleep timer / playback speed
+    private var sleepAt = 0L
+    private val speeds = floatArrayOf(1f, 1.25f, 1.5f, 2f, 0.75f)
+    private val sleepRunnable = Runnable {
+        Toast.makeText(this, "Uyku zamanlayıcısı doldu, yayın kapatılıyor", Toast.LENGTH_LONG).show()
+        saveProgress()
+        finish()
+    }
 
     // movie / series
     private var movieId = ""
@@ -260,6 +271,7 @@ class PlayerActivity : AppCompatActivity() {
         infoBadge = findViewById(R.id.infoBadge)
         infoEpg = findViewById(R.id.infoEpg)
         infoEpgProgress = findViewById(R.id.infoEpgProgress)
+        infoNext = findViewById(R.id.infoNext)
         channelPanel = findViewById(R.id.channelPanel)
         panelTitle = findViewById(R.id.panelTitle)
         channelList = findViewById(R.id.channelList)
@@ -459,6 +471,7 @@ class PlayerActivity : AppCompatActivity() {
         liveRetries = 0
         playLiveUrl(api.liveUrl(ch.id, liveExt))
         loadEpg(ch)
+        store.addRecentChannel(ch)
     }
 
     private fun playLiveUrl(url: String) {
@@ -481,7 +494,7 @@ class PlayerActivity : AppCompatActivity() {
         epgJob = lifecycleScope.launch {
             delay(600)
             val result = try {
-                api.shortEpg(ch.id)
+                Repo.epg(ch.id)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -497,6 +510,7 @@ class PlayerActivity : AppCompatActivity() {
         val e = epg
         if (e == null || e.title.isBlank()) {
             infoEpg.text = ""
+            infoNext.visibility = View.GONE
             infoEpgProgress.visibility = View.GONE
             return
         }
@@ -506,6 +520,12 @@ class PlayerActivity : AppCompatActivity() {
         val total = (e.end - e.start).coerceAtLeast(1)
         infoEpgProgress.progress = (((now - e.start).toFloat() / total) * 1000).toInt().coerceIn(0, 1000)
         infoEpgProgress.visibility = View.VISIBLE
+        if (!e.nextTitle.isNullOrBlank()) {
+            infoNext.text = "Sonra: ${e.nextTitle}   ${fmt.format(Date(e.nextStart * 1000))}"
+            infoNext.visibility = View.VISIBLE
+        } else {
+            infoNext.visibility = View.GONE
+        }
     }
 
     private fun showInfo(autoHideMs: Long = 5_000) {
@@ -739,6 +759,45 @@ class PlayerActivity : AppCompatActivity() {
         Toast.makeText(this, "Görüntü: ${resizeNames[resizeIndex]}", Toast.LENGTH_SHORT).show()
     }
 
+    private fun speedText(v: Float): String =
+        (if (v == v.toInt().toFloat()) v.toInt().toString() else v.toString()) + "x"
+
+    private fun cycleSpeed() {
+        val cur = player.playbackParameters.speed
+        val i = speeds.indexOfFirst { Math.abs(it - cur) < 0.01f }
+        val next = speeds[(i + 1) % speeds.size]
+        player.setPlaybackSpeed(next)
+        Toast.makeText(this, "Oynatma hızı: ${speedText(next)}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun remainingSleepMin(): Int =
+        (((sleepAt - SystemClock.uptimeMillis()).coerceAtLeast(0L) + 59_999L) / 60_000L).toInt()
+
+    private fun pickSleepTimer() {
+        val minutes = intArrayOf(0, 15, 30, 45, 60, 90, 120)
+        val names = minutes.map { if (it == 0) "Kapalı" else "$it dakika sonra kapat" }
+        val checked = if (sleepAt > 0) minutes.indexOfFirst { it > 0 && Math.abs(it - remainingSleepMin()) <= 1 }.coerceAtLeast(0) else 0
+        AlertDialog.Builder(this)
+            .setTitle("Uyku zamanlayıcısı")
+            .setSingleChoiceItems(names.toTypedArray(), checked) { dialog, which ->
+                setSleepTimer(minutes[which])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun setSleepTimer(minutes: Int) {
+        handler.removeCallbacks(sleepRunnable)
+        if (minutes <= 0) {
+            sleepAt = 0L
+            Toast.makeText(this, "Uyku zamanlayıcısı kapalı", Toast.LENGTH_SHORT).show()
+            return
+        }
+        sleepAt = SystemClock.uptimeMillis() + minutes * 60_000L
+        handler.postDelayed(sleepRunnable, minutes * 60_000L)
+        Toast.makeText(this, "Uyku zamanlayıcısı: $minutes dk", Toast.LENGTH_SHORT).show()
+    }
+
     private fun showOptions() {
         val labels = mutableListOf<String>()
         val actions = mutableListOf<() -> Unit>()
@@ -750,6 +809,12 @@ class PlayerActivity : AppCompatActivity() {
         }
         labels += "Görüntü oranı: ${resizeNames[resizeIndex]}"
         actions += { cycleResize() }
+        if (mode != MODE_LIVE) {
+            labels += "Oynatma hızı: ${speedText(player.playbackParameters.speed)}"
+            actions += { cycleSpeed() }
+        }
+        labels += if (sleepAt > 0) "Uyku zamanlayıcısı (kalan ${remainingSleepMin()} dk)" else "Uyku zamanlayıcısı"
+        actions += { pickSleepTimer() }
         if (tracks(C.TRACK_TYPE_AUDIO).size > 1) {
             labels += "Ses"
             actions += { pickTrack(C.TRACK_TYPE_AUDIO) }
