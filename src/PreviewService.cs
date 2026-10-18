@@ -83,6 +83,8 @@ internal static class ExplorerSelection
                     if ((long)w.HWND != foreground.ToInt64()) continue;
                     dynamic selection = w.Document.SelectedItems();
                     Debug += $" sel={(int)selection.Count};";
+                    try { Debug += " folder=" + (string)w.Document.Folder.Self.Path + " items=" + (int)w.Document.Folder.Items().Count + ";"; } catch (Exception e) { Debug += " folderErr:" + e.Message; }
+                    try { Debug += " focus=" + (string)w.Document.FocusedItem.Path + ";"; } catch (Exception e) { Debug += " focusErr:" + e.Message; }
                     if ((int)selection.Count < 1) continue;
                     string path = selection.Item(0).Path;
                     if (active != IntPtr.Zero && TabOf((object)w) == active) return path;

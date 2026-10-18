@@ -401,6 +401,7 @@ public sealed class PreviewSmokeRunner
                 keybd_event(0x24, 0, 0, UIntPtr.Zero);
                 keybd_event(0x24, 0, 2, UIntPtr.Zero);
                 await Wait(1.5);
+                Log("SHOT explorer " + SmokeKit.Shot(hwnd, _dir, "explorer-01"));
             }
             string? selected = null;
             var done = new System.Threading.ManualResetEventSlim();
