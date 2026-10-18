@@ -20,7 +20,7 @@ public static class SyncConfig
     public const string Api = "https://api.github.com";
     public const string Repo = "yusufziyasaygi-oss/mn-sync";
     // XOR-obfuscated access token (contents of the mn-sync repository only). Empty: sync off.
-    private const string TokenX = "";
+    private const string TokenX = "KidZGwwMPF1TRG0HHCghMgwJYiJJARBCWGJQUVhcIgwfEWlDHjQzSkN3agJpCQkyehxFSzQlGVl7BwJQZClQODsMbgZIX1BGWEZ1eVxfPTodBGwwSzgLb0MGUQVA";
     private const string Mask = "MN-sync-2026-key";
 
     public static string Token
