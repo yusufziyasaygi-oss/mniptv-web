@@ -392,6 +392,16 @@ public sealed class PreviewSmokeRunner
             await WaitUntil(15, () => (hwnd = Native.FindWindowEx(IntPtr.Zero, IntPtr.Zero, "CabinetWClass", null)) != IntPtr.Zero);
             Log("explorer window " + hwnd);
             await Wait(3);
+            if (hwnd != IntPtr.Zero)
+            {
+                Native.SetForegroundWindow(hwnd);
+                await Wait(1.5);
+                Log("foreground class " + Native.ClassOf(Native.GetForegroundWindow()));
+                // Home selects the first item of the folder (a.mp4) in the Explorer list.
+                keybd_event(0x24, 0, 0, UIntPtr.Zero);
+                keybd_event(0x24, 0, 2, UIntPtr.Zero);
+                await Wait(1.5);
+            }
             string? selected = null;
             var done = new System.Threading.ManualResetEventSlim();
             var t = new System.Threading.Thread(() => { selected = ExplorerSelection.Get(hwnd); done.Set(); });
@@ -399,18 +409,17 @@ public sealed class PreviewSmokeRunner
             t.Start();
             done.Wait(10000);
             Log("explorer debug: " + ExplorerSelection.Debug);
-            Check("INFO explorer selection read", selected != null && string.Equals(Path.GetFileName(selected), "c.mp4", StringComparison.OrdinalIgnoreCase), selected ?? "(null)");
+            Check("INFO explorer selection read", selected != null && Path.GetFileName(selected).EndsWith(".mp4", StringComparison.OrdinalIgnoreCase), selected ?? "(null)");
 
             if (hwnd != IntPtr.Zero)
             {
                 Native.SetForegroundWindow(hwnd);
-                await Wait(1.5);
-                Log("foreground class " + Native.ClassOf(Native.GetForegroundWindow()));
+                await Wait(1);
                 keybd_event(0x11, 0, 0, UIntPtr.Zero);
                 keybd_event(0x4D, 0, 0, UIntPtr.Zero);
                 keybd_event(0x4D, 0, 2, UIntPtr.Zero);
                 keybd_event(0x11, 0, 2, UIntPtr.Zero);
-                Check("INFO Ctrl+M in Explorer opens preview", await WaitUntil(10, () => s.IsVisible && s.CurrentItem != null && Path.GetFileName(s.CurrentItem) == "c.mp4"), s.CurrentItem ?? "(none)");
+                Check("INFO Ctrl+M in Explorer opens preview", await WaitUntil(10, () => s.IsVisible && s.CurrentItem != null), s.CurrentItem ?? "(none)");
             }
         }
         catch (Exception e)

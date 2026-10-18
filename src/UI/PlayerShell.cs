@@ -368,6 +368,14 @@ public sealed class PlayerShell : Window
                     Engine.Set("speed", Rate);
                     break;
                 case MpvEventKind.Failed:
+                    // A PC without a usable audio device reports "audio output initialization failed" when the
+                    // file ends; the video itself played fine, so treat it as a normal end.
+                    if (ev.Code == -14 && _loaded && !_ended)
+                    {
+                        _ended = true;
+                        OnEnded();
+                        break;
+                    }
                     _failed = true;
                     FailureText = MpvEngine.ErrorText(ev.Code);
                     break;
@@ -404,11 +412,9 @@ public sealed class PlayerShell : Window
 
         if (_loaded)
         {
-            var dw = Engine.Number("dwidth");
-            var dh = Engine.Number("dheight");
-            if (double.IsFinite(dw) && double.IsFinite(dh) && dw > 0 && dh > 0)
+            var aspectNow = DisplayAspect();
+            if (aspectNow is { } aspect)
             {
-                var aspect = dw / dh;
                 if (VideoAspect == null || Math.Abs(aspect - VideoAspect.Value) > 0.005)
                 {
                     VideoAspect = aspect;
@@ -425,6 +431,24 @@ public sealed class PlayerShell : Window
         if (state == PState.Error && !_errorShown) { _errorShown = true; Wake(); ShowError(); }
         if ((DateTime.UtcNow - _positionSaved).TotalSeconds > 5) { SavePosition(); _positionSaved = DateTime.UtcNow; }
         RefreshUi();
+    }
+
+    /// Display geometry including anamorphic pixels and phone rotation metadata.
+    private double? DisplayAspect()
+    {
+        if (Engine == null) return null;
+        var w = Engine.Number("video-params/dw");
+        var h = Engine.Number("video-params/dh");
+        if (!(double.IsFinite(w) && double.IsFinite(h) && w > 0 && h > 0))
+        {
+            w = Engine.Number("video-params/w");
+            h = Engine.Number("video-params/h");
+        }
+        if (!(double.IsFinite(w) && double.IsFinite(h) && w > 0 && h > 0)) return null;
+        var ratio = w / h;
+        var rotate = Engine.Number("video-params/rotate");
+        if (double.IsFinite(rotate) && ((int)Math.Round(rotate) % 180 + 180) % 180 == 90) ratio = 1 / ratio;
+        return ratio > 0 && double.IsFinite(ratio) ? ratio : null;
     }
 
     private void OnEnded()
