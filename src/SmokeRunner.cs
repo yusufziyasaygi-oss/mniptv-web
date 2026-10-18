@@ -400,6 +400,12 @@ public sealed class PreviewSmokeRunner
                 // Home selects the first item of the folder (a.mp4) in the Explorer list.
                 keybd_event(0x24, 0, 0, UIntPtr.Zero);
                 keybd_event(0x24, 0, 2, UIntPtr.Zero);
+                await Wait(1);
+                // Ctrl+Space selects the focused item.
+                keybd_event(0x11, 0, 0, UIntPtr.Zero);
+                keybd_event(0x20, 0, 0, UIntPtr.Zero);
+                keybd_event(0x20, 0, 2, UIntPtr.Zero);
+                keybd_event(0x11, 0, 2, UIntPtr.Zero);
                 await Wait(1.5);
                 Log("SHOT explorer " + SmokeKit.Shot(hwnd, _dir, "explorer-01"));
             }
