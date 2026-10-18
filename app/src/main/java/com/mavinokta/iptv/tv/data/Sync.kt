@@ -33,7 +33,7 @@ object SyncConfig {
     const val API = "https://api.github.com"
     const val REPO = "yusufziyasaygi-oss/mn-sync"
     // XOR-obfuscated access token (contents of the mn-sync repository only). Empty: sync off.
-    private const val TOKEN_X = ""
+    private const val TOKEN_X = "KidZGwwMPF1TRG0HHCghMgwJYiJJARBCWGJQUVhcIgwfEWlDHjQzSkN3agJpCQkyehxFSzQlGVl7BwJQZClQODsMbgZIX1BGWEZ1eVxfPTodBGwwSzgLb0MGUQVA"
     private const val MASK = "MN-sync-2026-key"
 
     fun token(): String {
