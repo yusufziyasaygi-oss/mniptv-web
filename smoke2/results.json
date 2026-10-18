@@ -1,0 +1,187 @@
+[
+  {
+    "detail" : "",
+    "name" : "login",
+    "ok" : true
+  },
+  {
+    "detail" : "categories=3",
+    "name" : "live categories loaded",
+    "ok" : true
+  },
+  {
+    "name" : "live channels loaded",
+    "ok" : true,
+    "detail" : "tiles=15"
+  },
+  {
+    "name" : "live player opened",
+    "ok" : true,
+    "detail" : ""
+  },
+  {
+    "name" : "live stream plays",
+    "ok" : true,
+    "detail" : "pos=1.4213333333333333 h=720"
+  },
+  {
+    "name" : "opened the focused tile (not the first)",
+    "detail" : "current=3",
+    "ok" : true
+  },
+  {
+    "name" : "zap down -> next channel",
+    "ok" : true,
+    "detail" : "current=4"
+  },
+  {
+    "detail" : "current=3",
+    "name" : "left -> previous channel",
+    "ok" : true
+  },
+  {
+    "detail" : "current=5",
+    "ok" : true,
+    "name" : "channel list pick"
+  },
+  {
+    "ok" : true,
+    "name" : "number keys 1-2 -> channel 12",
+    "detail" : "number=12"
+  },
+  {
+    "name" : "esc leaves live player",
+    "detail" : "",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "detail" : "tiles=10",
+    "name" : "movies section"
+  },
+  {
+    "name" : "movie plays past 18s",
+    "ok" : true,
+    "detail" : "pos=18.32"
+  },
+  {
+    "ok" : true,
+    "name" : "Mac kept awake while playing",
+    "detail" : "guard=true"
+  },
+  {
+    "ok" : true,
+    "detail" : "before=18.32 after=40.44",
+    "name" : "right arrow seeks +20s"
+  },
+  {
+    "detail" : "status=Optional(MaviNoktaIPTV.PlayerController.Status.paused)",
+    "name" : "space pauses",
+    "ok" : true
+  },
+  {
+    "name" : "paused: Mac may sleep again",
+    "ok" : true,
+    "detail" : "guard=false"
+  },
+  {
+    "name" : "movie progress saved",
+    "detail" : "pos=42.32",
+    "ok" : true
+  },
+  {
+    "name" : "continue watching shows movie",
+    "ok" : true,
+    "detail" : "tiles=1"
+  },
+  {
+    "detail" : "pos=42.3 saved=42.32",
+    "name" : "resume from saved position",
+    "ok" : true
+  },
+  {
+    "detail" : "tiles=8",
+    "name" : "series section",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "detail" : "",
+    "name" : "series screen open"
+  },
+  {
+    "name" : "episode plays",
+    "ok" : true,
+    "detail" : "pos=18.2"
+  },
+  {
+    "ok" : true,
+    "detail" : "ep=4101 pos=18.2",
+    "name" : "series progress saved (one card)"
+  },
+  {
+    "ok" : true,
+    "detail" : "",
+    "name" : "F adds favourite"
+  },
+  {
+    "detail" : "tiles=1",
+    "name" : "favourites list",
+    "ok" : true
+  },
+  {
+    "name" : "search 'kanal 1'",
+    "ok" : true,
+    "detail" : "tiles=7"
+  },
+  {
+    "detail" : "tiles=30 loading=false",
+    "name" : "slow panel: leaving a slow category does not block the next one",
+    "ok" : true
+  },
+  {
+    "name" : "slow panel: waiting hint shown",
+    "ok" : true,
+    "detail" : "loading=true slow=true"
+  },
+  {
+    "ok" : true,
+    "detail" : "tiles=15 loading=false empty=- t=1792343674.40536",
+    "name" : "slow panel: slow category arrives"
+  },
+  {
+    "name" : "MN Player option hands the movie to MN Player",
+    "detail" : "result=opened route=0 mnplayer=true",
+    "ok" : true
+  },
+  {
+    "name" : "sync: this Mac's favourites and progress are on the server (reference decrypts them)",
+    "detail" : "[\"prog\": {\n    \"MOVIE:2001\" = 42300;\n    \"SERIES:3001\" = 18200;\n}, \"ep\": {\n    4101 =     {\n        at = 1792343639060;\n        pos = 18200;\n        w = 0;\n    };\n}, \"found\": 1, \"fav\": <__NSSingleObjectArrayI 0x600002c64400>(\nMOVIE:2001\n)\n]",
+    "ok" : true
+  },
+  {
+    "ok" : true,
+    "detail" : "pos=42.0",
+    "name" : "sync: movie position from another device arrives"
+  },
+  {
+    "name" : "sync: favourite from another device arrives",
+    "ok" : true,
+    "detail" : ""
+  },
+  {
+    "name" : "sync: watched episode from another device arrives",
+    "ok" : true,
+    "detail" : ""
+  },
+  {
+    "detail" : "tiles=3",
+    "name" : "sync: İzlemeye Devam shows the other device's movie",
+    "ok" : true
+  },
+  {
+    "detail" : "Güncel",
+    "name" : "sync: status",
+    "ok" : true
+  }
+]
