@@ -1,0 +1,155 @@
+127.0.0.1 "GET /player_api.php?username=u&password=p HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343483111 HTTP/1.1" 404 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 201 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1004&limit=3 HTTP/1.1" 200 -
+127.0.0.1 "GET /logo.png HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 35284)
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 438, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 404, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+----------------------------------------
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1005.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1005&limit=3 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 55262)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 438, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 404, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+----------------------------------------
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1004.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1006.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1006&limit=3 HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 46176)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 438, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 404, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [Errno 104] Connection reset by peer
+----------------------------------------
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1012.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1012&limit=3 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343579654 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams&category_id=2 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=10 HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343683706 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343695944 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 200 -
+127.0.0.1 "GET /movie/u/p/2001.mp4 HTTP/1.1" 206 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343724800 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343740989 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series&category_id=20 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343751968 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3001 HTTP/1.1" 200 -
+127.0.0.1 "GET /series/u/p/4101.mp4 HTTP/1.1" 200 -
+127.0.0.1 "GET /series/u/p/4102.mp4 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343769951 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343794079 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343794364 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343847659 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_info&series_id=3008 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343883737 HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=1 HTTP/1.1" 200 -
+127.0.0.1 "GET /__slow?on=0 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1001.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /live/u/p/1001.ts HTTP/1.1" 206 -
+127.0.0.1 "GET /live/u/p/1001.ts HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_short_epg&stream_id=1001&limit=3 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792343987540 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "PUT /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792344072302 HTTP/1.1" 200 -
+127.0.0.1 "GET /__synclog HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_streams&category_id=11 HTTP/1.1" 200 -
+127.0.0.1 "GET /repos/yusufziyasaygi-oss/mn-sync/contents/v1/7a789f23d10c98c40ee3bf3a7bc8110c8c9bba5b0210ac5c5e1d5424c8094b41.json?t=1792344153163 HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_vod_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /poster.png HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_live_categories HTTP/1.1" 200 -
+127.0.0.1 "GET /player_api.php?username=u&password=p&action=get_series_categories HTTP/1.1" 200 -
