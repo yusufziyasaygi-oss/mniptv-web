@@ -44,7 +44,7 @@ internal static class Verify
             }
             var w = engine.Text("video-params/w");
             var h = engine.Text("video-params/h");
-            lines.Add($"{(ok ? "PASS" : "FAIL")} {Path.GetFileName(file)} {w}x{h} codec={engine.Text("video-codec")}");
+            lines.Add($"{(ok ? "PASS" : "FAIL")} {Path.GetFileName(file)} {w}x{h} codec={engine.Text("video-codec")} rotate={engine.Text("video-params/rotate")} disp={engine.Text("dwidth")}x{engine.Text("dheight")}");
             if (!ok) failed = true;
             engine.Stop();
         }

@@ -108,6 +108,7 @@ jobs:
           "$FF" -loglevel error -y -display_rotation:v 90 -i $M/a.mp4 -t 8 -c copy $M/rot.mp4
           printf '1\n00:00:01,000 --> 00:00:30,000\nMN Player altyazi testi\n\n' > $M/sub.srt
           ls -la $M
+          "$(dirname "$FF")/ffprobe" -v error -show_streams $M/rot.mp4 | grep -iE "rotat|displaymatrix|width|height" || true
 
       - name: Codec check (headless)
         id: codec
@@ -118,7 +119,7 @@ jobs:
           set +e
           cd ci/media
           WIN="$(cygpath -w "$PWD/../../out/codec.txt")"
-          ../../publish/MNPlayer.exe --verify-media "$WIN" a.mp4 b.mkv c.mp4 d.mkv e.webm f.avi g.mov h.ts i.mp3
+          ../../publish/MNPlayer.exe --verify-media "$WIN" a.mp4 b.mkv c.mp4 d.mkv e.webm f.avi g.mov h.ts i.mp3 rot.mp4
           echo "exit=$?"
           sleep 2
           cat ../../out/codec.txt

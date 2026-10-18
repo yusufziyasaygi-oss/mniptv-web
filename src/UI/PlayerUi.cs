@@ -147,9 +147,7 @@ public sealed class PlayerUi : Canvas
         CenterButton.Width = 70;
         CenterButton.Height = 70;
 
-        _status.Width = Math.Min(560, Math.Max(120, w - 32));
-        SetLeft(_status, (w - _status.Width) / 2);
-        SetTop(_status, Math.Max(8, h / 2 - 110));
+        PlaceStatus();
 
         _menuLayer.Width = w;
         _menuLayer.Height = h;
@@ -157,6 +155,16 @@ public sealed class PlayerUi : Canvas
         _menu.MaxHeight = Math.Max(120, h - barH - 40);
         _dialogLayer.Width = w;
         _dialogLayer.Height = h;
+    }
+
+    private void PlaceStatus()
+    {
+        var w = ActualWidth;
+        var h = ActualHeight;
+        _statusText.MaxWidth = Math.Max(80, Math.Min(520, w - 80));
+        _status.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        SetLeft(_status, Math.Max(8, (w - _status.DesiredSize.Width) / 2));
+        SetTop(_status, Math.Max(8, h / 2 - 110));
     }
 
     private static void Place(FrameworkElement e, double x, double y, double w, double h)
@@ -179,6 +187,7 @@ public sealed class PlayerUi : Canvas
     {
         _statusText.Text = text;
         _status.Visibility = Visibility.Visible;
+        PlaceStatus();
         _statusTimer.Stop();
         _statusTimer.Start();
     }

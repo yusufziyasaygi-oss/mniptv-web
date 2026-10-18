@@ -63,10 +63,13 @@ internal interface IShellBrowserCom
 /// Reads the selected file of the active Explorer window (all of it best effort, never throws).
 internal static class ExplorerSelection
 {
+    public static string Debug = "";
+
     public static string? Get(IntPtr foreground)
     {
         try
         {
+            Debug = "start;";
             var type = Type.GetTypeFromProgID("Shell.Application");
             if (type == null) return null;
             dynamic shell = Activator.CreateInstance(type)!;
@@ -76,19 +79,22 @@ internal static class ExplorerSelection
             {
                 try
                 {
+                    Debug += $" win={(long)w.HWND}/{foreground.ToInt64()};";
                     if ((long)w.HWND != foreground.ToInt64()) continue;
                     dynamic selection = w.Document.SelectedItems();
+                    Debug += $" sel={(int)selection.Count};";
                     if ((int)selection.Count < 1) continue;
                     string path = selection.Item(0).Path;
                     if (active != IntPtr.Zero && TabOf((object)w) == active) return path;
                     fallback ??= path;
                 }
-                catch (Exception) { }
+                catch (Exception e) { Debug += " inner:" + e.Message; }
             }
             return fallback;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Debug += " outer:" + e;
             return null;
         }
     }

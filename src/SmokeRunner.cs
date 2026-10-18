@@ -98,7 +98,7 @@ public sealed class SmokeRunner
     {
         var e = _s.Engine;
         var diag = e == null ? "engine=nil"
-            : $"hwdec={e.Text("hwdec-current")} vo={e.Text("current-vo")} pixfmt={e.Text("video-params/pixelformat")} drops={e.Text("frame-drop-count")}";
+            : $"hwdec={e.Text("hwdec-current")} vo={e.Text("current-vo")} pixfmt={e.Text("video-params/pixelformat")} drops={e.Text("frame-drop-count")} rot={e.Text("video-params/rotate")} dw={e.Text("dwidth")}x{e.Text("dheight")} fail='{_s.FailureText}' eof={e.Text("eof-reached")} idle={e.Text("idle-active")} path={System.IO.Path.GetFileName(e.Text("path"))}";
         _lines.Add($"{DateTime.Now:HH:mm:ss.f} {text} | idx={_s.Index} state={_s.State} t={_s.LastTime} len={_s.LastLength} aspect={_s.VideoAspect:0.000} vol={_s.VolumeValue} | {diag}");
         File.WriteAllText(Path.Combine(_dir, "steps.txt"), string.Join("\n", _lines), Encoding.UTF8);
     }
@@ -398,6 +398,7 @@ public sealed class PreviewSmokeRunner
             t.SetApartmentState(System.Threading.ApartmentState.STA);
             t.Start();
             done.Wait(10000);
+            Log("explorer debug: " + ExplorerSelection.Debug);
             Check("INFO explorer selection read", selected != null && string.Equals(Path.GetFileName(selected), "c.mp4", StringComparison.OrdinalIgnoreCase), selected ?? "(null)");
 
             if (hwnd != IntPtr.Zero)

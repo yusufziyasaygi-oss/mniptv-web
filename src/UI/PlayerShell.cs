@@ -76,6 +76,7 @@ public sealed class PlayerShell : Window
     public bool Seekable { get; private set; }
     public double? VideoAspect { get; private set; }
     public bool EngineFailed { get; private set; }
+    public string FailureText { get; private set; } = "";
     public string? CurrentItem => Queue.Count > 0 && Index >= 0 && Index < Queue.Count ? Queue[Index] : null;
 
     private readonly DispatcherTimer _tick = new() { Interval = TimeSpan.FromMilliseconds(200) };
@@ -227,6 +228,7 @@ public sealed class PlayerShell : Window
         Index = i;
         _loaded = false;
         _failed = false;
+        FailureText = "";
         _ended = false;
         _errorShown = false;
         LastTime = 0;
@@ -340,7 +342,7 @@ public sealed class PlayerShell : Window
         var subs = Engine.Tracks().Where(t => t.Type == "sub").ToList();
         if (subs.Count == 0) { Ui.Notify("Altyazı yok"); return; }
         if (subs.Any(t => t.Selected)) { Engine.Set("sid", "no"); Ui.Notify("Altyazı kapalı"); }
-        else { Engine.Set("sid", subs[0].Id); Ui.Notify("Altyazı açık"); }
+        else { Engine.Set("sid", subs[0].Id.ToString()); Ui.Notify("Altyazı açık"); }
     }
 
     public void FrameStep() => Engine?.CmdAsync("frame-step");
@@ -367,6 +369,7 @@ public sealed class PlayerShell : Window
                     break;
                 case MpvEventKind.Failed:
                     _failed = true;
+                    FailureText = MpvEngine.ErrorText(ev.Code);
                     break;
                 case MpvEventKind.Ended:
                     if (!_ended && _loaded)
@@ -762,7 +765,7 @@ public sealed class PlayerShell : Window
             var label = !string.IsNullOrEmpty(t.Title) ? t.Title : (!string.IsNullOrEmpty(t.Lang) ? t.Lang : $"Kanal {t.Id}");
             if (!string.IsNullOrEmpty(t.Title) && !string.IsNullOrEmpty(t.Lang)) label = $"{t.Title} [{t.Lang}]";
             var id = t.Id;
-            list.Add(new MenuEntry { Text = $"{n}. {label}", Checked = t.Selected, Click = () => Engine?.Set(prop, id) });
+            list.Add(new MenuEntry { Text = $"{n}. {label}", Checked = t.Selected, Click = () => Engine?.Set(prop, id.ToString()) });
         }
         return list;
     }
