@@ -76,3 +76,9 @@ body{background:#000}
   .content-pane{overflow:visible}
 }
 .acc-sync{color:var(--muted);font-size:13px}.acc-sync strong{color:#fff}
+
+/* Küçük oynatıcı: Safari/iOS'un yerleşik tam ekran düğmesi sol üstte çıkar; kapatma düğmesi sağa alındı. */
+.player-topbar{flex-direction:row}
+.player-topbar #playerClose{order:3;margin-left:auto}
+.player-topbar .player-title-wrap{order:1;margin-left:50px;flex:1;min-width:0;max-width:calc(100% - 110px)}
+.player-topbar .player-top-actions{order:2}
