@@ -148,6 +148,7 @@
     return { type:source.type, name:source.name || 'IPTV', key:source.key, server };
   }
 
+  function appsNormalizeServer(input){let s=String(input||'').trim();if(!s)return s;if(!/^https?:\/\//i.test(s))s='http://'+s;for(const m of ['/player_api.php','/get.php']){const i=s.indexOf(m);if(i>=0)s=s.slice(0,i);}while(s.endsWith('/'))s=s.slice(0,-1);return s;}
   function normalizeProviderServer(raw) {
     let value = String(raw || '').trim();
     if (!value) throw appError('Sunucu adresi gerekli.', 400, 'missing_server');
@@ -240,7 +241,7 @@
       const username = String(data.username || '').trim();
       const password = String(data.password || '');
       if (!username || !password) throw appError('Kullanıcı adı ve şifre gerekli.', 400, 'missing_credentials');
-      const temp = {type:'xtream',name,base,username,password};
+      const temp = {type:'xtream',name,base,username,password,syncServer:appsNormalizeServer(data.server)};
       const root = await providerFetch(providerApiUrl(temp), 'json');
       validateAccount(root);
       const formats = Array.isArray(root?.user_info?.allowed_output_formats)
@@ -465,6 +466,7 @@
           indexCatalog();
           state.loading = false;
           renderApp();
+          syncStart();
           if (cached.epg && state.route==='live') scheduleEPG(700);
           return;
         }
@@ -482,6 +484,7 @@
       }
       state.loading = false;
       renderApp();
+      syncStart();
       if (Array.isArray(result.warnings) && result.warnings.length) toast('Katalog kısmen yüklendi', 'Sağlayıcının reddettiği bölümler otomatik atlandı.');
       if (result.epg && state.route==='live') scheduleEPG(700);
     } catch (e) {
@@ -615,10 +618,11 @@
   function openAccountDialog(){
     const src=state.source||{}; const server=src.server||src.url||'';
     modalLayer.hidden=false;
-    modal.innerHTML=`<button class="icon-button glass modal-close" data-modal-close aria-label="Kapat">✕</button><div class="account-dialog"><h2 id="modalTitle">Hesap</h2><div class="acc-info"><strong>${esc(src.name||'MN IPTV')}</strong><span>${esc(server)}</span>${src.username?`<span>${esc(src.username)}</span>`:''}</div><div class="acc-actions"><button class="primary-button" data-acc="refresh" ${state.offlineMode?'disabled':''}>Listeyi yenile</button><button class="secondary-button" data-acc="switch">Hesabı değiştir</button><button class="danger-button" data-acc="logout">Çıkış yap</button></div></div>`;
+    modal.innerHTML=`<button class="icon-button glass modal-close" data-modal-close aria-label="Kapat">✕</button><div class="account-dialog"><h2 id="modalTitle">Hesap</h2><div class="acc-info"><strong>${esc(src.name||'MN IPTV')}</strong><span>${esc(server)}</span>${src.username?`<span>${esc(src.username)}</span>`:''}</div><div class="acc-sync">Senkron: <strong>${esc(syncStatusText())}</strong></div><div class="acc-actions"><button class="primary-button" data-acc="refresh" ${state.offlineMode?'disabled':''}>Listeyi yenile</button><button class="secondary-button" data-acc="sync" ${syncEnabled()?'':'disabled'}>Şimdi senkronla</button><button class="secondary-button" data-acc="switch">Hesabı değiştir</button><button class="danger-button" data-acc="logout">Çıkış yap</button></div></div>`;
     $('[data-modal-close]',modal)?.addEventListener('click',closeModal);
     $$('[data-acc]',modal).forEach(b=>b.addEventListener('click',async()=>{
       const a=b.dataset.acc; closeModal();
+      if(a==='sync'){toast('Senkron başlatıldı');sync.lastRun=0;await syncRun();toast('Senkron',sync.status);return;}
       if(a==='refresh'){const s=privateSource()||state.source;try{localStorage.removeItem(`mniptv:global:catalogCache:${s?.key||state.sourceKey}`);}catch{}await loadCatalog(s,true);toast('Liste yenilendi');return;}
       try{await api('session.php',{method:'DELETE'});}catch{}
       state.connected=false;state.catalog=[];state.itemById.clear();state.route='home';renderLogin(availableOfflineSource());
@@ -855,7 +859,7 @@
   }
 
   function toggleFavorite(item){
-    if(state.favorites.has(item.id))state.favorites.delete(item.id);else state.favorites.add(item.id);persistFavorites();toast(state.favorites.has(item.id)?'Favorilere eklendi':'Favorilerden çıkarıldı',item.name);
+    if(state.favorites.has(item.id))state.favorites.delete(item.id);else state.favorites.add(item.id);persistFavorites();syncFav(item,state.favorites.has(item.id));toast(state.favorites.has(item.id)?'Favorilere eklendi':'Favorilerden çıkarıldı',item.name);
   }
 
   function openCardContext(id){
@@ -867,6 +871,7 @@
   }
   function closeContext(){contextLayer.hidden=true;contextMenu.innerHTML='';}
   function removeContinue(item){
+    syncProgDelete(item);
     if(item.seriesContainer||item._resumeEpisode){for(const [id,h] of Object.entries(state.history))if(id===item.id||h?.seriesId===item.id)delete state.history[id];}
     else delete state.history[item.id];
     persistHistory();toast('Listeden kaldırıldı',item.name);
@@ -1030,6 +1035,8 @@
   function recordProgress(force=false){
     const item=state.currentItem,v=playerEls.video;if(!item||item.section==='live'||!Number.isFinite(v.currentTime)||v.currentTime<1)return;
     const now=Date.now();if(!force&&now-state.progressTimer<4000)return;state.progressTimer=now;const duration=Number.isFinite(v.duration)?v.duration:0;
+    const finished=duration>0&&v.currentTime/duration>0.965;
+    syncProgress(item,v.currentTime,duration,finished);
     if(duration>0&&v.currentTime/duration>0.965){delete state.history[item.id];}
     else state.history[item.id]={id:item.id,position:v.currentTime,duration,updated:now,item:{...item},seriesId:item.seriesId||null,seriesName:item.seriesName||null,seriesArtwork:item.seriesArtwork||null,season:item.season||null,episode:item.episode||null,group:item.group||''};
     persistHistory();
@@ -1113,7 +1120,7 @@
     playerEls.audio.addEventListener('click',()=>openTrackMenu('audio'));playerEls.subtitle.addEventListener('click',()=>openTrackMenu('subtitle'));
     playerEls.retry.addEventListener('click',()=>{const item=state.currentItem;if(item)startPlayback(item,{resume:true});});
     playerEls.nextUpButton.addEventListener('click',()=>playAdjacent(1));
-    v.addEventListener('play',()=>{updatePlayButton();scheduleControlsHide();});v.addEventListener('pause',()=>{updatePlayButton();showControls(true);recordProgress(true);});
+    v.addEventListener('play',()=>{updatePlayButton();scheduleControlsHide();});v.addEventListener('pause',()=>{updatePlayButton();showControls(true);recordProgress(true);syncFlush();});
     v.addEventListener('waiting',()=>playerEls.loading.hidden=false);v.addEventListener('playing',()=>{playerEls.loading.hidden=true;playerEls.error.hidden=true;});
     v.addEventListener('timeupdate',()=>{if(state.currentItem?.section!=='live'){if(Number.isFinite(v.duration)&&v.duration>0){playerEls.seek.value=String(Math.round(v.currentTime/v.duration*1000));playerEls.current.textContent=fmtTime(v.currentTime);playerEls.duration.textContent=fmtTime(v.duration);}recordProgress(false);}});
     v.addEventListener('durationchange',()=>{if(Number.isFinite(v.duration))playerEls.duration.textContent=fmtTime(v.duration);});
@@ -1266,12 +1273,163 @@
     $$('[data-track]',playerEls.trackMenu).forEach(el=>el.addEventListener('click',()=>{buttons[+el.dataset.track].run();playerEls.trackMenu.hidden=true;scheduleControlsHide();}));
   }
 
+
+  // ===== Cihazlar arası senkron (uygulamalarla aynı şifreli mn-sync biçimi) =====
+  const SYNC_REPO='yusufziyasaygi-oss/mn-sync', SYNC_TX='KidZGwwMPF1TRG0HHCghMgwJYiJJARBCWGJQUVhcIgwfEWlDHjQzSkN3agJpCQkyehxFSzQlGVl7BwJQZClQODsMbgZIX1BGWEZ1eVxfPTodBGwwSzgLb0MGUQVA', SYNC_MASK='MN-sync-2026-key';
+  const SYNC_KIND={live:'LIVE',movies:'MOVIE',series:'SERIES'}, SYNC_SECTION={LIVE:'live',MOVIE:'movies',SERIES:'series'};
+  const sync={doc:null,docKey:'',timer:null,running:false,again:false,pending:false,lastRun:0,lastPush:0,status:'Kapalı',crypto:null,poll:null,base:(typeof window!=='undefined'&&window.__MN_SYNC_BASE)||null};
+  function syncToken(){try{const x=atob(SYNC_TX);let o='';for(let i=0;i<x.length;i++)o+=String.fromCharCode(x.charCodeAt(i)^SYNC_MASK.charCodeAt(i%SYNC_MASK.length));return o;}catch{return '';}}
+  function syncAccount(){const s=privateSource();if(!s||s.type!=='xtream'||!s.username)return null;const server=String(s.syncServer||s.base||'').replace(/\/+$/,'');return {server,user:String(s.username).trim(),pass:String(s.password||'').trim(),key:s.key};}
+  function syncEnabled(){return !!(sync.base||syncToken())&&!!syncAccount()&&!state.offlineMode;}
+  function syncNow(){return Date.now();}
+  function syncDocLoad(){
+    const acc=syncAccount();if(!acc)return null;
+    if(sync.doc&&sync.docKey===acc.key)return sync.doc;
+    let doc=storage.load?storage.load('syncdoc',null):null;
+    sync.docKey=acc.key;
+    if(!doc||typeof doc!=='object'){
+      // İlk açılış: bu tarayıcıdaki mevcut favori/geçmiş çok eski kayıt olarak girer.
+      doc={v:1,fav:{},prog:{},ep:{}};let n=state.favorites.size;
+      for(const id of state.favorites){const it=state.itemById.get(id);if(it?.providerId&&SYNC_KIND[it.section])doc.fav[`${SYNC_KIND[it.section]}:${it.providerId}`]={at:n--,del:false,e:syncEntry(it)};}
+      for(const h of Object.values(state.history)){const rec=syncProgFromHistory(h);if(rec)doc.prog[rec.key]={at:Math.round(h.updated||1),del:false,p:rec};}
+    }
+    sync.doc=doc;return doc;
+  }
+  function syncSave(){try{storage.save('syncdoc',sync.doc);}catch{}}
+  function syncEntry(it){return {kind:SYNC_KIND[it.section],id:String(it.providerId),name:it.name||'',icon:it.artwork||'',ext:it.ext||'',cat:'',num:0};}
+  function syncProgFromHistory(h){
+    if(!h||!h.position)return null;const it=h.item||{};
+    if(h.seriesId){const parent=state.itemById.get(h.seriesId);if(!parent?.providerId)return null;
+      return {key:`SERIES:${parent.providerId}`,kind:'SERIES',id:String(parent.providerId),title:h.seriesName||parent.name||'',subtitle:`S${h.season||0} B${h.episode||0} · ${it.name||''}`,image:h.seriesArtwork||parent.artwork||'',ext:it.ext||'',episodeId:String(it.providerId||''),season:h.season||0,episode:h.episode||0,pos:Math.round(h.position*1000),dur:Math.round((h.duration||0)*1000)};}
+    if(it.section==='movies'&&it.providerId)return {key:`MOVIE:${it.providerId}`,kind:'MOVIE',id:String(it.providerId),title:it.name||'',subtitle:'',image:it.artwork||'',ext:it.ext||'',episodeId:'',season:0,episode:0,pos:Math.round(h.position*1000),dur:Math.round((h.duration||0)*1000)};
+    return null;
+  }
+  function syncRecord(section,key,body,at){
+    if(!syncEnabled())return;const doc=syncDocLoad();if(!doc)return;
+    body.at=at||syncNow();(doc[section]||(doc[section]={}))[key]=body;syncSave();syncSchedule();
+  }
+  function syncFav(item,added){if(!item?.providerId||!SYNC_KIND[item.section])return;syncRecord('fav',`${SYNC_KIND[item.section]}:${item.providerId}`,{del:!added,e:syncEntry(item)});}
+  function syncProgress(item,position,duration,finished){
+    if(!syncEnabled()||!item)return;
+    if(item.seriesId){
+      const parent=state.itemById.get(item.seriesId);if(!parent?.providerId)return;const key=`SERIES:${parent.providerId}`;
+      if(item.providerId)syncRecord('ep',String(item.providerId),{pos:Math.round(position*1000),w:!!finished});
+      if(finished)syncRecord('prog',key,{del:true});
+      else if(position>15){const h={position,duration,seriesId:item.seriesId,seriesName:item.seriesName,seriesArtwork:item.seriesArtwork,season:item.season,episode:item.episode,item};const rec=syncProgFromHistory(h);if(rec)syncRecord('prog',key,{del:false,p:rec});}
+    }else if(item.section==='movies'&&item.providerId){
+      const key=`MOVIE:${item.providerId}`;
+      if(finished)syncRecord('prog',key,{del:true});
+      else if(position>15)syncRecord('prog',key,{del:false,p:syncProgFromHistory({position,duration,item})});
+    }
+  }
+  function syncProgDelete(item){
+    if(!item)return;let key='';
+    if(item.seriesContainer||item._resumeEpisode||item.seriesId){const pid=item.seriesContainer?item.providerId:state.itemById.get(item.seriesId)?.providerId;if(pid)key=`SERIES:${pid}`;}
+    else if(item.providerId)key=`MOVIE:${item.providerId}`;
+    if(key)syncRecord('prog',key,{del:true});
+  }
+  function syncSchedule(){
+    sync.pending=true;clearTimeout(sync.timer);
+    const delay=Math.max(6,45-(syncNow()-sync.lastPush)/1000);
+    sync.timer=setTimeout(syncRun,delay*1000);
+  }
+  function syncFlush(){if(sync.pending&&syncEnabled()){clearTimeout(sync.timer);syncRun();}}
+  function syncPull(gap=20){if(!syncEnabled()||syncNow()-sync.lastRun<gap*1000)return;syncRun();}
+  async function syncLib(){if(!sync.crypto)sync.crypto=await import('./sync-crypto.js');return sync.crypto;}
+  function syncMerge(local,remote){
+    const out={v:1,fav:{},prog:{},ep:{}};
+    for(const sec of ['fav','prog','ep']){
+      for(const [k,v] of Object.entries(local?.[sec]||{}))out[sec][k]=v;
+      for(const [k,v] of Object.entries(remote?.[sec]||{}))if((v?.at||0)>(out[sec][k]?.at||0))out[sec][k]=v;
+    }
+    const lim=syncNow()-90*86400000;
+    for(const sec of ['fav','prog'])for(const [k,v] of Object.entries(out[sec]))if(!v||(v.del&&(v.at||0)<lim))delete out[sec][k];
+    const trim=(o,max)=>{const ks=Object.keys(o);if(ks.length>max)ks.sort((a,b)=>(o[b].at||0)-(o[a].at||0)).slice(max).forEach(k=>delete o[k]);};
+    trim(out.prog,150);trim(out.ep,3000);return out;
+  }
+  const syncCanon=v=>JSON.stringify(v,(k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.keys(x).sort().reduce((o,kk)=>(o[kk]=x[kk],o),{}):x);
+  async function syncFetch(fileId,key,lib){
+    const base=sync.base||'https://api.github.com';
+    const r=await fetch(`${base}/repos/${SYNC_REPO}/contents/v1/${fileId}.json?t=${syncNow()}`,{headers:syncHeaders(),cache:'no-store'});
+    if(r.status===404)return {remote:null,sha:null};
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const o=await r.json();let remote=null;
+    try{remote=lib.unseal(atob(String(o.content||'').replace(/\s/g,'')),key);}catch{}
+    return {remote,sha:o.sha||null};
+  }
+  function syncHeaders(){return {'Authorization':'Bearer '+(sync.base?'test':syncToken()),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};}
+  function syncUtf8b64(str){const b=new TextEncoder().encode(str);let s='';for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s);}
+  async function syncRun(){
+    if(!syncEnabled())return;
+    if(sync.running){sync.again=true;return;}
+    sync.running=true;
+    try{do{sync.again=false;await syncOnce();}while(sync.again);}finally{sync.running=false;}
+  }
+  async function syncOnce(){
+    const acc=syncAccount();if(!acc)return;sync.lastRun=syncNow();const hadPending=sync.pending;sync.pending=false;
+    try{
+      const lib=await syncLib();const {id,key}=lib.derive(acc.server,acc.user,acc.pass);
+      for(let attempt=0;attempt<3;attempt++){
+        const {remote,sha}=await syncFetch(id,key,lib);
+        const local=syncDocLoad();const merged=syncMerge(local,remote);
+        if(syncCanon(merged)!==syncCanon(local)){sync.doc=merged;syncSave();syncApply(merged);}
+        if(remote&&syncCanon(merged)===syncCanon(remote)){sync.status='Güncel';return;}
+        const body={message:'sync web',content:syncUtf8b64(lib.seal(merged,key))};if(sha)body.sha=sha;
+        const r=await fetch(`${sync.base||'https://api.github.com'}/repos/${SYNC_REPO}/contents/v1/${id}.json`,{method:'PUT',headers:{...syncHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+        if(r.status===200||r.status===201){sync.lastPush=syncNow();sync.status='Güncel';return;}
+        if(r.status!==409&&r.status!==422)throw new Error('HTTP '+r.status);
+      }
+      throw new Error('çakışma');
+    }catch(e){
+      console.warn('sync',e);sync.status='Bağlanamadı';
+      if(hadPending){sync.pending=true;clearTimeout(sync.timer);sync.timer=setTimeout(syncRun,60000);}
+    }
+  }
+  function syncApply(doc){
+    const key=state.sourceKey;if(!key)return;let favChanged=false,histChanged=false;
+    const wid=(section,pid)=>stableId(`${key}|${section}|${pid}`);
+    // favoriler
+    const want=new Set();
+    for(const [k,v] of Object.entries(doc.fav||{})){
+      const [kind,...rest]=k.split(':');const section=SYNC_SECTION[kind];if(!section||!v)continue;
+      const id=wid(section,rest.join(':'));
+      if(v.del){if(state.favorites.has(id)){state.favorites.delete(id);favChanged=true;}}
+      else{want.add(id);if(!state.favorites.has(id)){state.favorites.add(id);favChanged=true;}}
+    }
+    // izlemeye devam
+    for(const [k,v] of Object.entries(doc.prog||{})){
+      if(!v)continue;const [kind,...rest]=k.split(':');const pid=rest.join(':');
+      if(kind==='MOVIE'){
+        const id=wid('movies',pid);if(state.currentItem?.id===id)continue;const cur=state.history[id];
+        if(v.del){if(cur&&(cur.updated||0)<v.at){delete state.history[id];histChanged=true;}continue;}
+        const p=v.p;if(!p||(cur&&(cur.updated||0)>=v.at))continue;
+        const item=state.itemById.get(id)||{id,name:p.title,section:'movies',artwork:p.image||null,providerId:pid,ext:p.ext||'mp4',group:''};
+        state.history[id]={id,position:p.pos/1000,duration:p.dur/1000,updated:v.at,item:{...item},seriesId:null,seriesName:null,seriesArtwork:null,season:null,episode:null,group:item.group||''};histChanged=true;
+      }else if(kind==='SERIES'){
+        const sid=wid('series',pid);
+        if(v.del){for(const [hid,h] of Object.entries(state.history))if(h?.seriesId===sid&&(h.updated||0)<v.at&&state.currentItem?.id!==hid){delete state.history[hid];histChanged=true;}continue;}
+        const p=v.p;if(!p||!p.episodeId)continue;const eid=wid('episode',p.episodeId);if(state.currentItem?.id===eid)continue;
+        const latest=Object.values(state.history).filter(h=>h?.seriesId===sid).reduce((m,h)=>Math.max(m,h.updated||0),0);
+        if(latest>=v.at)continue;
+        const parent=state.itemById.get(sid);
+        const epItem={id:eid,name:(String(p.subtitle||'').split(' · ').slice(1).join(' · '))||`S${p.season} E${p.episode}`,group:'',section:'series',artwork:p.image||null,providerId:p.episodeId,tvgId:null,added:null,ext:p.ext||'mp4',seriesContainer:false,seriesId:sid,season:p.season,episode:p.episode};
+        state.history[eid]={id:eid,position:p.pos/1000,duration:p.dur/1000,updated:v.at,item:epItem,seriesId:sid,seriesName:parent?.name||p.title,seriesArtwork:parent?.artwork||p.image||null,season:p.season,episode:p.episode,group:parent?.group||''};histChanged=true;
+      }
+    }
+    if(favChanged)persistFavorites();if(histChanged)persistHistory();
+    if((favChanged||histChanged)&&playerEls.layer.hidden&&modalLayer.hidden&&['home','continue','favorites','movies','series','live'].includes(state.route)){const y=window.scrollY;renderPage();window.scrollTo(0,y);}
+  }
+  function syncStart(){
+    if(!syncEnabled())return;syncPull(0);
+    clearInterval(sync.poll);sync.poll=setInterval(()=>{if(!document.hidden)syncPull(55);},60000);
+  }
+  function syncStatusText(){const acc=syncAccount();if(state.offlineMode)return 'Çevrimdışı';if(!acc)return 'Yalnızca Xtream hesaplarında';return sync.status;}
   function bindGlobalEvents(){
     bindPlayer();
     $('#modalBackdrop')?.addEventListener('click',closeModal);$('#contextBackdrop')?.addEventListener('click',closeContext);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(nativeFullscreenElement()||videoIsNativeFullscreen())return;if(!contextLayer.hidden)closeContext();else if(!modalLayer.hidden)closeModal();else if(!playerEls.layer.hidden){if(playerEls.layer.classList.contains('expanded'))setPlayerExpanded(false);else stopPlayback(true);}}if(!playerEls.layer.hidden&&e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement?.tagName)){e.preventDefault();playerEls.video.paused?playerEls.video.play():playerEls.video.pause();}});
     document.addEventListener('visibilitychange',async()=>{if(document.hidden&&state.settings.autoPiP&&!playerEls.layer.hidden&&!playerEls.video.paused){try{if(!document.pictureInPictureElement&&playerEls.video.requestPictureInPicture)await playerEls.video.requestPictureInPicture();}catch{}}});
-    window.addEventListener('beforeunload',()=>recordProgress(true));
+    window.addEventListener('beforeunload',()=>recordProgress(true));document.addEventListener('visibilitychange',()=>{if(document.hidden)syncFlush();else syncPull(20);});
     window.addEventListener('online',()=>toast('İnternet bağlantısı geri geldi'));window.addEventListener('offline',()=>toast('Çevrimdışısın','İndirilen içerikler oynatılabilir.'));
   }
 

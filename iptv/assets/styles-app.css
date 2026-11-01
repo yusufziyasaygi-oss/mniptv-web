@@ -75,3 +75,4 @@ body{background:#000}
   .split{height:auto}
   .content-pane{overflow:visible}
 }
+.acc-sync{color:var(--muted);font-size:13px}.acc-sync strong{color:#fff}
