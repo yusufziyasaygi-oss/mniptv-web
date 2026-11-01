@@ -1,0 +1,77 @@
+/* MN IPTV web — uygulamalarla aynı görünüm (siyah zemin, lacivert kartlar, mavi vurgu) */
+:root{--bg:#000;--bg-soft:#05080f;--card:#0b1426;--card-hover:#101c36;--panel-2:#0b1426;--line:rgba(255,255,255,.07);--blue:#2f7bff;--blue-2:#5b9bff}
+body{background:#000}
+.sidebar{background:#05080f;border-right:1px solid var(--line)}
+.nav-button{border-radius:12px}
+.nav-button.active{background:rgba(47,123,255,.16);color:#fff;box-shadow:inset 3px 0 0 var(--blue)}
+.account-pill{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}
+.account-pill:hover{background:var(--card-hover)}
+.acc-avatar{flex:none;width:34px;height:34px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-weight:700}
+.acc-text{min-width:0}.acc-text small{margin:0!important}
+.topbar{background:transparent}
+
+/* 3 kolon: sidebar | kategoriler | içerik */
+.content:has(.split){padding:0;height:calc(100vh - var(--topbar-h,84px));overflow:hidden}
+.split{display:grid;grid-template-columns:270px minmax(0,1fr);height:100%;min-height:0}
+.cat-pane{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:#03060c}
+.pane-title{padding:16px 18px 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cat-scroll{overflow:auto;padding:4px 10px 18px;display:flex;flex-direction:column;gap:2px}
+.cat-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#c9d6ea;cursor:pointer}
+.cat-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-item em{font-style:normal;font-size:12px;color:var(--muted);flex:none}
+.cat-item:hover{background:var(--card)}
+.cat-item.active{background:rgba(47,123,255,.2);color:#fff}
+.cat-item.active em{color:#bcd3ff}
+.content-pane{overflow:auto;padding:18px 22px 40px;min-width:0}
+.pane-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.pane-head strong{font-size:20px}.pane-head span{color:var(--muted);font-size:13px}
+.content-pane .media-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+
+/* canlı kanal listesi */
+.live-list{display:flex;flex-direction:column;gap:8px}
+.live-row{display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;cursor:pointer}
+.live-row:hover,.live-row:focus-visible{background:var(--card-hover);border-color:rgba(47,123,255,.5);outline:none}
+.live-logo{flex:none;width:52px;height:52px;border-radius:10px;background:#050b17;display:grid;place-items:center;overflow:hidden}
+.live-logo img{width:100%;height:100%;object-fit:contain;padding:4px}
+.live-logo span{font-weight:700;color:var(--blue-2);font-size:20px}
+.live-info{flex:1;min-width:0}.live-info strong,.live-info small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-info small{color:var(--muted);margin-top:2px}
+.fav-btn{background:transparent;border:0;font-size:20px;color:var(--muted);cursor:pointer;padding:6px}
+.fav-btn.on{color:#fbbf24}
+.live-play{flex:none;width:34px;height:34px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-size:12px}
+
+/* dizi detayı */
+.season-pills{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.season-pill{border:1px solid var(--line);background:var(--card);padding:8px 16px;border-radius:999px;cursor:pointer}
+.season-pill.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* hesap */
+.account-dialog{padding:28px;display:grid;gap:18px;min-width:min(380px,86vw)}
+.account-dialog h2{margin:0}
+.acc-info{display:grid;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;word-break:break-all}
+.acc-info span{color:var(--muted);font-size:13px}
+.acc-actions{display:grid;gap:10px}
+
+/* giriş */
+.login-page{display:block;min-height:100vh}
+.login-panel{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:28px 16px}
+.login-card{background:#05080f;border:1px solid var(--line);border-radius:22px;padding:28px;width:min(440px,100%)}
+.login-brand{text-align:center;margin-bottom:18px}
+.login-brand .brand-mark{margin:0 auto 10px}
+.login-brand h1{margin:0;font-size:26px}.login-brand p{margin:6px 0 0;color:var(--muted)}
+.remember{display:flex;align-items:center;gap:10px;margin:4px 0 14px;color:#c9d6ea;font-size:14px;cursor:pointer}
+.remember small{color:var(--muted)}
+.public-download-card{width:min(440px,100%)}
+
+@media (max-width:900px){
+  .split{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  .cat-pane{border-right:0;border-bottom:1px solid var(--line)}
+  .pane-title{display:none}
+  .cat-scroll{flex-direction:row;overflow-x:auto;padding:10px 12px;gap:8px}
+  .cat-item{width:auto;flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card)}
+  .cat-item em{display:none}
+  .content-pane{padding:14px 14px 90px}
+  .content:has(.split){height:auto;overflow:visible}
+  .split{height:auto}
+  .content-pane{overflow:visible}
+}

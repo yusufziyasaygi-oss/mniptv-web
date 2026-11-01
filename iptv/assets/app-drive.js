@@ -119,12 +119,24 @@
     return `mn${h.toString(16).padStart(8,'0')}`;
   }
 
+  const REMEMBER_FLAG = 'mniptv:remember:v1';
   function privateSource() {
-    try { return JSON.parse(sessionStorage.getItem(PRIVATE_SESSION_KEY) || 'null'); } catch { return null; }
+    try { const v = sessionStorage.getItem(PRIVATE_SESSION_KEY); if (v) return JSON.parse(v); } catch {}
+    try { if (localStorage.getItem(REMEMBER_FLAG) === '1') { const v = localStorage.getItem(PRIVATE_SESSION_KEY); if (v) return JSON.parse(v); } } catch {}
+    return null;
   }
   function savePrivateSource(source) {
-    if (source) sessionStorage.setItem(PRIVATE_SESSION_KEY, JSON.stringify(source));
-    else sessionStorage.removeItem(PRIVATE_SESSION_KEY);
+    const remember = state.rememberMe === true || (state.rememberMe == null && (()=>{try{return localStorage.getItem(REMEMBER_FLAG)==='1';}catch{return false;}})());
+    try {
+      if (source) {
+        sessionStorage.setItem(PRIVATE_SESSION_KEY, JSON.stringify(source));
+        if (remember) { localStorage.setItem(REMEMBER_FLAG,'1'); localStorage.setItem(PRIVATE_SESSION_KEY, JSON.stringify(source)); }
+        else { localStorage.removeItem(REMEMBER_FLAG); localStorage.removeItem(PRIVATE_SESSION_KEY); }
+      } else {
+        sessionStorage.removeItem(PRIVATE_SESSION_KEY);
+        localStorage.removeItem(REMEMBER_FLAG); localStorage.removeItem(PRIVATE_SESSION_KEY);
+      }
+    } catch {}
   }
   function publicSource(source) {
     if (!source) return null;
@@ -502,19 +514,9 @@
   function renderLogin(offlineInfo = null, error = '') {
     app.innerHTML = `
       <main class="login-page">
-        <section class="login-visual">
-          <div class="login-grid-art"></div>
-          <div class="login-copy">
-            <div class="brand-row"><div class="brand-mark"><span>M</span><i></i></div><strong>MN IPTV</strong></div>
-            <h1>Yayınların.<br>Senin ekranın.</h1>
-            <p>Canlı TV, film ve dizilerini tek yerde izle. Kaldığın yerden devam et, bölümler arasında geç ve içeriklerini doğrudan kendi IPTV kaynağından izle.</p>
-            <div class="feature-pills"><span>Canlı TV</span><span>Film & Dizi</span><span>İzlemeye Devam Et</span><span>Picture in Picture</span><span>Doğrudan Bağlantı</span></div>
-          </div>
-        </section>
         <section class="login-panel">
           <form id="loginForm" class="login-card">
-            <h2>Kaynağını bağla</h2>
-            <p>MN IPTV içerik sağlamaz. Kendi yetkili IPTV hesabını veya M3U listenı bağlayabilirsin.</p>
+            <div class="login-brand"><div class="brand-mark"><span>M</span><i></i></div><h1>MN IPTV</h1><p>Hesabını bağla ve izlemeye başla</p></div>
             <div class="segmented">
               <button type="button" class="${state.sourceMode==='xtream'?'active':''}" data-login-mode="xtream">Hesap bilgileri</button>
               <button type="button" class="${state.sourceMode==='m3u'?'active':''}" data-login-mode="m3u">M3U bağlantısı</button>
@@ -526,16 +528,17 @@
               <div class="form-field"><label>Kullanıcı adı</label><input name="username" autocomplete="username" required></div>
               <div class="form-field"><label>Şifre</label><input name="password" type="password" autocomplete="current-password" required></div>
             ` : `
-              <div class="form-field"><label>M3U bağlantısı</label><input name="url" inputmode="url" autocomplete="url" placeholder="https://…/get.php?…" required></div>
+              <div class="form-field"><label>M3U bağlantısı</label><input name="url" inputmode="url" autocomplete="url" placeholder="http://…/get.php?…" required></div>
             `}
-            <div class="form-help">Giriş bilgileri yalnızca bu tarayıcı oturumunda tutulur. Kişisel izleme geçmişin, favorilerin ve indirme kayıtların bu cihazda saklanır.</div>
+            <label class="remember"><input type="checkbox" name="remember" checked><span>Beni hatırla <small>(bilgiler yalnızca bu tarayıcıda saklanır)</small></span></label>
             <button class="primary-button login-submit" type="submit">Bağlan</button>
             ${offlineInfo ? `<button id="offlineEntry" class="secondary-button offline-entry" type="button">İndirilenleri çevrimdışı aç</button>` : ''}
+            <div class="form-help">MN IPTV içerik sağlamaz; kendi yetkili IPTV hesabını bağlarsın.</div>
           </form>
           <section class="public-download-card" aria-label="MN IPTV uygulamalarını indir">
-            <div class="public-download-head"><div><strong>MN IPTV uygulamasını indir</strong><span>Platformunu seç ve doğrudan indir.</span></div></div>
+            <div class="public-download-head"><div><strong>Uygulamayı indir</strong><span>macOS · Windows · Android · Android TV</span></div></div>
             <div class="public-download-links">
-              <a href="https://drive.google.com/uc?export=download&id=1yeSmAepFYs56tFeIKL47TXqDmzlGTzSA" target="_blank" rel="noopener"><b></b><span><strong>macOS</strong><small>DMG</small></span></a>
+              <a href="https://drive.google.com/uc?export=download&id=1yeSmAepFYs56tFeIKL47TXqDmzlGTzSA" target="_blank" rel="noopener"><b></b><span><strong>macOS</strong><small>DMG</small></span></a>
               <a href="https://drive.google.com/uc?export=download&id=1Fjbz7yuP1ZqrQ9y-rcz1aHUfoTLrwaM-" target="_blank" rel="noopener"><b>⊞</b><span><strong>Windows</strong><small>EXE</small></span></a>
               <a href="https://drive.google.com/uc?export=download&id=1rQVpw3qMEZHoT6Lvf1ywjaJgwqQEsDwY" target="_blank" rel="noopener"><b>◆</b><span><strong>Android</strong><small>APK</small></span></a>
               <a href="https://drive.google.com/uc?export=download&id=12Bne0unAR8b1pfVdwAXGKgxJlEPM8xiv" target="_blank" rel="noopener"><b>▣</b><span><strong>Android TV</strong><small>APK</small></span></a>
@@ -546,7 +549,7 @@
     $$('[data-login-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.sourceMode=btn.dataset.loginMode;renderLogin(offlineInfo);}));
     $('#loginForm')?.addEventListener('submit', async e => {
       e.preventDefault(); const form = new FormData(e.currentTarget); const submit = $('.login-submit', e.currentTarget);
-      submit.disabled = true; submit.textContent = 'Bağlanıyor…';
+      state.rememberMe = form.get('remember')==='on'; submit.disabled = true; submit.textContent = 'Bağlanıyor…';
       const payload = state.sourceMode==='xtream'
         ? {type:'xtream',name:form.get('name'),server:form.get('server'),username:form.get('username'),password:form.get('password')}
         : {type:'m3u',name:form.get('name'),url:form.get('url')};
@@ -563,8 +566,8 @@
   }
 
   const navItems = [
-    ['home','⌂','Ana Sayfa'],['live','▣','Canlı TV'],['movies','◆','Filmler'],['series','▤','Diziler'],
-    ['continue','↻','Devam Et'],['favorites','★','Favoriler'],['downloads','↓','İndirilenler'],['search','⌕','Arama'],['apps','⇩','Uygulamaları İndir'],['settings','⚙','Ayarlar']
+    ['home','⌂','Ana Sayfa'],['continue','↻','İzlemeye Devam'],['live','▣','Canlı TV'],['movies','◆','Filmler'],['series','▤','Diziler'],
+    ['favorites','★','Favoriler'],['search','⌕','Ara'],['downloads','↓','İndirilenler'],['apps','⇩','Uygulamaları İndir'],['settings','⚙','Ayarlar']
   ];
   const mobilePrimaryNav = new Set(['home','live','movies','series','search']);
 
@@ -582,7 +585,7 @@
         <aside class="sidebar">
           <div class="sidebar-brand"><div class="brand-mark"><span>M</span><i></i></div><strong>MN IPTV</strong></div>
           <nav class="nav-list">${navItems.map(([id,icon,label])=>`<button class="nav-button ${state.route===id?'active':''} ${mobilePrimaryNav.has(id)?'mobile-primary':'mobile-secondary'}" data-route="${id}"><span class="nav-icon">${icon}</span><span class="nav-label">${label}</span></button>`).join('')}</nav>
-          <div class="sidebar-footer"><div class="source-pill"><small>${state.offlineMode?'Çevrimdışı':'Bağlı kaynak'}</small><strong>${esc(state.source?.name||'MN IPTV')}</strong></div></div>
+          <div class="sidebar-footer"><button id="accountButton" class="source-pill account-pill" type="button"><span class="acc-avatar">${esc((state.source?.name||'M').trim().charAt(0).toUpperCase()||'M')}</span><span class="acc-text"><small>${state.offlineMode?'Çevrimdışı':'Hesap'}</small><strong>${esc(state.source?.name||'MN IPTV')}</strong></span></button></div>
         </aside>
         <main class="main">
           <header class="topbar">
@@ -596,11 +599,26 @@
       </div>`;
     $$('[data-route]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.route)));
     $('#mobileMoreButton')?.addEventListener('click',openMobileNav);
+    $('#accountButton')?.addEventListener('click',openAccountDialog);
     $('#globalSearch')?.addEventListener('input',e=>{
       state.query=e.target.value; resetPageLimit(); clearTimeout(state.searchDebounce);
       state.searchDebounce=setTimeout(renderPage,140);
     });
     renderPage();
+  }
+
+
+  function openAccountDialog(){
+    const src=state.source||{}; const server=src.server||src.url||'';
+    modalLayer.hidden=false;
+    modal.innerHTML=`<button class="icon-button glass modal-close" data-modal-close aria-label="Kapat">✕</button><div class="account-dialog"><h2 id="modalTitle">Hesap</h2><div class="acc-info"><strong>${esc(src.name||'MN IPTV')}</strong><span>${esc(server)}</span>${src.username?`<span>${esc(src.username)}</span>`:''}</div><div class="acc-actions"><button class="primary-button" data-acc="refresh" ${state.offlineMode?'disabled':''}>Listeyi yenile</button><button class="secondary-button" data-acc="switch">Hesabı değiştir</button><button class="danger-button" data-acc="logout">Çıkış yap</button></div></div>`;
+    $('[data-modal-close]',modal)?.addEventListener('click',closeModal);
+    $$('[data-acc]',modal).forEach(b=>b.addEventListener('click',async()=>{
+      const a=b.dataset.acc; closeModal();
+      if(a==='refresh'){const s=privateSource()||state.source;try{localStorage.removeItem(`mniptv:global:catalogCache:${s?.key||state.sourceKey}`);}catch{}await loadCatalog(s,true);toast('Liste yenilendi');return;}
+      try{await api('session.php',{method:'DELETE'});}catch{}
+      state.connected=false;state.catalog=[];state.itemById.clear();state.route='home';renderLogin(availableOfflineSource());
+    }));
   }
 
   function navigate(route) {
@@ -613,7 +631,8 @@
   function openMobileNav(){
     const extra=navItems.filter(([id])=>!mobilePrimaryNav.has(id));
     contextLayer.hidden=false;
-    contextMenu.innerHTML=extra.map(([id,icon,label])=>`<button type="button" data-mobile-route="${id}"><span style="display:inline-block;width:28px">${icon}</span>${esc(label)}</button>`).join('');
+    contextMenu.innerHTML=extra.map(([id,icon,label])=>`<button type="button" data-mobile-route="${id}"><span style="display:inline-block;width:28px">${icon}</span>${esc(label)}</button>`).join('')+`<button type="button" data-mobile-account><span style="display:inline-block;width:28px">☺</span>Hesap</button>`;
+    $('[data-mobile-account]',contextMenu)?.addEventListener('click',()=>{closeContext();openAccountDialog();});
     $$('[data-mobile-route]',contextMenu).forEach(b=>b.addEventListener('click',()=>{const route=b.dataset.mobileRoute;closeContext();navigate(route);}));
   }
 
@@ -668,30 +687,32 @@
   function renderCatalogPage(section) {
     const cats = state.categories[section] || [];
     const q = normalized(state.query);
-    const browsingCategory = state.category !== 'all';
+    const all = filteredCatalog(section);
+    const items = all.slice(0,state.pageLimit);
+    const total = state.catalog.filter(i=>i.section===section).length;
+    const more = all.length>items.length ? `<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more>Daha fazla göster (${all.length-items.length})</button></div>` : '';
+    const heading = state.category==='all' ? `Tümü` : state.category;
+    const catList = `<button class="cat-item ${state.category==='all'?'active':''}" data-category="__all"><span>Tümü</span><em>${total}</em></button>` +
+      cats.map(c=>`<button class="cat-item ${state.category===c.name?'active':''}" data-category="${esc(c.name)}"><span>${esc(c.name)}</span><em>${c.count}</em></button>`).join('');
+    const body = !items.length
+      ? emptyState('İçerik bulunamadı', q?'Aramana uyan içerik yok.':'Bu kategoride gösterilecek içerik yok.')
+      : section==='live'
+        ? `<div class="live-list">${items.map(renderLiveRow).join('')}</div>${more}`
+        : `<div class="media-grid">${items.map(renderCard).join('')}</div>${more}`;
+    return `<div class="split">
+      <aside class="cat-pane" aria-label="Kategoriler"><div class="pane-title">Kategoriler</div><div class="cat-scroll">${catList}</div></aside>
+      <section class="content-pane"><div class="pane-head"><strong>${esc(heading)}</strong><span>${all.length} ${section==='live'?'kanal':section==='movies'?'film':'dizi'}${q?' · arama sonucu':''}</span></div>${body}</section>
+    </div>`;
+  }
 
-    // Kategori ekranı artık üstte yatay chip olarak değil, içerik kartlarıyla aynı
-    // akışta bir ızgara olarak görünür. Arama yazılınca doğrudan o bölümdeki
-    // içerikler aranır; kategori seçilmişse arama yalnızca o kategori içinde kalır.
-    if (!browsingCategory && !q) {
-      if (!cats.length) return emptyState('Kategori bulunamadı','Bu bölümde gösterilecek kategori yok.');
-      return `<div class="catalog-intro"><strong>${esc(sectionLabel(section))} kategorileri</strong><span>Bir kategori seç; içerikler burada listelensin.</span></div>
-        <div class="category-grid">${cats.map(c=>renderCategoryCard(c,section)).join('')}</div>`;
-    }
-
-    const allItems = filteredCatalog(section);
-    const items = allItems.slice(0,state.pageLimit);
-    const more = allItems.length>items.length ? `<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more> Daha Fazla Göster (${allItems.length-items.length}) </button></div>` : '';
-    const heading = browsingCategory ? state.category : `“${state.query.trim()}” arama sonuçları`;
-    const sub = browsingCategory
-      ? `${allItems.length} içerik${q ? ' · kategori içinde arama' : ''}`
-      : `${allItems.length} sonuç · tüm ${sectionLabel(section).toLocaleLowerCase('tr-TR')} içinde`;
-
-    return `<div class="catalog-selection-bar">
-        <button class="secondary-button compact category-back-button" data-category-back>← Kategoriler</button>
-        <div><strong>${esc(heading)}</strong><span>${esc(sub)}</span></div>
-      </div>
-      ${items.length ? `<div class="media-grid ${section==='live'?'live-grid':''}">${items.map(renderCard).join('')}</div>${more}` : emptyState('İçerik bulunamadı',q?'Aramana uyan içerik yok.':'Bu kategoride gösterilecek içerik yok.')}`;
+  function renderLiveRow(item,idx){
+    const img=safeImage(item.artwork), epg=state.epg.get(item.id);
+    return `<article class="live-row" tabindex="0" data-card-id="${esc(item.id)}">
+      <div class="live-logo">${img?`<img loading="lazy" decoding="async" src="${esc(img)}" alt="" onerror="this.remove()">`:`<span>${esc((item.name||'?').trim().charAt(0))}</span>`}</div>
+      <div class="live-info"><strong>${esc(item.name)}</strong><small>${esc(epg?.now?.title||item.group||'')}</small></div>
+      <button class="fav-btn ${state.favorites.has(item.id)?'on':''}" data-action="toggle-favorite" data-id="${esc(item.id)}" aria-label="Favori">${state.favorites.has(item.id)?'★':'☆'}</button>
+      <span class="live-play">▶</span>
+    </article>`;
   }
 
   function renderCategoryCard(category, section) {
@@ -739,7 +760,7 @@
     const all=state.catalog.filter(i=>(i._search||normalized(`${i.name} ${i.group}`)).includes(q));
     const items=all.slice(0,state.pageLimit);
     const more=all.length>items.length?`<div class="load-more-wrap"><button class="secondary-button load-more-button" data-load-more>Daha Fazla Göster (${all.length-items.length})</button></div>`:'';
-    return items.length?`<div class="media-grid">${items.map(renderCard).join('')}</div>${more}`:emptyState('Sonuç bulunamadı','Arama kelimelerini değiştirip tekrar dene.');
+    return items.length?`<div class="pane-head" style="margin-bottom:14px"><strong>Sonuçlar</strong><span>${all.length} sonuç</span></div><div class="media-grid">${items.map(renderCard).join('')}</div>${more}`:emptyState('Sonuç bulunamadı','Arama kelimelerini değiştirip tekrar dene.');
   }
 
   function renderDownloads() {
@@ -812,7 +833,7 @@
 
   function bindPageActions(root){
     $$('[data-route-inline]',root).forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.routeInline)));
-    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category;state.query='';const input=$('#globalSearch');if(input)input.value='';resetPageLimit();renderPage();}));
+    $$('[data-category]',root).forEach(b=>b.addEventListener('click',()=>{state.category=b.dataset.category==='__all'?'all':b.dataset.category;state.query='';const input=$('#globalSearch');if(input)input.value='';resetPageLimit();renderPage();}));
     $$('[data-category-back]',root).forEach(b=>b.addEventListener('click',()=>{state.category='all';state.query='';const input=$('#globalSearch');if(input)input.value='';resetPageLimit();renderPage();}));
     $$('[data-load-more]',root).forEach(b=>b.addEventListener('click',()=>{state.pageLimit+=pageStep();renderPage();}));
     $$('[data-action]',root).forEach(b=>b.addEventListener('click',async e=>{e.stopPropagation();await handleAction(b.dataset.action,b.dataset.id);}));
@@ -856,6 +877,7 @@
   }
 
   async function openDetails(item){
+    state.openSeason=null;
     modalLayer.hidden=false;modal.innerHTML=detailSkeleton(item);
     let details=state.detailsCache.get(item.id);
     if(!details&&state.connected&&!state.offlineMode&&item.providerId){
@@ -881,10 +903,16 @@
   function latestSeriesProgress(seriesId){return Object.values(state.history).filter(h=>h?.seriesId===seriesId&&h.position>0).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]||null;}
   function renderEpisodes(parent,episodes){
     const groups=new Map();episodes.forEach(ep=>{const s=ep.season||0;if(!groups.has(s))groups.set(s,[]);groups.get(s).push(ep);});
-    return [...groups.entries()].sort((a,b)=>a[0]-b[0]).map(([season,eps])=>`<h3 class="season-title">Sezon ${season}</h3><div class="episode-list">${eps.map(ep=>{const img=safeImage(ep.artwork||parent.artwork),h=state.history[ep.id],pct=h?.duration?clamp(h.position/h.duration*100,0,100):0;return `<div class="episode-row" data-episode-id="${esc(ep.id)}"><div class="episode-art">${img?`<img src="${esc(img)}" alt="">`:''}</div><div class="episode-info"><strong>${esc(ep.name)}</strong><small>S${ep.season||0} E${ep.episode||0}${h?.position?` · ${fmtTime(h.position)} kaldı`:''}</small>${pct?`<div class="progress-track"><i style="width:${pct}%"></i></div>`:''}</div><div class="episode-actions"><button class="secondary-button" data-episode-play="${esc(ep.id)}">▶</button>${canDownload(ep)?`<button class="secondary-button" data-episode-download="${esc(ep.id)}">${state.downloads[ep.id]?'✓':'↓ İndir'}</button>`:''}</div></div>`;}).join('')}</div>`).join('');
+    const seasons=[...groups.keys()].sort((a,b)=>a-b);
+    const cur=seasons.includes(state.openSeason)?state.openSeason:seasons[0];
+    const eps=(groups.get(cur)||[]).slice().sort((a,b)=>(a.episode||0)-(b.episode||0));
+    const pills=`<div class="season-pills">${seasons.map(n=>`<button class="season-pill ${n===cur?'active':''}" data-season="${n}">Sezon ${n}</button>`).join('')}</div>`;
+    const rows=eps.map(ep=>{const img=safeImage(ep.artwork||parent.artwork),h=state.history[ep.id],pct=h?.duration?clamp(h.position/h.duration*100,0,100):0;return `<div class="episode-row" data-episode-id="${esc(ep.id)}"><div class="episode-art">${img?`<img src="${esc(img)}" alt="">`:''}</div><div class="episode-info"><strong>${esc(ep.name)}</strong><small>S${ep.season||0} E${ep.episode||0}${h?.position?` · ${fmtTime(h.position)}`:''}</small>${pct?`<div class="progress-track"><i style="width:${pct}%"></i></div>`:''}</div><div class="episode-actions"><button class="secondary-button" data-episode-play="${esc(ep.id)}">▶</button>${canDownload(ep)?`<button class="secondary-button" data-episode-download="${esc(ep.id)}">${state.downloads[ep.id]?'✓':'↓'}</button>`:''}</div></div>`;}).join('');
+    return `${pills}<div class="episode-list">${rows}</div>`;
   }
 
   function bindDetailActions(parent,details){
+    $$('[data-season]',modal).forEach(b=>b.addEventListener('click',()=>{state.openSeason=+b.dataset.season;modal.innerHTML=renderDetails(parent,details);bindDetailActions(parent,details);}));
     $('[data-modal-close]',modal)?.addEventListener('click',closeModal);
     $('[data-detail="favorite"]',modal)?.addEventListener('click',()=>{toggleFavorite(parent);modal.innerHTML=renderDetails(parent,details);bindDetailActions(parent,details);});
     $('[data-detail="play"]',modal)?.addEventListener('click',()=>{closeModal();startPlayback(parent,{resume:true});});
