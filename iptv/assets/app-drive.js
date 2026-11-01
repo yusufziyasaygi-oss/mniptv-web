@@ -512,6 +512,10 @@
   }
 
   function renderLogin(offlineInfo = null, error = '') {
+    const sv = privateSource() || {};
+    if (sv.type && !state.loginModeSet) { state.sourceMode = sv.type; state.loginModeSet = true; }
+    const val = (k) => esc(sv.type===state.sourceMode ? (sv[k]||'') : '');
+    const svServer = sv.base ? String(sv.base).replace(/\/$/,'') : '';
     app.innerHTML = `
       <main class="login-page">
         <section class="login-panel">
@@ -522,13 +526,13 @@
               <button type="button" class="${state.sourceMode==='m3u'?'active':''}" data-login-mode="m3u">M3U bağlantısı</button>
             </div>
             ${error ? `<div class="form-error">${esc(error)}</div>` : ''}
-            <div class="form-field"><label>Profil adı</label><input name="name" autocomplete="nickname" placeholder="Örn. Ev IPTV"></div>
+            <div class="form-field"><label>Profil adı</label><input name="name" autocomplete="nickname" placeholder="Örn. Ev IPTV" value="${val('name')}"></div>
             ${state.sourceMode==='xtream' ? `
-              <div class="form-field"><label>Sunucu adresi</label><input name="server" inputmode="url" autocomplete="url" placeholder="http://sunucu-adresi:port" required></div>
-              <div class="form-field"><label>Kullanıcı adı</label><input name="username" autocomplete="username" required></div>
-              <div class="form-field"><label>Şifre</label><input name="password" type="password" autocomplete="current-password" required></div>
+              <div class="form-field"><label>Sunucu adresi</label><input name="server" inputmode="url" autocomplete="url" placeholder="http://sunucu-adresi:port" value="${sv.type==='xtream'?esc(svServer):''}" required></div>
+              <div class="form-field"><label>Kullanıcı adı</label><input name="username" autocomplete="username" value="${val('username')}" required></div>
+              <div class="form-field"><label>Şifre</label><input name="password" type="password" autocomplete="current-password" value="${val('password')}" required></div>
             ` : `
-              <div class="form-field"><label>M3U bağlantısı</label><input name="url" inputmode="url" autocomplete="url" placeholder="http://…/get.php?…" required></div>
+              <div class="form-field"><label>M3U bağlantısı</label><input name="url" inputmode="url" autocomplete="url" placeholder="http://…/get.php?…" value="${val('url')}" required></div>
             `}
             <label class="remember"><input type="checkbox" name="remember" checked><span>Beni hatırla <small>(bilgiler yalnızca bu tarayıcıda saklanır)</small></span></label>
             <button class="primary-button login-submit" type="submit">Bağlan</button>
@@ -546,7 +550,7 @@
           </section>
         </section>
       </main>`;
-    $$('[data-login-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.sourceMode=btn.dataset.loginMode;renderLogin(offlineInfo);}));
+    $$('[data-login-mode]').forEach(btn=>btn.addEventListener('click',()=>{state.sourceMode=btn.dataset.loginMode;state.loginModeSet=true;renderLogin(offlineInfo);}));
     $('#loginForm')?.addEventListener('submit', async e => {
       e.preventDefault(); const form = new FormData(e.currentTarget); const submit = $('.login-submit', e.currentTarget);
       state.rememberMe = form.get('remember')==='on'; submit.disabled = true; submit.textContent = 'Bağlanıyor…';
