@@ -1,5 +1,52 @@
 import Cocoa
 import UniformTypeIdentifiers
+import QuickLookThumbnailing
+
+private enum FinderThumbnails {
+    static let identifier = "com.mavinokta.player.mxf-thumbnail"
+    static var bundle: URL {
+        Bundle.main.bundleURL.appendingPathComponent("Contents/PlugIns/MXFFirstFrame.appex")
+    }
+    static var build: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "" }
+    static let lastRegistration = "finderThumbnailRegisteredBuild"
+
+    static func run(_ arguments: [String]) throws -> String {
+        let process = Process(), pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
+        process.arguments = arguments
+        process.standardOutput = pipe
+        process.standardError = pipe
+        try process.run()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        let output = String(decoding: data, as: UTF8.self)
+        if process.terminationStatus != 0 {
+            throw NSError(domain: "MNFinderThumbnails", code: Int(process.terminationStatus),
+                          userInfo: [NSLocalizedDescriptionKey: "macOS uzantı kaydını tamamlayamadı. " + output])
+        }
+        return output
+    }
+
+    static func register(enable: Bool = false) throws {
+        guard FileManager.default.fileExists(atPath: bundle.path) else {
+            throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError,
+                          userInfo: [NSLocalizedDescriptionKey: "Kurulu uygulamada MXF uzantısı eksik. Kurulum paketini yeniden aç."])
+        }
+        _ = try run(["-a", bundle.path])
+        if enable { _ = try run(["-e", "use", "-i", identifier]) }
+        // Registration can become visible a moment after pluginkit returns.
+        for attempt in 0..<8 {
+            let listing = try run(["-m", "-vv", "-i", identifier])
+            if listing.contains(bundle.path) {
+                UserDefaults.standard.set(build, forKey: lastRegistration)
+                return
+            }
+            if attempt < 7 { Thread.sleep(forTimeInterval: 0.2) }
+        }
+        throw NSError(domain: "MNFinderThumbnails", code: 1,
+                      userInfo: [NSLocalizedDescriptionKey: "macOS bu uygulamanın MXF uzantısını kayıtlı uzantılar arasında göstermiyor."])
+    }
+}
 
 let accent = NSColor(red: 59/255, green: 139/255, blue: 1, alpha: 1)
 let videoExtensions = "mp4 m4v mov mkv avi webm wmv flv f4v mpg mpeg mpe m1v m2v mpv ts mts m2ts m2t vob ogv ogm 3gp 3g2 asf divx rm rmvb dv mxf nut nsv hevc h264 h265 y4m av1 amv mpegts".split(separator:" ").map(String.init)
@@ -194,8 +241,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         playbackRate=prefs.object(forKey:"rate") == nil ? 1 : prefs.float(forKey:"rate")
         libvlc_audio_set_volume(mp,savedVolume)
         createControls();buildMenu();layout()
-        if !previewMode,Bundle.main.bundleURL.path=="/Applications/MN Player.app",!prefs.bool(forKey:"initialSetupCompleted") {
-            Task { _ = await configureInstallation() }
+        if !previewMode && Bundle.main.bundleURL.path == "/Applications/MN Player.app" {
+            if !prefs.bool(forKey: "initialSetupCompleted") {
+                Task { _ = await configureInstallation() }
+            } else if prefs.string(forKey: FinderThumbnails.lastRegistration) != FinderThumbnails.build {
+                // Upgrades and other login accounts may still have only the old player settings.
+                DispatchQueue.global(qos: .utility).async { try? FinderThumbnails.register() }
+            }
         }
         timer=Timer.scheduledTimer(withTimeInterval:0.2,repeats:true) { [weak self] _ in self?.tick() }
         window.makeFirstResponder(surface);NSApp.activate(ignoringOtherApps:true)
@@ -456,10 +508,59 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
         engineQueue.async {[self] in libvlc_media_player_stop(mp);libvlc_media_player_release(mp);libvlc_release(engine);DispatchQueue.main.async{NSApp.reply(toApplicationShouldTerminate:true)}}
         return .terminateLater
     }
-    func buildMenu(){let bar=NSMenu();let appMenu=NSMenu();appMenu.addItem(item("MN Player Hakkında",#selector(about)));appMenu.addItem(item("Varsayılan video oynatıcı yap",#selector(setDefaults)));appMenu.addItem(item("Önceki varsayılanları geri yükle",#selector(restoreDefaults)));appMenu.addItem(.separator());appMenu.addItem(withTitle:"Çık",action:#selector(NSApplication.terminate(_:)),keyEquivalent:"q");let appItem=NSMenuItem();appItem.submenu=appMenu;bar.addItem(appItem)
+    func buildMenu(){let bar=NSMenu();let appMenu=NSMenu();appMenu.addItem(item("MN Player Hakkında",#selector(about)));appMenu.addItem(item("Finder’da MXF küçük resimlerini onar…",#selector(repairMXFThumbnails)));appMenu.addItem(item("Varsayılan video oynatıcı yap",#selector(setDefaults)));appMenu.addItem(item("Önceki varsayılanları geri yükle",#selector(restoreDefaults)));appMenu.addItem(.separator());appMenu.addItem(withTitle:"Çık",action:#selector(NSApplication.terminate(_:)),keyEquivalent:"q");let appItem=NSMenuItem();appItem.submenu=appMenu;bar.addItem(appItem)
         let file=NSMenu(title:"Dosya");file.addItem(item("Medya Aç…",#selector(openMedia),"o"));file.addItem(item("Bağlantı Aç…",#selector(openURL),"l"));file.addItem(item("Altyazı Ekle…",#selector(openCaptions),"s"));file.addItem(item("Oynatma Listesi",#selector(showQueue),"p"));let f=NSMenuItem(title:"Dosya",action:nil,keyEquivalent:"");f.submenu=file;bar.addItem(f)
         let play=NSMenu(title:"Oynatma");play.addItem(item("Oynat / Duraklat",#selector(togglePlay)));play.addItem(item("Sonraki",#selector(next)));play.addItem(item("Önceki",#selector(previous)));play.addItem(item("Tam Ekran",#selector(fullScreen),"f"));play.addItem(item("Mini Oynatıcı",#selector(mini),"i"));play.addItem(item("Kısayollar",#selector(shortcuts),"/"));let p=NSMenuItem(title:"Oynatma",action:nil,keyEquivalent:"");p.submenu=play;bar.addItem(p);NSApp.mainMenu=bar}
     @objc func about(){let a=NSAlert();a.messageText="MN Player " + (Bundle.main.object(forInfoDictionaryKey:"CFBundleShortVersionString") as? String ?? "Geliştirme");a.informativeText="Mavi Nokta Production\nVLC medya motoru\nLisanslar uygulama paketindeki Resources/Licenses klasöründedir.";a.beginSheetModal(for:window)}
+    @objc func repairMXFThumbnails() {
+        let panel = NSOpenPanel()
+        panel.title = "Finder’da küçük resmi görünmeyen bir MXF dosyası seç"
+        panel.prompt = "Onar ve kontrol et"
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.beginSheetModal(for: window) { [weak self] response in
+            guard response == .OK, let file = panel.url else { return }
+            guard file.pathExtension.lowercased() == "mxf" else {
+                self?.notify("MXF uzantılı bir dosya seç.")
+                return
+            }
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try FinderThumbnails.register(enable: true)
+                    let request = QLThumbnailGenerator.Request(fileAt: file, size: CGSize(width: 160, height: 160),
+                                                               scale: 2, representationTypes: .thumbnail)
+                    QLThumbnailGenerator.shared.generateBestRepresentation(for: request) { representation, error in
+                        let thumb = representation?.type == .thumbnail ? representation?.nsImage : nil
+                        DispatchQueue.main.async {
+                            self?.showThumbnailResult(file: file, image: thumb, error: error)
+                        }
+                    }
+                } catch {
+                    DispatchQueue.main.async { self?.showThumbnailResult(file: file, image: nil, error: error) }
+                }
+            }
+        }
+    }
+
+    private func showThumbnailResult(file: URL, image: NSImage?, error: Error?) {
+        let alert = NSAlert()
+        let type = (try? file.resourceValues(forKeys: [.contentTypeKey]))?.contentType?.identifier ?? "bilinmiyor"
+        if let image = image {
+            alert.messageText = "Mac bu dosya için küçük resim üretti."
+            alert.informativeText = file.lastPathComponent + "\nFinder’da klasörü yeniden aç."
+            let view = NSImageView(frame: NSRect(x: 0, y: 0, width: 240, height: 136))
+            view.imageScaling = .scaleProportionallyUpOrDown
+            view.image = image
+            alert.accessoryView = view
+        } else {
+            alert.messageText = "MXF küçük resmi oluşturulamadı."
+            alert.informativeText = [file.lastPathComponent, "Dosya türü: " + type,
+                ProcessInfo.processInfo.operatingSystemVersionString,
+                error.map { "\(($0 as NSError).domain) (\(($0 as NSError).code)) — " + $0.localizedDescription }
+                    ?? "Finder görüntü döndürmedi."].joined(separator: "\n")
+        }
+        alert.beginSheetModal(for: window)
+    }
     @objc func setDefaults(){Task { _ = await changeDefaults(restore:false) }}
     @objc func restoreDefaults(){Task { _ = await changeDefaults(restore:true) }}
     @MainActor func configureInstallation() async -> [String:Any] {
@@ -480,17 +581,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
             let task=Process();task.executableURL=URL(fileURLWithPath:registrar);task.arguments=["-f",path];task.standardOutput=FileHandle.nullDevice;task.standardError=FileHandle.nullDevice
             do{try task.run();task.waitUntilExit();registration[path]=task.terminationStatus}catch{registration[path] = -1}
         }
-        // Register for this login on installation, including upgrades over an existing copy.
-        let thumbnail = Bundle.main.bundleURL.appendingPathComponent("Contents/PlugIns/MXFFirstFrame.appex")
-        let pluginKit = Process()
-        pluginKit.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
-        pluginKit.arguments = ["-a", thumbnail.path]
         do {
-            try pluginKit.run()
-            pluginKit.waitUntilExit()
-            registration[thumbnail.path] = pluginKit.terminationStatus
+            try FinderThumbnails.register()
+            registration[FinderThumbnails.bundle.path] = 0
         } catch {
-            registration[thumbnail.path] = -1
+            registration[FinderThumbnails.bundle.path] = -1
         }
         NSUpdateDynamicServices()
         let defaults=await changeDefaults(restore:false,silent:true)

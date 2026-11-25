@@ -46,6 +46,23 @@ jobs:
           sh desktop/build.sh 2>&1 | tee out/build.log
           test -x "MN Player.app/Contents/MacOS/MNPlayer"
 
+      - name: Package
+        if: success()
+        shell: bash
+        run: |
+          set -e
+          V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" desktop/Info.plist)
+          W=work/installer
+          mkdir -p "$W/payload/Applications" "$W/scripts"
+          ditto "MN Player.app" "$W/payload/Applications/MN Player.app"
+          cp desktop/postinstall "$W/scripts/postinstall"; chmod 755 "$W/scripts/postinstall"
+          pkgbuild --analyze --root "$W/payload" "$W/components.plist"
+          i=0; while /usr/libexec/PlistBuddy -c "Print :$i:RootRelativeBundlePath" "$W/components.plist" >/dev/null 2>&1; do /usr/libexec/PlistBuddy -c "Set :$i:BundleIsRelocatable false" "$W/components.plist"; i=$((i+1)); done
+          pkgbuild --root "$W/payload" --component-plist "$W/components.plist" --scripts "$W/scripts" --identifier com.mavinokta.player.installer --version "$V" --install-location / "$W/MNPlayer-component.pkg"
+          productbuild --distribution desktop/Distribution.xml --package-path "$W" --resources desktop/installer-resources "out/MNPlayer-$V-AppleSilicon.pkg"
+          ditto -c -k --keepParent "MN Player.app" "out/MN-Player-$V-macOS.zip"
+          shasum -a 256 out/*.pkg out/*.zip > out/SHA256.txt
+
       - name: Test Finder MXF thumbnails
         if: steps.build.outcome == 'success'
         shell: bash
@@ -76,23 +93,6 @@ jobs:
           lipo -archs "$APP/Contents/MacOS/MNPlayer" > out/test/archs.txt
           plutil -lint "$APP/Contents/Info.plist" "$APP/Contents/Helpers/MN Finder.app/Contents/Info.plist" "$APP/Contents/Helpers/MN Preview.app/Contents/Info.plist" > out/test/plist-lint.txt 2>&1
           exit 0
-
-      - name: Package
-        if: success() && steps.build.outcome == 'success' && steps.test.outcome == 'success'
-        shell: bash
-        run: |
-          set -e
-          V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" desktop/Info.plist)
-          W=work/installer
-          mkdir -p "$W/payload/Applications" "$W/scripts"
-          ditto "MN Player.app" "$W/payload/Applications/MN Player.app"
-          cp desktop/postinstall "$W/scripts/postinstall"; chmod 755 "$W/scripts/postinstall"
-          pkgbuild --analyze --root "$W/payload" "$W/components.plist"
-          i=0; while /usr/libexec/PlistBuddy -c "Print :$i:RootRelativeBundlePath" "$W/components.plist" >/dev/null 2>&1; do /usr/libexec/PlistBuddy -c "Set :$i:BundleIsRelocatable false" "$W/components.plist"; i=$((i+1)); done
-          pkgbuild --root "$W/payload" --component-plist "$W/components.plist" --scripts "$W/scripts" --identifier com.mavinokta.player.installer --version "$V" --install-location / "$W/MNPlayer-component.pkg"
-          productbuild --distribution desktop/Distribution.xml --package-path "$W" --resources desktop/installer-resources "out/MNPlayer-$V-AppleSilicon.pkg"
-          ditto -c -k --keepParent "MN Player.app" "out/MN-Player-$V-macOS.zip"
-          shasum -a 256 out/*.pkg out/*.zip > out/SHA256.txt
 
       - name: Publish outputs
         if: success() && steps.build.outcome == 'success' && steps.test.outcome == 'success'
