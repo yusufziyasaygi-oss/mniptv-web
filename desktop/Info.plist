@@ -74,6 +74,7 @@
                                 <string>org.matroska.mkv</string>
                                 <string>org.videolan.divx</string>
                                 <string>org.videolan.mpeg-stream</string>
+                                <string>org.smpte.mxf</string>
                                 <string>org.videolan.mxf</string>
                                 <string>org.videolan.nsv</string>
                                 <string>org.videolan.vob</string>
@@ -151,7 +152,7 @@
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleShortVersionString</key>
-        <string>2.2.7</string>
+        <string>2.2.8</string>
         <key>CFBundleURLTypes</key>
         <array>
                 <dict>
@@ -166,7 +167,7 @@
                 </dict>
         </array>
         <key>CFBundleVersion</key>
-        <string>29</string>
+        <string>30</string>
         <key>LSMinimumSystemVersion</key>
         <string>13.0</string>
         <key>NSHighResolutionCapable</key>
