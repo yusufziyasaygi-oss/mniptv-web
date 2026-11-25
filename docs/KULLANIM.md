@@ -2,7 +2,7 @@
 
 ## Kurulum
 
-Başka bir Apple Silicon Mac'e kurmak için `MNPlayer-2.2.7-AppleSilicon.pkg` dosyasını açıp macOS kurulum adımlarını tamamla. macOS 13 ve üzeri gerekir. Yönetici yetkisiyle uygulama Uygulamalar klasörüne kurulur; oturum açmış kullanıcı için Control + M ve varsayılan video oynatıcısı otomatik ayarlanır. Başka kullanıcı hesapları ilk uygulama açılışında kendi ayarlarını tamamlar. Ayrı VLC kurulumu, terminal veya Klavye Ayarları gerekmez. Kurulum sonucu kullanıcı hesabındaki `~/Library/Application Support/MNPlayer/installation.json` dosyasına yazılır.
+Başka bir Apple Silicon Mac'e kurmak için `MNPlayer-2.2.8-AppleSilicon.pkg` dosyasını açıp macOS kurulum adımlarını tamamla. macOS 13 ve üzeri gerekir. Yönetici yetkisiyle uygulama Uygulamalar klasörüne kurulur; oturum açmış kullanıcı için Control + M ve varsayılan video oynatıcısı otomatik ayarlanır. Başka kullanıcı hesapları ilk uygulama açılışında kendi ayarlarını tamamlar. Ayrı VLC kurulumu, terminal veya Klavye Ayarları gerekmez. Kurulum sonucu kullanıcı hesabındaki `~/Library/Application Support/MNPlayer/installation.json` dosyasına yazılır.
 
 Paket yerel olarak hazırlanmıştır; Apple Developer ID ile imzalanmamış ve noter onayı almamıştır. Başka bilgisayarda macOS güvenlik onayı isteyebilir. Intel Mac ve Windows bu paketin hedefi değildir. Yeni/temiz bir Mac'teki kurulum henüz denenmedi; mevcut Mac'te otomatik ayar işlemi ve paket içeriği doğrulandı.
 
@@ -10,11 +10,11 @@ macOS 27 ve üzerinde kurulum Finder uzantılarını kaydeder. Oynatıcı ve kı
 
 ## Finder’da MXF küçük resimleri
 
-2.2.7 ile bir klasörü açtığında Finder, görüntü içeren desteklenen MXF dosyalarının ilk karesini simgede gösterir. Dosyayı seçmen veya bir tuşa basman gerekmez. İlk kare siyahsa küçük resim de siyahtır. Finder’da simge önizlemeleri kapalıysa klasörün Görüntü Seçenekleri’nden “Simge önizlemesini göster” seçeneğini aç. Yalnızca ses içeren MXF dosyalarında gösterilecek kare bulunmaz.
+2.2.8 ile bir klasörü açtığında Finder, görüntü içeren desteklenen MXF dosyalarının ilk karesini simgede gösterir. Dosyayı seçmen veya bir tuşa basman gerekmez. İlk kare siyahsa küçük resim de siyahtır. Finder’da simge önizlemeleri kapalıysa klasörün Görüntü Seçenekleri’nden “Simge önizlemesini göster” seçeneğini aç. Yalnızca ses içeren MXF dosyalarında gösterilecek kare bulunmaz.
 
 MXF simgesi boş kalırsa MN Player menüsünden **Finder’da MXF küçük resimlerini onar…** seçeneğini aç. Bir MXF seç. Uygulama uzantıyı kaydeder ve Mac’in o dosya için ürettiği küçük resmi veya hata nedenini gösterir.
 
-## Masaüstü — sürüm 2.2.7
+## Masaüstü — sürüm 2.2.8
 
 Bu bilgisayara `/Applications/MN Player.app` olarak kurulmuştur. Apple Silicon Mac üzerinde çalışır. VLC 3.0.24 motoru ve codec eklentileri uygulamanın içinde gelir; ayrı VLC kurulumu veya açık bir VLC penceresi gerekmez.
 
