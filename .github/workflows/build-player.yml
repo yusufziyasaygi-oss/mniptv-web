@@ -94,11 +94,54 @@ jobs:
           plutil -lint "$APP/Contents/Info.plist" "$APP/Contents/Helpers/MN Finder.app/Contents/Info.plist" "$APP/Contents/Helpers/MN Preview.app/Contents/Info.plist" > out/test/plist-lint.txt 2>&1
           exit 0
 
-      - name: Publish outputs
-        if: success() && steps.build.outcome == 'success' && steps.test.outcome == 'success'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-player-output
+          path: out/
+          retention-days: 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mxf-control
+          path: ${{ runner.temp }}/mxf-first-frame.MXF
+          retention-days: 2
+
+  verify-and-publish:
+    needs: build
+    runs-on: xcode-27
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: mac-player-output
+          path: out
+      - uses: actions/download-artifact@v4
+        with:
+          name: mxf-control
+          path: control
+      - name: Verify the packaged Finder extension on macOS 27
+        timeout-minutes: 5
         shell: bash
         run: |
-          echo "build=${{ steps.build.outcome }} test=${{ steps.test.outcome }}" > out/status.txt
+          set -euo pipefail
+          {
+            sw_vers
+            version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' desktop/Info.plist)
+            shasum -a 256 -c out/SHA256.txt
+            sudo installer -pkg "out/MNPlayer-$version-AppleSilicon.pkg" -target /
+            app="/Applications/MN Player.app"
+            codesign --verify --deep --strict "$app"
+            pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail
+            swiftc tests/mxf-thumbnail.swift -o "$RUNNER_TEMP/check"
+            "$RUNNER_TEMP/check" "$PWD/control/mxf-first-frame.MXF" red
+          } 2>&1 | tee out/test/mxf-macos27.txt
+      - name: Read Installer diagnostics on failure
+        if: failure()
+        run: sudo tail -90 /var/log/install.log
+      - name: Publish outputs
+        shell: bash
+        run: |
+          echo "build=success test=success macos27=success" > out/status.txt
           echo "${GITHUB_SHA}" > out/source_sha.txt
           cd out
           git init -q

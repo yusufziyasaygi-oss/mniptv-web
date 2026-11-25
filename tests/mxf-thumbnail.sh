@@ -49,3 +49,5 @@ ffmpeg -nostdin -loglevel error -f lavfi -i color=red:s=3840x2160:r=50 \
     -c:v libx264 -threads 2 -pix_fmt yuv422p10le -g 1 -preset ultrafast -c:a pcm_s24le -t 0.08 -f mxf "$camera"
 ffprobe -v error -select_streams v:0 -show_entries stream=profile,width,height,pix_fmt,r_frame_rate -of csv "$camera"
 "$work/check" "$camera" red
+
+if [ -n "${RUNNER_TEMP:-}" ]; then cp "$camera" "$RUNNER_TEMP/mxf-first-frame.MXF"; fi

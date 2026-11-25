@@ -10,9 +10,9 @@ private enum FinderThumbnails {
     static var build: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "" }
     static let lastRegistration = "finderThumbnailRegisteredBuild"
 
-    static func run(_ arguments: [String]) throws -> String {
+    static func run(_ arguments: [String], executable: String = "/usr/bin/pluginkit") throws -> String {
         let process = Process(), pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
+        process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
         process.standardOutput = pipe
         process.standardError = pipe
@@ -31,6 +31,10 @@ private enum FinderThumbnails {
         guard FileManager.default.fileExists(atPath: bundle.path) else {
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError,
                           userInfo: [NSLocalizedDescriptionKey: "Kurulu uygulamada MXF uzantısı eksik. Kurulum paketini yeniden aç."])
+        }
+        if enable {
+            let registrar = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+            _ = try run(["-f", Bundle.main.bundleURL.path], executable: registrar)
         }
         _ = try run(["-a", bundle.path])
         if enable { _ = try run(["-e", "use", "-i", identifier]) }

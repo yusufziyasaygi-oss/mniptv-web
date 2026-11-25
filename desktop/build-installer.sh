@@ -12,5 +12,5 @@ while /usr/libexec/PlistBuddy -c "Print :$component_index:RootRelativeBundlePath
     /usr/libexec/PlistBuddy -c "Set :$component_index:BundleIsRelocatable false" "$BUILD/components.plist"
     component_index=$((component_index + 1))
 done
-pkgbuild --root "$BUILD/payload" --component-plist "$BUILD/components.plist" --scripts "$BUILD/scripts" --identifier com.mavinokta.player.installer --version 2.2.6 --install-location / "$BUILD/MNPlayer-component.pkg"
-productbuild --distribution "$BASE/desktop/Distribution.xml" --package-path "$BUILD" --resources "$BASE/desktop/installer-resources" "$BASE/../MNPlayer-2.2.6-AppleSilicon.pkg"
+pkgbuild --root "$BUILD/payload" --component-plist "$BUILD/components.plist" --scripts "$BUILD/scripts" --identifier com.mavinokta.player.installer --version 2.2.7 --install-location / "$BUILD/MNPlayer-component.pkg"
+productbuild --distribution "$BASE/desktop/Distribution.xml" --package-path "$BUILD" --resources "$BASE/desktop/installer-resources" "$BASE/../MNPlayer-2.2.7-AppleSilicon.pkg"

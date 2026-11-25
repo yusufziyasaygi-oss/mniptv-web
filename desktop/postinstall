@@ -4,6 +4,21 @@ set -eu
 console_user=$(/usr/bin/stat -f '%Su' /dev/console)
 case "$console_user" in root|loginwindow|'') exit 0 ;; esac
 console_uid=$(/usr/bin/id -u "$console_user")
+app='/Applications/MN Player.app'
+# On macOS 27 the Installer session can stall while Launch Services changes
+# the default player. Register Finder providers here; finish user preferences
+# from the normal application session on first launch.
+if [ "$(/usr/bin/sw_vers -productVersion | /usr/bin/cut -d. -f1)" -ge 27 ]; then
+    as_console_user() {
+        /bin/launchctl asuser "$console_uid" /usr/bin/sudo -n -H -u "$console_user" "$@"
+    }
+    registrar='/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
+    as_console_user "$registrar" -f "$app" "$app/Contents/Helpers/MN Finder.app" ||
+        echo 'Finder kaydı uygulama açıldığında yeniden denenecek.'
+    as_console_user /usr/bin/pluginkit -a "$app/Contents/PlugIns/MXFFirstFrame.appex" ||
+        echo 'MXF uzantısı uygulama açıldığında yeniden kaydedilecek.'
+    exit 0
+fi
 player='/Applications/MN Player.app/Contents/MacOS/MNPlayer'
 if ! /bin/launchctl asuser "$console_uid" /usr/bin/sudo -H -u "$console_user" "$player" --configure-install; then
     echo 'Kullanıcı ayarları uygulamanın ilk açılışında yeniden tamamlanacak.'
