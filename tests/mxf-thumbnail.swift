@@ -20,7 +20,11 @@ generator.generateBestRepresentation(for: request) { result, error in
         ? color.redComponent > 0.7 && color.greenComponent < 0.3 && color.blueComponent < 0.3
         : color.blueComponent > 0.7 && color.greenComponent < 0.3 && color.redComponent < 0.3
     print("\(url.lastPathComponent): \(image.pixelsWide)x\(image.pixelsHigh), center \(color)")
-    if !matches { exit(1) }
+    if !matches {
+        let file = url.deletingPathExtension().appendingPathExtension("png")
+        try? image.representation(using: .png, properties: [:])?.write(to: file)
+        exit(1)
+    }
     exit(0)
 }
 DispatchQueue.main.asyncAfter(deadline: .now() + 30) {

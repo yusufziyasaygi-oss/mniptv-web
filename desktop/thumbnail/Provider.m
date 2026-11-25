@@ -1,5 +1,6 @@
 #import <QuickLookThumbnailing/QuickLookThumbnailing.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <ImageIO/ImageIO.h>
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/imgutils.h>
@@ -101,6 +102,31 @@ done:
     return image;
 }
 
+// Quick Look consumes a file reply after the handler returns. Give concurrent
+// requests separate files and clear older replies when the extension is reused.
+static NSURL *replyDirectory(void) {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSURL *directory = [manager.temporaryDirectory URLByAppendingPathComponent:@"MXFReplies" isDirectory:YES];
+    if (![manager createDirectoryAtURL:directory withIntermediateDirectories:YES attributes:nil error:nil]) return nil;
+    static NSTimeInterval nextCleanup;
+    @synchronized (manager) {
+        NSTimeInterval now = NSDate.timeIntervalSinceReferenceDate;
+        if (now >= nextCleanup) {
+            nextCleanup = now + 3600;
+            NSArray *files = [manager contentsOfDirectoryAtURL:directory
+                includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:0 error:nil];
+            for (NSURL *file in files) {
+                NSDate *date = nil;
+                if ([file getResourceValue:&date forKey:NSURLContentModificationDateKey error:nil] &&
+                    date && date.timeIntervalSinceReferenceDate < now - 3600) {
+                    [manager removeItemAtURL:file error:nil];
+                }
+            }
+        }
+    }
+    return directory;
+}
+
 @interface MNMXFThumbnailProvider : QLThumbnailProvider
 @end
 
@@ -119,14 +145,23 @@ done:
         handler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:nil]);
         return;
     }
-    // Keep the pixel data alive until Quick Look executes the reply's drawing block.
-    id retainedImage = CFBridgingRelease(image);
-    CGSize size = CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image));
-    CGFloat factor = fmin(maximum.width / size.width, maximum.height / size.height);
-    CGRect bounds = CGRectMake(0, 0, size.width * factor, size.height * factor);
-    handler([QLThumbnailReply replyWithContextSize:bounds.size drawingBlock:^BOOL(CGContextRef context) {
-        CGContextDrawImage(context, bounds, (__bridge CGImageRef)retainedImage);
-        return YES;
-    }], nil);
+    NSURL *directory = replyDirectory();
+    NSString *name = [NSUUID.UUID.UUIDString stringByAppendingPathExtension:@"png"];
+    NSURL *file = [directory URLByAppendingPathComponent:name];
+    CGImageDestinationRef destination = file ? CGImageDestinationCreateWithURL(
+        (__bridge CFURLRef)file, CFSTR("public.png"), 1, NULL) : NULL;
+    BOOL written = NO;
+    if (destination) {
+        CGImageDestinationAddImage(destination, image, NULL);
+        written = CGImageDestinationFinalize(destination);
+        CFRelease(destination);
+    }
+    CGImageRelease(image);
+    if (!written) {
+        if (file) [NSFileManager.defaultManager removeItemAtURL:file error:nil];
+        handler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil]);
+        return;
+    }
+    handler([QLThumbnailReply replyWithImageFileURL:file], nil);
 }
 @end

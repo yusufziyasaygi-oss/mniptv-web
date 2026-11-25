@@ -39,7 +39,7 @@ printf 'FFmpeg %s, source: https://ffmpeg.org/releases/%s\n' "$version" "$archiv
 cp "$base/desktop/thumbnail/Info.plist" "$extension/Contents/Info.plist"
 clang -arch arm64 -fobjc-arc -fapplication-extension -O2 \
     -I"$prefix/include" -L"$prefix/lib" -lavformat -lavcodec -lavutil -lswscale \
-    -framework Foundation -framework CoreGraphics -framework QuickLookThumbnailing \
+    -framework Foundation -framework CoreGraphics -framework ImageIO -framework QuickLookThumbnailing \
     -Wl,-e,_NSExtensionMain -Wl,-rpath,@executable_path/../Frameworks \
     "$base/desktop/thumbnail/Provider.m" -o "$extension/Contents/MacOS/MXFFirstFrame"
 codesign --force --sign - --entitlements "$base/desktop/thumbnail/Entitlements.plist" "$extension"

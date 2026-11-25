@@ -21,5 +21,14 @@ for color in red blue; do
         -f lavfi -i "color=green:s=640x360:r=25" \
         -filter_complex '[0:v]trim=end_frame=1[a];[1:v]trim=end_frame=24[b];[a][b]concat=n=2:v=1:a=0' \
         -c:v mpeg2video -threads 1 -bf 2 -f mxf "$clip"
-    "$work/check" "$clip" "$color"
+    if ! "$work/check" "$clip" "$color"; then
+        mdls -name kMDItemContentType "$clip" || true
+        for png in "${clip%.*}.png" "$HOME"/Library/Containers/com.mavinokta.player.mxf-thumbnail/Data/tmp/MXFReplies/*.png; do
+            if [ -f "$png" ]; then
+                echo "Average RGB and alpha in $png"
+                ffmpeg -v error -i "$png" -vf scale=1:1 -frames:v 1 -pix_fmt rgba -f rawvideo - | od -An -tu1
+            fi
+        done
+        exit 1
+    fi
 done
