@@ -133,6 +133,7 @@ static NSURL *replyDirectory(void) {
 @implementation MNMXFThumbnailProvider
 - (void)provideThumbnailForFileRequest:(QLFileThumbnailRequest *)request
                      completionHandler:(void (^)(QLThumbnailReply *, NSError *))handler {
+    NSLog(@"MNMXFThumbnailProvider: request received");
     CGSize maximum = request.maximumSize;
     CGSize pixels = CGSizeMake(fmin(1536, maximum.width * request.scale),
                                fmin(1536, maximum.height * request.scale));
@@ -142,6 +143,7 @@ static NSURL *replyDirectory(void) {
         image = firstImage(request.fileURL, pixels);
     }
     if (!image) {
+        NSLog(@"MNMXFThumbnailProvider: first frame unavailable");
         handler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:nil]);
         return;
     }
@@ -162,6 +164,7 @@ static NSURL *replyDirectory(void) {
         handler(nil, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil]);
         return;
     }
+    NSLog(@"MNMXFThumbnailProvider: first frame generated");
     handler([QLThumbnailReply replyWithImageFileURL:file], nil);
 }
 @end
