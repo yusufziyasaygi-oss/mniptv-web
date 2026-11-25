@@ -40,7 +40,6 @@ jobs:
 
       - name: Build app
         id: build
-        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
@@ -50,7 +49,6 @@ jobs:
       - name: Test
         id: test
         if: steps.build.outcome == 'success'
-        continue-on-error: true
         shell: bash
         run: |
           set +e
@@ -71,9 +69,15 @@ jobs:
           plutil -lint "$APP/Contents/Info.plist" "$APP/Contents/Helpers/MN Finder.app/Contents/Info.plist" "$APP/Contents/Helpers/MN Preview.app/Contents/Info.plist" > out/test/plist-lint.txt 2>&1
           exit 0
 
-      - name: Package
+      - name: Test Finder MXF thumbnails
         if: steps.build.outcome == 'success'
-        continue-on-error: true
+        shell: bash
+        run: |
+          set -eo pipefail
+          bash tests/mxf-thumbnail.sh 2>&1 | tee out/test/mxf-thumbnails.txt
+
+      - name: Package
+        if: success() && steps.build.outcome == 'success' && steps.test.outcome == 'success'
         shell: bash
         run: |
           set -e
@@ -90,7 +94,7 @@ jobs:
           shasum -a 256 out/*.pkg out/*.zip > out/SHA256.txt
 
       - name: Publish outputs
-        if: always()
+        if: success() && steps.build.outcome == 'success' && steps.test.outcome == 'success'
         shell: bash
         run: |
           echo "build=${{ steps.build.outcome }} test=${{ steps.test.outcome }}" > out/status.txt

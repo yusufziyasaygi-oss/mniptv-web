@@ -10,3 +10,5 @@ Yerel macOS oynatıcı (LibVLC). Kaynak: Drive hafıza modülü 01 (MN Player 2.
 2.2.3: Finder önizlemesi açıkken ana oynatıcı duraklar, Esc sonrası önizleme süreci 10 dk hazır bekler (sonraki Control+M anında açılır).
 
 Not: Asıl `MNPlayer.icns` kayıtta yoktu; `assets/icon-1024.png` geçici ikondur.
+
+2.2.5: Finder, simge önizlemeleri açık olan klasörlerde MXF videolarını ilk kareleriyle gösterir. Kurulum paketi küçük resim uzantısını ve görüntüyü okuyan kitaplıkları içerir.
