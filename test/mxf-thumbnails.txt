@@ -1,0 +1,24 @@
+/var/folders/9d/l02zfgrs7c16twd3wbpdmhkc0000gn/T/tmp.oHUWkGZvEV/previous.pkg: OK
+installer: Package name is MN Player
+installer: Installing at base path /
+installer: The install was successful.
+installer: Package name is MN Player
+installer: Upgrading at base path /
+installer: The upgrade was successful.
+     com.mavinokta.player.mxf-thumbnail(2.2.8)
+	            Path = /Applications/MN Player.app/Contents/PlugIns/MXFFirstFrame.appex
+	            UUID = DD64E45A-9183-480F-ADD8-EF4DF6C13DF5
+	       Timestamp = 2026-11-25 09:58:56 +0000
+	             SDK = com.apple.quicklook.thumbnail
+	   Parent Bundle = /Applications/MN Player.app
+	    Display Name = MN Player MXF
+	      Short Name = MN Player MXF
+	     Parent Name = MN Player
+	        Platform = macOS
+
+ (1 plug-in)
+	            Path = /Applications/MN Player.app/Contents/PlugIns/MXFFirstFrame.appex
+Çekim red.MXF: 320x180, center sRGB IEC61966-2.1 colorspace 1 0.147297 0 1
+Çekim blue.MXF: 320x180, center sRGB IEC61966-2.1 colorspace 0.0166049 0.19685 0.995184 1
+stream,High 4:2:2 Intra,3840,2160,yuv422p10le,50/1
+camera.MXF: 320x180, center sRGB IEC61966-2.1 colorspace 1 0.196022 0 1

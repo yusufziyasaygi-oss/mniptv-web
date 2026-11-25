@@ -1,0 +1,3 @@
+MN Player.app/Contents/Info.plist: OK
+MN Player.app/Contents/Helpers/MN Finder.app/Contents/Info.plist: OK
+MN Player.app/Contents/Helpers/MN Preview.app/Contents/Info.plist: OK

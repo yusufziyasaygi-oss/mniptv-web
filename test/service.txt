@@ -1,0 +1,3 @@
+NSPerformService=true
+13176 /Applications/MN Player.app/Contents/Helpers/MN Finder.app/Contents/MacOS/MNFinder
+e-mpeg2.ts

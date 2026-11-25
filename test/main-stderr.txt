@@ -1,0 +1,4 @@
+IOServiceMatchingfailed for: AppleM2ScalerParavirtDriver
+AWAKE_ON
+MAIN_PAUSED_FOR_PREVIEW
+AWAKE_OFF

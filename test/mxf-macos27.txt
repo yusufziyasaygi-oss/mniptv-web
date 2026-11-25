@@ -1,0 +1,22 @@
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+out/MNPlayer-2.2.8-AppleSilicon.pkg: OK
+out/MN-Player-2.2.8-macOS.zip: OK
+installer: Package name is MN Player
+installer: Installing at base path /
+installer: The install was successful.
+     com.mavinokta.player.mxf-thumbnail(2.2.8)
+	            Path = /Applications/MN Player.app/Contents/PlugIns/MXFFirstFrame.appex
+	            UUID = A480FCF9-B906-46D8-8D75-29713495BA9B
+	       Timestamp = 2026-11-25 10:01:59 +0000
+	             SDK = com.apple.quicklook.thumbnail
+	   Parent Bundle = /Applications/MN Player.app
+	    Display Name = MN Player MXF
+	      Short Name = MN Player MXF
+	     Parent Name = MN Player
+	        Platform = macOS
+
+ (1 plug-in)
+    org.smpte.mxf
+mxf-first-frame.MXF: 320x180, center sRGB IEC61966-2.1 colorspace hdrm(1) 1 0.196022 0 1

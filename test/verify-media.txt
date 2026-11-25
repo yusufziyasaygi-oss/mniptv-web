@@ -1,0 +1,9 @@
+IOServiceMatchingfailed for: AppleM2ScalerParavirtDriver
+ENGINE_START 2754ms
+PASS a-yatay.mp4 1280x720 287ms
+PASS b-dikey.mov 1080x1920 484ms
+PASS c-hevc.mkv 1920x1080 501ms
+PASS d-vp9.webm 640x360 267ms
+PASS e-mpeg2.ts 720x576 272ms
+PASS f-xvid.avi 640x480 295ms
+exit=0
