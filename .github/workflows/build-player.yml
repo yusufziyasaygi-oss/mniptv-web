@@ -132,6 +132,7 @@ jobs:
             app="/Applications/MN Player.app"
             codesign --verify --deep --strict "$app"
             pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail
+            /usr/libexec/PlistBuddy -c "Print :CFBundleDocumentTypes:0:LSItemContentTypes" "$app/Contents/Info.plist" | grep -F "org.smpte.mxf"
             swiftc tests/mxf-thumbnail.swift -o "$RUNNER_TEMP/check"
             "$RUNNER_TEMP/check" "$PWD/control/mxf-first-frame.MXF" red
           } 2>&1 | tee out/test/mxf-macos27.txt
