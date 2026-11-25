@@ -1,0 +1,32 @@
+name: Verify shipped MXF thumbnail provider on macOS 27
+on:
+  push:
+    branches: [test/mxf-macos27]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: xcode-27
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify published installer on current macOS
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers
+          curl -fsSL --retry 3 https://raw.githubusercontent.com/yusufziyasaygi-oss/mniptv-web/b07beb5ad2306addff068d8348dacf4b1a65425d/MNPlayer-2.2.6-AppleSilicon.pkg -o "$RUNNER_TEMP/player.pkg"
+          echo "242d07e93ded73b1b153fcffbbc6baf9d40d43ba99bc9ed3c5a8b051fef4f7c1  $RUNNER_TEMP/player.pkg" | shasum -a 256 -c -
+          sudo installer -pkg "$RUNNER_TEMP/player.pkg" -target /
+          pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail
+          codesign --verify --deep --strict '/Applications/MN Player.app'
+          swiftc tests/mxf-thumbnail.swift -o "$RUNNER_TEMP/check"
+          brew list --versions ffmpeg >/dev/null || brew install ffmpeg
+          mkdir -p "$HOME/Downloads"
+          camera="$HOME/Downloads/MN-camera-test.MXF"
+          ffmpeg -nostdin -loglevel error -f lavfi -i color=red:s=3840x2160:r=50 -f lavfi -i color=green:s=3840x2160:r=50 -f lavfi -i anullsrc=r=48000:cl=mono -filter_complex '[0:v]trim=end_frame=1[a];[1:v]trim=end_frame=3[b];[a][b]concat=n=2:v=1:a=0[v]' -map '[v]' -map 2:a -map 2:a -map 2:a -map 2:a -map 2:a -map 2:a -map 2:a -map 2:a -c:v libx264 -threads 2 -pix_fmt yuv422p10le -g 1 -preset ultrafast -c:a pcm_s24le -t 0.08 -f mxf "$camera"
+          "$RUNNER_TEMP/check" "$camera" red
+      - name: Read extension failures
+        if: failure()
+        run: |
+          /usr/bin/log show --last 3m --style compact --predicate 'eventMessage CONTAINS[c] "MXFFirstFrame" OR eventMessage CONTAINS[c] "com.mavinokta.player.mxf-thumbnail"' | tail -100
