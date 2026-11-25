@@ -1,19 +1,20 @@
 #!/bin/bash
 set -euo pipefail
-app="$PWD/MN Player.app"
+app="/Applications/MN Player.app"
+ditto "$PWD/MN Player.app" "$app"
 ext="$app/Contents/PlugIns/MXFFirstFrame.appex"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 codesign --verify --strict "$ext"
-lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
-"$lsregister" -f "$app"
-# Installation registers the containing app. Wait for automatic discovery,
-# without explicitly registering or enabling the extension in the test.
+# Exercise the same per-user registration as the installer's postinstall script.
+"$app/Contents/MacOS/MNPlayer" --configure-install
 for attempt in {1..30}; do
     if pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail | grep -F "$ext" >/dev/null; then break; fi
     sleep 1
 done
-pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail | grep -F "$ext"
+plugins=$(pluginkit -mAvv -i com.mavinokta.player.mxf-thumbnail)
+echo "$plugins"
+grep -F "$ext" <<< "$plugins"
 swiftc tests/mxf-thumbnail.swift -o "$work/check"
 for color in red blue; do
     clip="$work/Çekim $color.MXF"

@@ -480,6 +480,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSTa
             let task=Process();task.executableURL=URL(fileURLWithPath:registrar);task.arguments=["-f",path];task.standardOutput=FileHandle.nullDevice;task.standardError=FileHandle.nullDevice
             do{try task.run();task.waitUntilExit();registration[path]=task.terminationStatus}catch{registration[path] = -1}
         }
+        // Register for this login on installation, including upgrades over an existing copy.
+        let thumbnail = Bundle.main.bundleURL.appendingPathComponent("Contents/PlugIns/MXFFirstFrame.appex")
+        let pluginKit = Process()
+        pluginKit.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
+        pluginKit.arguments = ["-a", thumbnail.path]
+        do {
+            try pluginKit.run()
+            pluginKit.waitUntilExit()
+            registration[thumbnail.path] = pluginKit.terminationStatus
+        } catch {
+            registration[thumbnail.path] = -1
+        }
         NSUpdateDynamicServices()
         let defaults=await changeDefaults(restore:false,silent:true)
         let success=synced && verified && registration.values.allSatisfy{$0==0} && !defaults.isEmpty && defaults.allSatisfy{$0["result"]=="OK"}
